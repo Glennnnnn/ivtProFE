@@ -1,15 +1,19 @@
 import { Card, Form, Input, Button, Checkbox } from 'antd'
 import logo from '@/assets/logo.png'
 import './index.scss'
-import { useStore } from '@/store'
+import { useIvt } from '@/ivtFunc'
 
 const Login = () => {
-  const { loginStore } = useStore();
-  const onFinish = values => {
-    loginStore.login({
-      username: values.username,
-      password: values.password
-    })
+
+  //解构 但到实例对象为止
+  const { loginIvt } = useIvt();
+  const onFinish = async (values) => {
+    const { mobile, code } = values
+    try {
+      await loginIvt.login({ mobile, code })
+    } catch (e) {
+      console.log(e.response?.data?.message || '登录失败')
+    }
   }
 
   return (
