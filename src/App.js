@@ -1,23 +1,33 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Login from './pages/Login/index.js'
-import Layout from './pages/Layout/index.js'
+import LoginPage from './pages/LoginPage/index.js'
 
-import { Button } from 'antd'
+import NavigationFrame from './pages/NavigationFrame/index.js'
+
+import HomePage from "./pages/HomePage/index.js";
+import IvtListPage from "./pages/IvtListPage/index.js";
+import RecordPage from "./pages/RecordPage/index.js";
+//import { Button } from 'antd'
 import Test01 from "./testClass/test01.js";
 import { AuthComponent } from "./components/AuthComponent.js";
+
+import './App.css';
 
 function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <Button type="primary">Primary Button</Button>
         <Routes>
           <Route path="/" element={
-            <AuthComponent><Layout /></AuthComponent>
-          }></Route>
-          <Route path="/login" element={<Login />}></Route>
+            <AuthComponent><NavigationFrame /></AuthComponent>
+          }>
+            <Route index element={<HomePage />}></Route>
+            <Route path="/ivtlist" element={<IvtListPage />}></Route>
+            <Route path="/record" element={<RecordPage />}></Route>
+          </Route>
           <Route path="/test01" element={<Test01 />}></Route>
+          {/* login Page */}
+          <Route path="/login" element={<LoginPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>

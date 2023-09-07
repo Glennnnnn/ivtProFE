@@ -23,5 +23,14 @@ class LoginIvt {
     //console.log(res.data)
     console.log('aaa' + getToken())
   }
+
+  logout = async () => {
+    const res = await http.post('/user/logout', {
+      token: this.token
+    })
+    this.result = res.data.code
+    this.token = ''
+    //console.log(res.data)
+  }
 }
 export default LoginIvt

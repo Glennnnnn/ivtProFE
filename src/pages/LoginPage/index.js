@@ -3,14 +3,14 @@ import logo from '@/assets/logo.png'
 import './index.scss'
 import { useIvt } from '@/ivtFunc'
 
-const Login = () => {
+const LoginPage = () => {
 
   //解构 但到实例对象为止
   const { loginIvt } = useIvt();
   const onFinish = async (values) => {
-    const { mobile, code } = values
+    const { username, password } = values
     try {
-      await loginIvt.login({ mobile, code })
+      await loginIvt.login({ username, password })
     } catch (e) {
       console.log(e.response?.data?.message || '登录失败')
     }
@@ -89,4 +89,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage
