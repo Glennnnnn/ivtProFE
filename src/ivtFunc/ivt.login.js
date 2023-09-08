@@ -2,6 +2,7 @@
 import { makeAutoObservable } from "mobx"
 //import axios from "axios"
 import { getToken, http, setToken } from '@/utils'
+import { history } from "@/utils/historyPlugin"
 
 class LoginIvt {
   result = ''
@@ -17,9 +18,12 @@ class LoginIvt {
       username,
       password
     })
-    this.token = res.data.data.token
-    this.result = res.data.code
-    setToken(this.token)
+    if (res.data.code === 200) {
+      this.token = res.data.data.token
+      this.result = res.data.code
+      setToken(this.token)
+      history.push('/')
+    }
     //console.log(res.data)
     console.log('aaa' + getToken())
   }
@@ -30,6 +34,7 @@ class LoginIvt {
     })
     this.result = res.data.code
     this.token = ''
+    setToken(this.token)
     //console.log(res.data)
   }
 }

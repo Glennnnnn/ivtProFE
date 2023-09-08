@@ -1,6 +1,67 @@
+import { Select } from "antd";
+import React from "react";
+import "./index.scss"
+
 function IvtListPage() {
+
+  const onChange = (value) => {
+    console.log(`selected ${value}`);
+  };
+  const onSearch = (value) => {
+    console.log('search:', value);
+  };
+
+  // Filter `option.label` match the user type `input`
+  const filterOption = (input, option) =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
   return (
-    <div>IvtList</div>
+    <>
+      <Select
+        showSearch
+        placeholder="Select a person"
+        optionFilterProp="children"
+        onChange={onChange}
+        onSearch={onSearch}
+        filterOption={filterOption}
+        options={[
+          {
+            value: 'jack',
+            label: 'Jack',
+          },
+          {
+            value: 'lucy',
+            label: 'Lucy',
+          },
+          {
+            value: 'tom',
+            label: 'Tom',
+          },
+        ]}
+      />
+      <Select
+        showSearch
+        placeholder="Select a person"
+        optionFilterProp="children"
+        onChange={onChange}
+        onSearch={onSearch}
+        filterOption={filterOption}
+        options={[
+          {
+            value: 'jack',
+            label: 'Jack',
+          },
+          {
+            value: 'lucy',
+            label: 'Lucy',
+          },
+          {
+            value: 'tom',
+            label: 'Tom',
+          },
+        ]}
+      />
+    </>
   )
 }
 

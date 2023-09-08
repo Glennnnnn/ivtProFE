@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import LoginPage from './pages/LoginPage/index.js'
 
@@ -7,15 +7,19 @@ import NavigationFrame from './pages/NavigationFrame/index.js'
 import HomePage from "./pages/HomePage/index.js";
 import IvtListPage from "./pages/IvtListPage/index.js";
 import RecordPage from "./pages/RecordPage/index.js";
-//import { Button } from 'antd'
+//test
 import Test01 from "./testClass/test01.js";
+//components
 import { AuthComponent } from "./components/AuthComponent.js";
+//import { LoginJumpComp } from "./components/LoginJumpComp.js";
 
+import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
+import { history } from "./utils/historyPlugin.js";
 import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
+    <HistoryRouter history={history}>
       <div className="App">
         <Routes>
           <Route path="/" element={
@@ -30,7 +34,7 @@ function App() {
           <Route path="/login" element={<LoginPage />}></Route>
         </Routes>
       </div>
-    </BrowserRouter>
+    </HistoryRouter>
   );
 }
 

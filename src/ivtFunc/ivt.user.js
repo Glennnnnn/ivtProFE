@@ -1,5 +1,5 @@
 import { http } from "@/utils"
-import { makeAutoObservable } from "mobx"
+import { makeAutoObservable, runInAction } from "mobx"
 
 class IvtUser {
   userInfo = {}
@@ -9,7 +9,14 @@ class IvtUser {
 
   getUserInfo = async () => {
     const res = await http.get("/checkUser/queryBasicUserInfoByToken")
-    this.userInfo = res.data.data
+    runInAction(() => {
+      this.userInfo = res.data.data
+    })
+  }
+
+  checkUserToken = async () => {
+    const res = await http.get("/checkUser/checkUserByToken")
+    return res.data.msg
   }
 }
 
