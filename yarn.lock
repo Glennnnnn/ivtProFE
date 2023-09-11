@@ -1219,7 +1219,7 @@
 
 "@craco/craco@^7.1.0":
   version "7.1.0"
-  resolved "https://registry.npmjs.org/@craco/craco/-/craco-7.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/@craco/craco/-/craco-7.1.0.tgz#12bd394c7f0334e214302e4d35a1768f68042fbb"
   integrity sha512-oRAcPIKYrfPXp9rSzlsDNeOaVtDiKhoyqSXUoqiK24jCkHr4T8m/a2f74yXIzCbIheoUWDOIfWZyRgFgT+cpqA==
   dependencies:
     autoprefixer "^10.4.12"
@@ -8882,7 +8882,7 @@ sass-loader@^12.3.0:
 
 sass@^1.66.1:
   version "1.66.1"
-  resolved "https://registry.npmjs.org/sass/-/sass-1.66.1.tgz"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.66.1.tgz#04b51c4671e4650aa393740e66a4e58b44d055b1"
   integrity sha512-50c+zTsZOJVgFfTgwwEzkjA3/QACgdNsKueWPyAR0mRINIvLAStVQBbPg14iuqEQ74NPDbXzJARJ/O4SI1zftA==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
