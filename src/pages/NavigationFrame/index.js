@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 import './index.scss'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useIvt } from '@/ivtFunc'
+import { useIvt } from '@/store'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 const { Header, Sider } = Layout

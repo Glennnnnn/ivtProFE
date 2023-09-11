@@ -1,7 +1,7 @@
 import { Card, Form, Input, Button, Checkbox } from 'antd'
 import logo from '@/assets/logo.png'
 import './index.scss'
-import { useIvt } from '@/ivtFunc'
+import { useIvt } from '@/store'
 
 const LoginPage = () => {
 

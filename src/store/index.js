@@ -1,5 +1,5 @@
 import React from "react"
-import Loginvt from '@/ivtFunc/ivt.login'
+import Loginvt from '@/store/ivt.login'
 import IvtUser from "./ivt.user"
 
 class RootIvt {

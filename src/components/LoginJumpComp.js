@@ -1,5 +1,5 @@
 import { history } from "@/utils/historyPlugin"
-import { useIvt } from '@/ivtFunc'
+import { useIvt } from '@/store'
 import { getToken } from "@/utils"
 
 function LoginJumpComp({ children }) {
