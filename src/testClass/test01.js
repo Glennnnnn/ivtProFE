@@ -1,3 +1,4 @@
+import { http } from "@/utils"
 import React from "react"
 
 function ComSon1(props) {
@@ -55,6 +56,9 @@ class Test01 extends React.Component {
       <div>
         <ComSon1 msg={this.state.message} />
         <ComSon2 changFun={this.changeState} />
+        <button onClick={() => {
+          http.get("/print")
+        }}>this is a href button</button>
       </div >
 
     )

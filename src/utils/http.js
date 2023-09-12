@@ -5,7 +5,7 @@ import { history } from './historyPlugin'
 
 const http = axios.create({
   baseURL: '/api',
-  timeout: 500000
+  timeout: 5000
 })
 // 添加请求拦截器
 http.interceptors.request.use((config) => {
