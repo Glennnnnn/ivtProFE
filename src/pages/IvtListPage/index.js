@@ -4,57 +4,74 @@ import "./index.scss"
 import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space } from "antd";
 //import { Link } from "react-router-dom";
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import img404 from '@/assets/error.png'
+//import img404 from '@/assets/error.png'
+
 import { http } from "@/utils";
 
 function IvtListPage() {
   //const options = []
-  const [tags, setTags] = useState([])
+  const [searchTags, setSearchTags] = useState([])
+  const [ivtResults, setIvtResults] = useState([])
   useEffect(() => {
     const queryTags = async () => {
       const res = await http.get("/queryTag/querySearchInfo")
-      setTags(res.data.data)
+      setSearchTags(res.data.data)
     }
     queryTags()
   }, [])
 
+  useEffect(() => {
+    const queryResults = async () => {
+      const res = await http.post("/ivt/queryAllIvtInfo")
+      setIvtResults(res.data)
+
+    }
+    queryResults()
+
+  }, [])
+
   const columns = [
+    // {
+    //   title: 'image',
+    //   dataIndex: 'cover',
+    //   width: 120,
+    //   render: cover => {
+    //     return <img src={cover || img404} width={80} height={60} alt="" />
+    //   }
+    // },
     {
-      title: '封面',
-      dataIndex: 'cover',
-      width: 120,
-      render: cover => {
-        return <img src={cover || img404} width={80} height={60} alt="" />
-      }
-    },
-    {
-      title: '标题',
-      dataIndex: 'title',
+      title: 'Name',
+      dataIndex: 'ivtName',
       width: 220
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      render: data => <Tag color="green">审核通过</Tag>
+      title: 'Quantity',
+      dataIndex: 'ivtQty',
+      //render: data => <Tag color="green">审核通过</Tag>
     },
     {
-      title: '发布时间',
-      dataIndex: 'pubdate'
+      title: 'Tags',
+      dataIndex: 'tags',
+      render: (tags) => (
+        <span>
+          {tags.map((tag) => {
+            let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
+            if (tag.tagName === 'color') {
+              color = tag.tagValue;
+            }
+            return (
+              <Tag color={color} key={tag.tagName}>
+                {tag.tagName + ':' + tag.tagValue}
+                {/* {tag.toUpperCase()} */}
+              </Tag>
+            );
+          })}
+        </span>
+      ),
     },
     {
-      title: '阅读数',
-      dataIndex: 'read_count'
-    },
-    {
-      title: '评论数',
-      dataIndex: 'comment_count'
-    },
-    {
-      title: '点赞数',
-      dataIndex: 'like_count'
-    },
-    {
-      title: '操作',
+      title: 'Operations',
+      key: 'Operations',
       render: data => {
         return (
           <Space size="middle">
@@ -68,21 +85,6 @@ function IvtListPage() {
           </Space>
         )
       }
-    }
-  ]
-
-  const data = [
-    {
-      id: '8218',
-      comment_count: 0,
-      cover: {
-        images: ['http://geek.itheima.net/resources/images/15.jpg'],
-      },
-      like_count: 0,
-      pubdate: '2019-03-11 09:00:00',
-      read_count: 2,
-      status: 2,
-      title: 'wkwebview离线化加载h5资源解决方案'
     }
   ]
 
@@ -105,29 +107,13 @@ function IvtListPage() {
         }
         style={{ marginBottom: 20 }}
       >
-
-        {/* <div>
-          {
-            Object.keys(tags).map(tagName => {
-              return (
-                <div key={tagName}>{tagName}
-                  {
-                    tags[tagName].map(item => {
-                      return (<div key={item}>{item}</div>)
-                    })
-                  }
-                </div>
-              )
-            })
-          }
-        </div> */}
         <Form initialValues={{ status: 'a', channel_id: 'a' }}>
 
           {
-            Object.keys(tags).map(tagName => {
+            Object.keys(searchTags).map(searchTagName => {
               const options = []
               return (
-                <Form.Item label={tagName} name={tagName} key={tagName}>
+                <Form.Item label={searchTagName} name={searchTagName} key={searchTagName}>
                   {/* {tags[tagName].map(item => {
                     options.push({
                       value: item,
@@ -136,7 +122,7 @@ function IvtListPage() {
                     return null;
                   })} */}
                   {
-                    tags[tagName].forEach(element => {
+                    searchTags[searchTagName].forEach(element => {
                       options.push({
                         value: element,
                         label: element
@@ -144,7 +130,7 @@ function IvtListPage() {
                     })
                   }
                   <Select
-                    placeholder="Pleasechoose a tag type!"
+                    placeholder="Please choose a tag type!"
                     style={{ width: 120 }}
                     options={options}
                   ></Select>
@@ -162,8 +148,8 @@ function IvtListPage() {
         </Form>
       </Card>
 
-      <Card title={`根据筛选条件共查询到 count 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={data} />
+      <Card title={`There is ${ivtResults.length} results：`}>
+        <Table rowKey={"ivtId"} columns={columns} dataSource={ivtResults} />
       </Card>
 
     </div>
