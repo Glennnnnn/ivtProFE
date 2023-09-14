@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space } from "antd";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input } from "antd";
 //import { Link } from "react-router-dom";
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
@@ -12,6 +12,12 @@ function IvtListPage() {
   //const options = []
   const [searchTags, setSearchTags] = useState([])
   const [ivtResults, setIvtResults] = useState([])
+  const [searchParas, setSearchParas] = useState({
+    pageIndex: 1,
+    pageSize: 10
+  })
+  const [ivtCount, setIvtCount] = useState()
+
   useEffect(() => {
     const queryTags = async () => {
       const res = await http.get("/queryTag/querySearchInfo")
@@ -22,13 +28,34 @@ function IvtListPage() {
 
   useEffect(() => {
     const queryResults = async () => {
-      const res = await http.post("/ivt/queryAllIvtInfo")
-      setIvtResults(res.data)
-
+      const res = await http.post("/ivt/queryIvtResultByInfo", {
+        searchParas
+      })
+      setIvtResults(res.data.ivtResultPos)
+      setIvtCount(res.data.totalCount)
     }
     queryResults()
 
-  }, [])
+  }, [searchParas])
+
+  const handleButtonClick = async (values) => {
+    console.log(values)
+    const { ivtName, tags } = values
+    setSearchParas({
+      ...searchParas,
+      ivtName,
+      tags
+    })
+
+  }
+
+  const handlePageChange = (pageIndex) => {
+    console.log(pageIndex)
+    setSearchParas({
+      ...searchParas,
+      pageIndex
+    })
+  }
 
   const columns = [
     // {
@@ -107,38 +134,53 @@ function IvtListPage() {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: 'a', channel_id: 'a' }}>
+        <Form
+          onFinish={handleButtonClick}
+          initialValues={{ status: 'a', channel_id: 'a' }}>
 
-          {
-            Object.keys(searchTags).map(searchTagName => {
-              const options = []
-              return (
-                <Form.Item label={searchTagName} name={searchTagName} key={searchTagName}>
-                  {/* {tags[tagName].map(item => {
+          <Form.Item label="name" name={'ivtName'}>
+            <Input
+              style={{ width: 240 }}
+              placeholder="please enter the name">
+            </Input>
+          </Form.Item>
+
+          <Form.Item>
+            <Space>
+              {
+                Object.keys(searchTags).map(searchTagName => {
+                  const options = []
+                  return (
+                    <Form.Item
+                      label={searchTagName}
+                      name={['tags', searchTagName]}
+                      key={searchTagName}>
+                      {/* {tags[tagName].map(item => {
                     options.push({
                       value: item,
                       label: item
                     })
                     return null;
                   })} */}
-                  {
-                    searchTags[searchTagName].forEach(element => {
-                      options.push({
-                        value: element,
-                        label: element
-                      })
-                    })
-                  }
-                  <Select
-                    placeholder="Please choose a tag type!"
-                    style={{ width: 120 }}
-                    options={options}
-                  ></Select>
-                </Form.Item>
-
-              )
-            })
-          }
+                      {
+                        searchTags[searchTagName].forEach(element => {
+                          options.push({
+                            value: element,
+                            label: element
+                          })
+                        })
+                      }
+                      <Select
+                        placeholder={searchTagName}
+                        style={{ width: 120 }}
+                        options={options}
+                      ></Select>
+                    </Form.Item>
+                  )
+                })
+              }
+            </Space>
+          </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
@@ -148,11 +190,22 @@ function IvtListPage() {
         </Form>
       </Card>
 
-      <Card title={`There is ${ivtResults.length} results：`}>
-        <Table rowKey={"ivtId"} columns={columns} dataSource={ivtResults} />
+      <Card title={`There is ${ivtCount} results：`}>
+        <Table
+          rowKey={"ivtId"}
+          columns={columns}
+          dataSource={ivtResults}
+          pagination={{
+            position: ['bottomCenter'],
+            current: searchParas.pageIndex,
+            pageSize: searchParas.pageSize,
+            total: ivtCount,
+            onChange: handlePageChange
+          }}
+        />
       </Card>
 
-    </div>
+    </div >
   )
 }
 
