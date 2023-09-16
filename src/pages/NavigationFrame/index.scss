@@ -6,10 +6,17 @@
   padding: 0;
 }
 
+// .logo {
+//   position: absolute;
+//   width: 200px;
+//   height: 60px;
+//   background: url('~@/assets/logo.png') no-repeat center / 160px auto;
+// }
+
 .logo {
-  width: 200px;
-  height: 60px;
-  background: url('~@/assets/logo.png') no-repeat center / 160px auto;
+  position: absolute;
+  height: 64px;
+  display: inline-block
 }
 
 .layout-content {

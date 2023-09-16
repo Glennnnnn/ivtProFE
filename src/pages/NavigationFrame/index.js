@@ -10,7 +10,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useIvt } from '@/store'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-const { Header, Sider } = Layout
+const { Header } = Layout
 
 const NavigationFrame = () => {
   const { pathname } = useLocation()
@@ -29,7 +29,26 @@ const NavigationFrame = () => {
   return (
     <Layout>
       <Header className="header">
-        <div className="logo" />
+        {/* <img className="logo" src={logo}></img> */}
+        {/* <div className="logo" /> */}
+        <Menu
+          mode="horizontal"
+          theme="dark"
+          defaultSelectedKeys={pathname}
+          style={{
+            margin: 'absolute'
+          }}
+        >
+          <Menu.Item icon={<HomeOutlined />} key="/">
+            <Link to="/">Menu</Link>
+          </Menu.Item>
+          <Menu.Item icon={<DiffOutlined />} key="/ivtlist">
+            <Link to="/ivtlist">Inventory List</Link>
+          </Menu.Item>
+          <Menu.Item icon={<EditOutlined />} key="/record">
+            <Link to="/record">Operation history</Link>
+          </Menu.Item>
+        </Menu>
         <div className="user-info">
           <span className="user-name">{ivtUser.userInfo.username}</span>
           <span className="user-logout">
@@ -42,25 +61,10 @@ const NavigationFrame = () => {
         </div>
       </Header>
       <Layout>
-        <Sider width={200} className="site-layout-background">
-          <Menu
-            mode="inline"
-            theme="dark"
-            defaultSelectedKeys={pathname}
-            style={{ height: '100%', borderRight: 0 }}
-          >
-            <Menu.Item icon={<HomeOutlined />} key="/">
-              <Link to="/">Menu</Link>
-            </Menu.Item>
-            <Menu.Item icon={<DiffOutlined />} key="/ivtlist">
-              <Link to="/ivtlist">Inventory List</Link>
-            </Menu.Item>
-            <Menu.Item icon={<EditOutlined />} key="/record">
-              <Link to="/record">Operation history</Link>
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Layout className="layout-content" style={{ padding: 20 }}>
+        <Layout className="layout-content" style={{
+          margin: 0,
+          padding: 0
+        }}>
           {/* outlet seems to be the place shows the children router context */}
           <Outlet />
         </Layout>

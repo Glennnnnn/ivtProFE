@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input } from "antd";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu } from "antd";
+
 //import { Link } from "react-router-dom";
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import {
+  HomeOutlined,
+  DiffOutlined,
+  EditOutlined,
+  DeleteOutlined
+} from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
-
 import { http } from "@/utils";
-
+const { Sider } = Layout
 function IvtListPage() {
   //const options = []
   const [searchTags, setSearchTags] = useState([])
@@ -116,95 +121,117 @@ function IvtListPage() {
   ]
 
   return (
-    <div>
-      <Card
-        title={
-          <Breadcrumb separator=">"
-            items={[
-              {
-                title: 'Home',
-              },
-              {
-                title: 'Inventory management',
-                href: ''
-              }
-            ]}>
+    <div className="ivt-layout">
+      <Layout>
+        <Sider width={200} style={{
+          height: '100%'
+        }}
+          className="site-layout-background">
+          <Menu
+            mode="inline"
+            theme="dark"
+            defaultSelectedKeys={['1']}
+            style={{ height: '100%', borderRight: 0 }}
+          >
+            <Menu.Item icon={<HomeOutlined />} key="1">
+              数据概览
+            </Menu.Item>
+            <Menu.Item icon={<DiffOutlined />} key="2">
+              内容管理
+            </Menu.Item>
+            <Menu.Item icon={<EditOutlined />} key="3">
+              发布文章
+            </Menu.Item>
+          </Menu>
+        </Sider>
 
-          </Breadcrumb>
-        }
-        style={{ marginBottom: 20 }}
-      >
-        <Form
-          onFinish={handleButtonClick}
-          initialValues={{ status: 'a', channel_id: 'a' }}>
+        <Card
+          title={
+            <Breadcrumb separator=">"
+              items={[
+                {
+                  title: 'Home',
+                },
+                {
+                  title: 'Inventory management',
+                  href: ''
+                }
+              ]}>
 
-          <Form.Item label="name" name={'ivtName'}>
-            <Input
-              style={{ width: 240 }}
-              placeholder="please enter the name">
-            </Input>
-          </Form.Item>
+            </Breadcrumb>
+          }
+          headStyle={{ height: '5%' }}
+          bodyStyle={{ height: '85%', width: '100%' }}
 
-          <Form.Item>
-            <Space>
-              {
-                Object.keys(searchTags).map(searchTagName => {
-                  const options = []
-                  return (
-                    <Form.Item
-                      label={searchTagName}
-                      name={['tags', searchTagName]}
-                      key={searchTagName}>
-                      {/* {tags[tagName].map(item => {
+        >
+          <Form
+            onFinish={handleButtonClick}
+            initialValues={{ status: 'a', channel_id: 'a' }}>
+
+            <Form.Item label="name" name={'ivtName'}>
+              <Input
+                style={{ width: 240 }}
+                placeholder="please enter the name">
+              </Input>
+            </Form.Item>
+
+            <Form.Item>
+              <Space>
+                {
+                  Object.keys(searchTags).map(searchTagName => {
+                    const options = []
+                    return (
+                      <Form.Item
+                        label={searchTagName}
+                        name={['tags', searchTagName]}
+                        key={searchTagName}>
+                        {/* {tags[tagName].map(item => {
                     options.push({
                       value: item,
                       label: item
                     })
                     return null;
                   })} */}
-                      {
-                        searchTags[searchTagName].forEach(element => {
-                          options.push({
-                            value: element,
-                            label: element
+                        {
+                          searchTags[searchTagName].forEach(element => {
+                            options.push({
+                              value: element,
+                              label: element
+                            })
                           })
-                        })
-                      }
-                      <Select
-                        placeholder={searchTagName}
-                        style={{ width: 120 }}
-                        options={options}
-                      ></Select>
-                    </Form.Item>
-                  )
-                })
-              }
-            </Space>
-          </Form.Item>
+                        }
+                        <Select
+                          placeholder={searchTagName}
+                          style={{ width: 120 }}
+                          options={options}
+                        ></Select>
+                      </Form.Item>
+                    )
+                  })
+                }
+              </Space>
+            </Form.Item>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
-              筛选
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-
-      <Card title={`There is ${ivtCount} results：`}>
-        <Table
-          rowKey={"ivtId"}
-          columns={columns}
-          dataSource={ivtResults}
-          pagination={{
-            position: ['bottomCenter'],
-            current: searchParas.pageIndex,
-            pageSize: searchParas.pageSize,
-            total: ivtCount,
-            onChange: handlePageChange
-          }}
-        />
-      </Card>
-
+            <Form.Item>
+              <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
+                筛选
+              </Button>
+            </Form.Item>
+          </Form>
+          <Table
+            rowKey={"ivtId"}
+            columns={columns}
+            dataSource={ivtResults}
+            pagination={{
+              position: ['bottomCenter'],
+              current: searchParas.pageIndex,
+              pageSize: searchParas.pageSize,
+              total: ivtCount,
+              onChange: handlePageChange
+            }}
+          />
+        </Card>
+      </Layout>
     </div >
   )
 }
