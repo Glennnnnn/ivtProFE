@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu } from "antd";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm } from "antd";
 
 //import { Link } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
+import { Content } from "antd/es/layout/layout";
 const { Sider } = Layout
 function IvtListPage() {
   //const options = []
@@ -61,6 +62,20 @@ function IvtListPage() {
       pageIndex
     })
   }
+//TODO delete an item from item table
+const handleDeleteItem = (data) => {
+  console.log(data.ivtId)
+  const deleteResult = async () => {
+    const res = await http.post("/ivt/deleteIvtById", {"ivtId" : data.ivtId})
+    console.log("delete "+ res.data)
+    setSearchParas({
+      ...searchParas,
+      pageIndex: 1
+    })
+  }
+  deleteResult()
+
+}
 
   const columns = [
     // {
@@ -108,12 +123,19 @@ function IvtListPage() {
         return (
           <Space size="middle">
             <Button type="primary" shape="circle" icon={<EditOutlined />} />
-            <Button
-              type="primary"
-              danger
-              shape="circle"
-              icon={<DeleteOutlined />}
-            />
+            <Popconfirm
+              title="Sure to delete this item?"
+              onConfirm={() => handleDeleteItem(data)}
+              okText="confirm"
+              cancelText="cancel"
+            >
+              <Button
+                type="primary"
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
           </Space>
         )
       }
@@ -144,93 +166,94 @@ function IvtListPage() {
             </Menu.Item>
           </Menu>
         </Sider>
+        <Content>
+          <Card
+            title={
+              <Breadcrumb separator=">"
+                items={[
+                  {
+                    title: 'Home',
+                  },
+                  {
+                    title: 'Inventory management',
+                    href: ''
+                  }
+                ]}>
 
-        <Card
-          title={
-            <Breadcrumb separator=">"
-              items={[
-                {
-                  title: 'Home',
-                },
-                {
-                  title: 'Inventory management',
-                  href: ''
-                }
-              ]}>
+              </Breadcrumb>
+            }
+            headStyle={{ height: '5%' }}
+            bodyStyle={{ height: '85%', width: '100%' }}
 
-            </Breadcrumb>
-          }
-          headStyle={{ height: '5%' }}
-          bodyStyle={{ height: '85%', width: '100%' }}
+          >
+            <Form
+              onFinish={handleButtonClick}
+              initialValues={{ status: 'a', channel_id: 'a' }}>
 
-        >
-          <Form
-            onFinish={handleButtonClick}
-            initialValues={{ status: 'a', channel_id: 'a' }}>
+              <Form.Item label="name" name={'ivtName'}>
+                <Input
+                  style={{ width: 240 }}
+                  placeholder="please enter the name">
+                </Input>
+              </Form.Item>
 
-            <Form.Item label="name" name={'ivtName'}>
-              <Input
-                style={{ width: 240 }}
-                placeholder="please enter the name">
-              </Input>
-            </Form.Item>
-
-            <Form.Item>
-              <Space>
-                {
-                  Object.keys(searchTags).map(searchTagName => {
-                    const options = []
-                    return (
-                      <Form.Item
-                        label={searchTagName}
-                        name={['tags', searchTagName]}
-                        key={searchTagName}>
-                        {/* {tags[tagName].map(item => {
-                    options.push({
-                      value: item,
-                      label: item
-                    })
-                    return null;
-                  })} */}
-                        {
-                          searchTags[searchTagName].forEach(element => {
-                            options.push({
-                              value: element,
-                              label: element
+              <Form.Item>
+                <Space>
+                  {
+                    Object.keys(searchTags).map(searchTagName => {
+                      const options = []
+                      return (
+                        <Form.Item
+                          label={searchTagName}
+                          name={['tags', searchTagName]}
+                          key={searchTagName}>
+                          {/* {tags[tagName].map(item => {
+                      options.push({
+                        value: item,
+                        label: item
+                      })
+                      return null;
+                    })} */}
+                          {
+                            searchTags[searchTagName].forEach(element => {
+                              options.push({
+                                value: element,
+                                label: element
+                              })
                             })
-                          })
-                        }
-                        <Select
-                          placeholder={searchTagName}
-                          style={{ width: 120 }}
-                          options={options}
-                        ></Select>
-                      </Form.Item>
-                    )
-                  })
-                }
-              </Space>
-            </Form.Item>
+                          }
+                          <Select
+                            placeholder={searchTagName}
+                            style={{ width: 120 }}
+                            options={options}
+                          ></Select>
+                        </Form.Item>
+                      )
+                    })
+                  }
+                </Space>
+              </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
-                筛选
-              </Button>
-            </Form.Item>
-          </Form>
-          <Table
-            rowKey={"ivtId"}
-            columns={columns}
-            dataSource={ivtResults}
-            pagination={{
-              position: ['bottomCenter'],
-              current: searchParas.pageIndex,
-              pageSize: searchParas.pageSize,
-              total: ivtCount,
-              onChange: handlePageChange
-            }}
-          />
-        </Card>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
+                  筛选
+                </Button>
+              </Form.Item>
+            </Form>
+            <Table
+              rowKey={"ivtId"}
+              columns={columns}
+              dataSource={ivtResults}
+              pagination={{
+                position: ['bottomCenter'],
+                current: searchParas.pageIndex,
+                pageSize: searchParas.pageSize,
+                total: ivtCount,
+                onChange: handlePageChange
+              }}
+            />
+          </Card>
+        </Content>
       </Layout>
     </div >
   )
