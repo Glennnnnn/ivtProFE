@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm } from "antd";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm, Drawer, Row, Col } from "antd";
 
 //import { Link } from "react-router-dom";
 import {
   HomeOutlined,
   DiffOutlined,
   EditOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  PlusCircleOutlined,
+  MinusCircleOutlined
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
@@ -23,6 +25,14 @@ function IvtListPage() {
     pageSize: 10
   })
   const [ivtCount, setIvtCount] = useState()
+  //drawer
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     const queryTags = async () => {
@@ -62,20 +72,20 @@ function IvtListPage() {
       pageIndex
     })
   }
-//TODO delete an item from item table
-const handleDeleteItem = (data) => {
-  console.log(data.ivtId)
-  const deleteResult = async () => {
-    const res = await http.post("/ivt/deleteIvtById", {"ivtId" : data.ivtId})
-    console.log("delete "+ res.data)
-    setSearchParas({
-      ...searchParas,
-      pageIndex: 1
-    })
-  }
-  deleteResult()
+  //TODO delete an item from item table
+  const handleDeleteItem = (data) => {
+    console.log(data.ivtId)
+    const deleteResult = async () => {
+      const res = await http.post("/ivt/deleteIvtById", { "ivtId": data.ivtId })
+      console.log("delete " + res.data)
+      setSearchParas({
+        ...searchParas,
+        pageIndex: 1
+      })
+    }
+    deleteResult()
 
-}
+  }
 
   const columns = [
     // {
@@ -123,6 +133,16 @@ const handleDeleteItem = (data) => {
         return (
           <Space size="middle">
             <Button type="primary" shape="circle" icon={<EditOutlined />} />
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<PlusCircleOutlined />}
+            />
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<MinusCircleOutlined />}
+            />
             <Popconfirm
               title="Sure to delete this item?"
               onConfirm={() => handleDeleteItem(data)}
@@ -232,6 +252,68 @@ const handleDeleteItem = (data) => {
                     })
                   }
                 </Space>
+                <Button type="primary" onClick={showDrawer}>
+                  Open
+                </Button>
+                <Drawer
+                  title="Check the variables."
+                  width={720}
+                  onClose={onClose}
+                  open={open}
+                  styles={{
+                    body: {
+                      paddingBottom: 80,
+                    },
+                  }}
+                  extra={
+                    <Space>
+                      <Button onClick={onClose}>Cancel</Button>
+                      <Button onClick={onClose} type="primary">
+                        Submit
+                      </Button>
+                    </Space>
+                  }
+                >
+                  <Form layout="vertical" hideRequiredMark>
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="name"
+                          label="Name"
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Please enter user name',
+                            },
+                          ]}
+                        >
+                          <Input placeholder="Please enter user name" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          name="url"
+                          label="Url"
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Please enter url',
+                            },
+                          ]}
+                        >
+                          <Input
+                            style={{
+                              width: '100%',
+                            }}
+                            addonBefore="http://"
+                            addonAfter=".com"
+                            placeholder="Please enter url"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </Form>
+                </Drawer>
               </Form.Item>
 
               <Form.Item>
