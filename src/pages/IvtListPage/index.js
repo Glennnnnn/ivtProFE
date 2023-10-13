@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
+import ItemCreateForm from "./itemCreateForm";
 import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm, Drawer, Row, Col } from "antd";
 
 //import { Link } from "react-router-dom";
@@ -26,12 +27,18 @@ function IvtListPage() {
   })
   const [ivtCount, setIvtCount] = useState()
   //drawer
-  const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  //editForm
+  const [editOpen, setEditOpen] = useState(false);
+  const onEditCreate = (values) => {
+    console.log('Received values of form: ', values);
+    setEditOpen(false);
+  };
   const showDrawer = () => {
-    setOpen(true);
+    setCartOpen(true);
   };
   const onClose = () => {
-    setOpen(false);
+    setCartOpen(false);
   };
 
   useEffect(() => {
@@ -132,7 +139,15 @@ function IvtListPage() {
       render: data => {
         return (
           <Space size="middle">
-            <Button type="primary" shape="circle" icon={<EditOutlined />} />
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => {
+                console.log("click" + editOpen)
+                setEditOpen(true);
+              }}
+            />
             <Button
               type="primary"
               shape="circle"
@@ -164,6 +179,13 @@ function IvtListPage() {
 
   return (
     <div className="ivt-layout">
+      <ItemCreateForm
+        open={editOpen}
+        onCreate={onEditCreate}
+        onCancel={() => {
+          setEditOpen(false);
+        }}
+      />
       <Layout>
         <Sider width={200} style={{
           height: '100%'
@@ -259,7 +281,7 @@ function IvtListPage() {
                   title="Check the variables."
                   width={720}
                   onClose={onClose}
-                  open={open}
+                  open={cartOpen}
                   styles={{
                     body: {
                       paddingBottom: 80,
