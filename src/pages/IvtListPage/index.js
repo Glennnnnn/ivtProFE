@@ -17,6 +17,7 @@ import {
 import { http } from "@/utils";
 import { Content } from "antd/es/layout/layout";
 const { Sider } = Layout
+
 function IvtListPage() {
   //const options = []
   const [searchTags, setSearchTags] = useState([])
@@ -34,6 +35,12 @@ function IvtListPage() {
     console.log('Received values of form: ', values);
     setEditOpen(false);
   };
+  const [rowData, setRowData] = useState(
+    { "ivtId": 1, "ivtName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
+  )
+
+
+
   const showDrawer = () => {
     setCartOpen(true);
   };
@@ -62,7 +69,7 @@ function IvtListPage() {
   }, [searchParas])
 
   const handleButtonClick = async (values) => {
-    console.log(values)
+    // console.log(values)
     const { ivtName, tags } = values
     setSearchParas({
       ...searchParas,
@@ -80,10 +87,10 @@ function IvtListPage() {
     })
   }
   //TODO delete an item from item table
-  const handleDeleteItem = (data) => {
-    console.log(data.ivtId)
+  const handleDeleteItem = (ivtId) => {
+    console.log(ivtId)
     const deleteResult = async () => {
-      const res = await http.post("/ivt/deleteIvtById", { "ivtId": data.ivtId })
+      const res = await http.post("/ivt/deleteIvtById", { "ivtId": ivtId })
       console.log("delete " + res.data)
       setSearchParas({
         ...searchParas,
@@ -93,6 +100,10 @@ function IvtListPage() {
     deleteResult()
 
   }
+
+  // var rowData = {
+  //   ivtId: "a"
+  // };
 
   const columns = [
     // {
@@ -136,7 +147,7 @@ function IvtListPage() {
     {
       title: 'Operations',
       key: 'Operations',
-      render: data => {
+      render: record => {
         return (
           <Space size="middle">
             <Button
@@ -144,8 +155,11 @@ function IvtListPage() {
               shape="circle"
               icon={<EditOutlined />}
               onClick={() => {
-                console.log("click" + editOpen)
-                setEditOpen(true);
+                //console.log("click" + editOpen + ' index ' + index + '\n text ' + JSON.stringify(text) + ' \n record' + JSON.stringify(record))
+                //console.log(' \n record' + JSON.stringify(record))
+                // console.log("set new row" + JSON.stringify(rowData))
+                setEditOpen(true)
+                setRowData(record)
               }}
             />
             <Button
@@ -160,7 +174,7 @@ function IvtListPage() {
             />
             <Popconfirm
               title="Sure to delete this item?"
-              onConfirm={() => handleDeleteItem(data)}
+              onConfirm={() => handleDeleteItem(record.ivtId)}
               okText="confirm"
               cancelText="cancel"
             >
@@ -185,6 +199,7 @@ function IvtListPage() {
         onCancel={() => {
           setEditOpen(false);
         }}
+        rowData={rowData}
       />
       <Layout>
         <Sider width={200} style={{
