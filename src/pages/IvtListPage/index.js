@@ -57,6 +57,7 @@ function IvtListPage() {
   }, [])
 
   useEffect(() => {
+    // console.log('index useeffect02')
     const queryResults = async () => {
       const res = await http.post("/ivt/queryIvtResultByInfo", {
         searchParas

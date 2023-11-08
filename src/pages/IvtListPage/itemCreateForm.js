@@ -1,12 +1,14 @@
 
 import { Form, Input, Modal, Space, Tag } from 'antd';
-import { useEffect } from 'react';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 
 function ItemCreateForm(props) {
   const [form] = Form.useForm();
   const { open, onCreate, onCancel, rowData } = props
 
+  const [rowtags, setRowTags] = useState(rowData.tags)
+  const [delTagArray, setDelTagArray] = useState([])
+  //const tagDeleteLsit = []
   // console.log("1")
   // if (rowData != null) {
   //   form.setFieldsValue({
@@ -16,12 +18,65 @@ function ItemCreateForm(props) {
   //   });
 
   // }
-  const log = (e) => {
-    console.log(e);
+  // const editTagList = []
+  // const deleteTagList = []
+  // const updateList = []
+
+  const printMethod = () => {
+    console.log("print")
+    console.log(delTagArray);
+    //editTagList.push("a")
+  }
+
+  // const clickEvent = (e) => {
+  //   // console.log(e);
+  //   // console.log(rowtags)
+  //   // console.log(tagChild)
+
+  //   // deleteTagList.push()
+  //   // console.log(deleteTagList)
+  // };
+
+  const handleClose = (removedTag) => {
+    const newTags = rowtags.filter((tag) => tag !== removedTag);
+    //console.log(newTags);
+    setRowTags(newTags);
+    console.log(removedTag)
+    setDelTagArray([
+      ...delTagArray,
+      removedTag
+    ])
   };
 
+  const tagForMap = (tag) => {
+    const tagElem = (
+      <Tag
+        closable
+        onClick={printMethod}
+        onClose={(e) => {
+          e.preventDefault();
+          handleClose(tag);
+        }}
+      >
+        {tag.tagName + ':' + tag.tagValue}
+      </Tag>
+    );
+    return (
+      <span
+        key={tag.tagId}
+        style={{
+          display: 'inline-block',
+        }}
+      >
+        {tagElem}
+      </span>
+    );
+  };
+
+  const tagChild = rowtags.map(tagForMap);
+
   useEffect(() => {
-    //console.log("use effect")
+    console.log("use effect")
 
     //console.log(JSON.stringify(rowData))
     form.setFieldsValue({
@@ -30,10 +85,14 @@ function ItemCreateForm(props) {
       tags: rowData.tags
     });
 
-  }, [rowData, form])
+    setRowTags(rowData.tags)
+    //console.log(rowData.tags)
+  }, [rowData, form, open])
   // rowData = {
   //   a: 'a'
   // }
+
+
   return (
     <Modal
       open={open}
@@ -42,11 +101,13 @@ function ItemCreateForm(props) {
       cancelText="Cancel"
       onCancel={onCancel}
       focusTriggerAfterClose="false"
+      // if this property is not added, each time user delete a tag an cancel it, this tag will not be shown in the next click event. 
+      destroyOnClose="true"
       onOk={() => {
         form
           .validateFields()
           .then((values) => {
-            form.resetFields();
+            //form.resetFields();
             onCreate(values);
           })
           .catch((info) => {
@@ -93,19 +154,22 @@ function ItemCreateForm(props) {
           </Radio.Group>
         </Form.Item> */}
 
+        {/* TODO tag part of the form */}
         <Form.Item name="tags" label="tags">
           <Space size={[0, 8]} wrap>
-            {
-
+            {/* {
               rowData.tags.map((tag) => {
                 return (
-                  <Tag key={tag.tagId} closeIcon={<CloseCircleOutlined />} onClose={log}>
+                  <Tag key={tag.tagId} closeIcon={<CloseCircleOutlined />} onClose={clickEvent}>
                     {tag.tagName + ':' + tag.tagValue}
                   </Tag>
                 )
               })
-
-            }
+            } */}
+            {tagChild}
+            <Tag key='editTagButton' onClick={printMethod}>
+              deltag
+            </Tag>
             {/* <Tag closeIcon={<CloseCircleOutlined />} onClose={log}>
               Tag 2
             </Tag> */}
