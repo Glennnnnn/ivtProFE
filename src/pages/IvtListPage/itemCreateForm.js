@@ -1,6 +1,8 @@
 
 import { Form, Input, Modal, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import AddTagForm from './addTagForm';
 
 function ItemCreateForm(props) {
   const [form] = Form.useForm();
@@ -8,6 +10,10 @@ function ItemCreateForm(props) {
 
   const [rowtags, setRowTags] = useState(rowData.tags)
   const [delTagArray, setDelTagArray] = useState([])
+
+  //addTagFrom component variables and functions
+  const [addTagFormOpen, setAddTagFormOpen] = useState(false)
+
   //const tagDeleteLsit = []
   // console.log("1")
   // if (rowData != null) {
@@ -37,7 +43,13 @@ function ItemCreateForm(props) {
   //   // console.log(deleteTagList)
   // };
 
-  const handleClose = (removedTag) => {
+  const handleCancel = () => {
+    onCancel()
+    //clean the delete array
+    setDelTagArray([])
+  }
+
+  const handleTagClose = (removedTag) => {
     const newTags = rowtags.filter((tag) => tag !== removedTag);
     //console.log(newTags);
     setRowTags(newTags);
@@ -48,6 +60,11 @@ function ItemCreateForm(props) {
     ])
   };
 
+  const handleAddTag = () => {
+    setAddTagFormOpen(true)
+    console.log(addTagFormOpen)
+  }
+
   const tagForMap = (tag) => {
     const tagElem = (
       <Tag
@@ -55,7 +72,7 @@ function ItemCreateForm(props) {
         onClick={printMethod}
         onClose={(e) => {
           e.preventDefault();
-          handleClose(tag);
+          handleTagClose(tag);
         }}
       >
         {tag.tagName + ':' + tag.tagValue}
@@ -77,7 +94,7 @@ function ItemCreateForm(props) {
 
   useEffect(() => {
     console.log("use effect")
-
+    // console.log("the delArray is " + delTagArray)
     //console.log(JSON.stringify(rowData))
     form.setFieldsValue({
       ivtName: rowData.ivtName,
@@ -99,7 +116,7 @@ function ItemCreateForm(props) {
       title="Create a new collection"
       okText="Create"
       cancelText="Cancel"
-      onCancel={onCancel}
+      onCancel={handleCancel}
       focusTriggerAfterClose="false"
       // if this property is not added, each time user delete a tag an cancel it, this tag will not be shown in the next click event. 
       destroyOnClose="true"
@@ -167,17 +184,19 @@ function ItemCreateForm(props) {
               })
             } */}
             {tagChild}
-            <Tag key='editTagButton' onClick={printMethod}>
-              deltag
+            <Tag key='editTagButton' icon={<PlusOutlined />} onClick={handleAddTag}>
+              Add Tag
             </Tag>
             {/* <Tag closeIcon={<CloseCircleOutlined />} onClose={log}>
               Tag 2
             </Tag> */}
           </Space>
         </Form.Item>
-
       </Form>
-
+      <AddTagForm
+        addTagFormOpen={addTagFormOpen}
+        onAddTagFormCancel={() => { setAddTagFormOpen(false) }}
+      />
     </Modal>
   );
 };
