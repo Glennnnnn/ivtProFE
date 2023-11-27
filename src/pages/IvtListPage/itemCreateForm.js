@@ -60,8 +60,18 @@ function ItemCreateForm(props) {
     ])
   };
 
-  const handleAddTag = () => {
+  const handleAddTagOpen = () => {
     setAddTagFormOpen(true)
+    console.log(addTagFormOpen)
+  }
+
+  const handleAddTagOk = (values) => {
+    setAddTagFormOpen(false)
+    console.log("track" + JSON.stringify(values))
+    // setRowTags([
+    //   ...rowtags,
+
+    // ])
     console.log(addTagFormOpen)
   }
 
@@ -184,7 +194,7 @@ function ItemCreateForm(props) {
               })
             } */}
             {tagChild}
-            <Tag key='editTagButton' icon={<PlusOutlined />} onClick={handleAddTag}>
+            <Tag key='editTagButton' icon={<PlusOutlined />} onClick={handleAddTagOpen}>
               Add Tag
             </Tag>
             {/* <Tag closeIcon={<CloseCircleOutlined />} onClose={log}>
@@ -196,6 +206,7 @@ function ItemCreateForm(props) {
       <AddTagForm
         addTagFormOpen={addTagFormOpen}
         onAddTagFormCancel={() => { setAddTagFormOpen(false) }}
+        onAddTagOk={handleAddTagOk}
       />
     </Modal>
   );
