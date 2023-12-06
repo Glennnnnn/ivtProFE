@@ -117,13 +117,8 @@ function IvtListPage() {
     // },
     {
       title: 'Name',
-      dataIndex: 'ivtName',
+      dataIndex: 'ivtClassName',
       width: 220
-    },
-    {
-      title: 'Quantity',
-      dataIndex: 'ivtQty',
-      //render: data => <Tag color="green">审核通过</Tag>
     },
     {
       title: 'Tags',
@@ -144,6 +139,11 @@ function IvtListPage() {
           })}
         </span>
       ),
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'ivtQty',
+      //render: data => <Tag color="green">审核通过</Tag>
     },
     {
       title: 'Operations',

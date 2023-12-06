@@ -15,7 +15,7 @@ function AddTagForm(props) {
       okText="Confirm"
       cancelText="Cancel"
       onCancel={onAddTagFormCancel}
-      focusTriggerAfterClose="false"
+      //focusTriggerAfterClose="false"
       destroyOnClose="true"
       onOk={() => {
         form
