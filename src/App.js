@@ -18,6 +18,7 @@ import { history } from "./utils/historyPlugin.js";
 import './App.css';
 import FolderPage from "./pages/IvtInfoPage/folderPage.js";
 import TestPage from "./pages/IvtInfoPage/testPage.js";
+import IvtPage from "./pages/IvtInfoPage/ivtPage.js";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             }>
               <Route path="" element={<FolderPage />}></Route>
               <Route path="testPage" element={<TestPage />}></Route>
+              <Route path="ivtPage" element={<IvtPage />}></Route>
             </Route>
             <Route path="/record" element={<RecordPage />}></Route>
           </Route>

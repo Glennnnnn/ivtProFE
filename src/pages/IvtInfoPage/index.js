@@ -93,7 +93,7 @@ function IvtInfoPage() {
                 title: <a href="/ivtInfo/testPage">Application Center</a>,
               },
               {
-                title: <a href="/ivtInfo/testPage">Application List</a>,
+                title: <a href="/ivtInfo/ivtPage">Application List</a>,
               },
               {
                 title: 'An Application',

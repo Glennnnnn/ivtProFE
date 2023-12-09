@@ -13,9 +13,11 @@ import {
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
-import { Content } from "antd/es/layout/layout";
+// import { Content } from "antd/es/layout/layout";
+
 
 const IvtPage = () => {
+  const { Sider, Content } = Layout;
   //const options = []
   const [searchTags, setSearchTags] = useState([])
   const [ivtResults, setIvtResults] = useState([])
@@ -281,37 +283,8 @@ const IvtPage = () => {
         rowData={rowData}
       />
       <Layout>
-        <Sider width={200} style={{
-          height: '100%'
-        }}
-          className="site-layout-background">
-          <Menu
-            mode="inline"
-            theme="dark"
-            inlineCollapsed='true'
-            defaultSelectedKeys={['1']}
-            style={{ height: '100%', borderRight: 0 }}
-            onClick={handleMenuClick}
-            items={menuItems}
-          >
-          </Menu>
-        </Sider>
         <Content>
           <Card
-            title={
-              <Breadcrumb separator=">"
-                items={[
-                  {
-                    title: 'Home',
-                  },
-                  {
-                    title: 'Inventory management',
-                    href: ''
-                  }
-                ]}>
-
-              </Breadcrumb>
-            }
             headStyle={{ height: '5%' }}
             bodyStyle={{ height: '85%', width: '100%' }}
 
