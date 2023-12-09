@@ -2,10 +2,19 @@
 import axios from 'axios'
 import { getToken, setToken } from '@/utils/token'
 import { history } from './historyPlugin'
+import JSONbig from 'json-bigint'
 
+//const JSONbig = require('json-bigint')({ 'storeAsString': true });
 const http = axios.create({
   baseURL: '/api',
-  timeout: 5000
+  timeout: 5000,
+  transformResponse: [function (data) {
+    try {
+      return JSONbig.parse(data)
+    } catch (err) {
+      return data
+    }
+  }],
 })
 // 添加请求拦截器
 http.interceptors.request.use((config) => {

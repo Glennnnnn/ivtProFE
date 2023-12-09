@@ -5,7 +5,7 @@ import LoginPage from './pages/LoginPage/index.js'
 import NavigationFrame from './pages/NavigationFrame/index.js'
 
 import HomePage from "./pages/HomePage/index.js";
-import IvtListPage from "./pages/IvtListPage/index.js";
+import IvtInfoPage from "./pages/IvtInfoPage/index.js";
 import RecordPage from "./pages/RecordPage/index.js";
 //test
 import Test01 from "./testClass/test01.js";
@@ -16,6 +16,8 @@ import { AuthComponent } from "./components/AuthComponent.js";
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 import { history } from "./utils/historyPlugin.js";
 import './App.css';
+import FolderPage from "./pages/IvtInfoPage/folderPage.js";
+import TestPage from "./pages/IvtInfoPage/testPage.js";
 
 function App() {
   return (
@@ -26,13 +28,21 @@ function App() {
             <AuthComponent><NavigationFrame /></AuthComponent>
           }>
             <Route index element={<HomePage />}></Route>
-            <Route path="/ivtlist" element={<IvtListPage />}></Route>
+            <Route path="/ivtInfo" element={
+              <IvtInfoPage />
+            }>
+              <Route path="" element={<FolderPage />}></Route>
+              <Route path="testPage" element={<TestPage />}></Route>
+            </Route>
             <Route path="/record" element={<RecordPage />}></Route>
           </Route>
+
+
           <Route path="/test01" element={<Test01 />}></Route>
           {/* login Page */}
           <Route path="/login" element={<LoginPage />}></Route>
         </Routes>
+
       </div>
     </HistoryRouter>
   );

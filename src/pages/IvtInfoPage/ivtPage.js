@@ -3,11 +3,9 @@ import "./index.scss"
 
 import ItemCreateForm from "./itemCreateForm";
 import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm, Drawer, Row, Col } from "antd";
-
 //import { Link } from "react-router-dom";
 import {
-  HomeOutlined,
-  DiffOutlined,
+  MailOutlined,
   EditOutlined,
   DeleteOutlined,
   PlusCircleOutlined,
@@ -16,9 +14,8 @@ import {
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
 import { Content } from "antd/es/layout/layout";
-const { Sider } = Layout
 
-function IvtListPage() {
+const IvtPage = () => {
   //const options = []
   const [searchTags, setSearchTags] = useState([])
   const [ivtResults, setIvtResults] = useState([])
@@ -36,10 +33,9 @@ function IvtListPage() {
     setEditOpen(false);
   };
   const [rowData, setRowData] = useState(
-    { "ivtId": 1, "ivtName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
+    //solve the fist loading with a null value issue
+    { "ivtId": 1, "ivtClassName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
   )
-
-
 
   const showDrawer = () => {
     setCartOpen(true);
@@ -47,6 +43,7 @@ function IvtListPage() {
   const onClose = () => {
     setCartOpen(false);
   };
+  const [menuItems, setMenuItems] = useState([])
 
   useEffect(() => {
     const queryTags = async () => {
@@ -69,16 +66,62 @@ function IvtListPage() {
 
   }, [searchParas])
 
+  useEffect(() => {
+    const catLEvelResult = async () => {
+      const res = await http.get("/queryCategoryLevel")
+      const origin = res.data.data
+      // console.log(origin)
+
+      // const items = getItem("Main", "main", <MailOutlined />, (function () {
+      //   let ivtCatArr = [];
+      //   for (let cat of origin) {
+      //     ivtCatArr.push(getItem(cat['ivtCatName'], cat['ivtCatId'], null, (function () {
+      //       let ivtClassArr = [];
+      //       for (let ivtClass of cat['ivtClassPos']) {
+      //         ivtClassArr.push(getItem(ivtClass['ivtClassName'], ivtClass['ivtClassId']))
+      //       }
+      //       return ivtClassArr
+      //     })(), 'group'))
+      //   }
+      //   return ivtCatArr
+      // })(), 'group')
+
+      let meunResultArr = []
+      const items = getItem("Main", "main", <MailOutlined />, (function () {
+        let ivtCatArr = [];
+        for (let cat of origin) {
+          ivtCatArr.push(getItem(cat['ivtCatName'], cat['ivtCatId'], null, (function () {
+            let ivtClassArr = [];
+            for (let ivtClass of cat['ivtClassPos']) {
+              ivtClassArr.push(getItem(ivtClass['ivtClassName'], ivtClass['ivtClassId']))
+            }
+            return ivtClassArr
+          })(), null))
+        }
+        return ivtCatArr
+      })(), 'group')
+      meunResultArr.push(items)
+
+      setMenuItems(meunResultArr)
+    }
+    catLEvelResult()
+  }, [])
+
   const handleButtonClick = async (values) => {
     // console.log(values)
-    const { ivtName, tags } = values
+    const { ivtClassName, tags } = values
     setSearchParas({
       ...searchParas,
-      ivtName,
+      ivtClassName,
       tags
     })
 
   }
+
+  const handleMenuClick = (e) => {
+    console.log(menuItems)
+    console.log('click ', e);
+  };
 
   const handlePageChange = (pageIndex) => {
     console.log(pageIndex)
@@ -101,6 +144,41 @@ function IvtListPage() {
     deleteResult()
 
   }
+  //left menu setting params
+  function getItem(label, key, icon, children, type) {
+    return {
+      key,
+      icon,
+      children,
+      label,
+      type,
+    };
+  }
+
+  //left menu data
+  // const items = [
+  //   getItem('Navigation One', 'sub1', <MailOutlined />, [
+  //     getItem('Item 1', 'g1', null, [getItem('Option 1', '1'), getItem('Option 2', '2')], 'group'),
+  //     getItem('Item 2', 'g2', null, [getItem('Option 3', '3'), getItem('Option 4', '4')], 'group'),
+  //   ]),
+  //   getItem('Navigation Two', 'sub2', null, [
+  //     getItem('Option 5', '5'),
+  //     getItem('Option 6', '6'),
+  //     getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),
+  //   ]),
+  //   {
+  //     type: 'divider',
+  //   },
+  //   getItem('Navigation Three', 'sub4', null, [
+  //     getItem('Option 9', '9'),
+  //     getItem('Option 10', '10'),
+  //     getItem('Option 11', '11'),
+  //     getItem('Option 12', '12'),
+  //   ]),
+  //   getItem('Group', 'grp', null, [
+  //     getItem('Option 13', '13'),
+  //     getItem('Option 14', '14')], 'group'),
+  // ];
 
   // var rowData = {
   //   ivtId: "a"
@@ -210,18 +288,12 @@ function IvtListPage() {
           <Menu
             mode="inline"
             theme="dark"
+            inlineCollapsed='true'
             defaultSelectedKeys={['1']}
             style={{ height: '100%', borderRight: 0 }}
+            onClick={handleMenuClick}
+            items={menuItems}
           >
-            <Menu.Item icon={<HomeOutlined />} key="1">
-              数据概览
-            </Menu.Item>
-            <Menu.Item icon={<DiffOutlined />} key="2">
-              内容管理
-            </Menu.Item>
-            <Menu.Item icon={<EditOutlined />} key="3">
-              发布文章
-            </Menu.Item>
           </Menu>
         </Sider>
         <Content>
@@ -248,7 +320,7 @@ function IvtListPage() {
               onFinish={handleButtonClick}
               initialValues={{ status: 'a', channel_id: 'a' }}>
 
-              <Form.Item label="name" name={'ivtName'}>
+              <Form.Item label="name" name={'ivtClassName'}>
                 <Input
                   style={{ width: 240 }}
                   placeholder="please enter the name">
@@ -379,4 +451,4 @@ function IvtListPage() {
   )
 }
 
-export default IvtListPage
+export default IvtPage

@@ -42,8 +42,8 @@ const NavigationFrame = () => {
           <Menu.Item icon={<HomeOutlined />} key="/">
             <Link to="/">Menu</Link>
           </Menu.Item>
-          <Menu.Item icon={<DiffOutlined />} key="/ivtlist">
-            <Link to="/ivtlist">Inventory List</Link>
+          <Menu.Item icon={<DiffOutlined />} key="/ivtinfo">
+            <Link to="/ivtinfo">Inventory List</Link>
           </Menu.Item>
           <Menu.Item icon={<EditOutlined />} key="/record">
             <Link to="/record">Operation history</Link>
