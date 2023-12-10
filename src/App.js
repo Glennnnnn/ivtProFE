@@ -8,7 +8,7 @@ import {
   FolderOpenOutlined,
   SettingOutlined,
   LogoutOutlined,
-  AppstoreOutlined
+  AppstoreTwoTone
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 
@@ -27,6 +27,7 @@ const { Header, Sider, Content } = Layout;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState('dashboard');
   const { token: { colorBgContainer },} = theme.useToken();
   const isAuthenticated = getToken();
 
@@ -43,7 +44,7 @@ const App = () => {
         
         {/* Company Icon and Name */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px' }}>
-          <AppstoreOutlined style={{ fontSize: "50px" }} />
+          <AppstoreTwoTone style={{ fontSize: "50px" }} />
           {!collapsed && <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Pioneer Aluminium</span>}
         </div>
 
@@ -51,16 +52,16 @@ const App = () => {
           theme="light"
           mode="inline"
           defaultSelectedKeys={['dashboard']}>
-          <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
+          <Menu.Item key="dashboard" icon={<DashboardOutlined />} onClick={() => setSelectedMenu('dashboard')}>
             <Link to="/dashboard">Dashboard</Link>
           </Menu.Item>
-          <Menu.Item key="orders" icon={<ShoppingOutlined />}>
+          <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setSelectedMenu('orders')}>
             <Link to="/orders">Orders</Link>
           </Menu.Item>
-          <Menu.Item key="inventory" icon={<FolderOpenOutlined />}>
+          <Menu.Item key="inventory" icon={<FolderOpenOutlined />} onClick={() => setSelectedMenu('inventory')}>
             <Link to="/inventory">Inventory</Link>
           </Menu.Item>
-          <Menu.Item key="settings" icon={<SettingOutlined />}>
+          <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => setSelectedMenu('settings')}>
             <Link to="/settings">Settings</Link>
           </Menu.Item>
         </Menu>
@@ -86,14 +87,15 @@ const App = () => {
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
-              fontSize: '16px',
+              fontSize: '20px',
               width: 64,
               height: 64,
             }}/>
+          <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{selectedMenu.toUpperCase()}</span>
         </Header>
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '16px 16px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
