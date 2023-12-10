@@ -11,6 +11,7 @@ const LoginPage = () => {
     const { username, password } = values
     try {
       await loginIvt.login({ username, password })
+      window.location.href = '/';
     } catch (e) {
       console.log(e.response?.data?.message || '登录失败')
     }
