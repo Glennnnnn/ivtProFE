@@ -7,7 +7,8 @@ import {
   ShoppingOutlined,
   FolderOpenOutlined,
   SettingOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 
@@ -39,6 +40,13 @@ const App = () => {
     <Layout>
       <Sider theme='light' trigger={null} collapsible collapsed={collapsed} style={{height: '100vh'}}>
         <div className="demo-logo-vertical" />
+        
+        {/* Company Icon and Name */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px' }}>
+          <AppstoreOutlined style={{ fontSize: "50px" }} />
+          {!collapsed && <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Pioneer Aluminium</span>}
+        </div>
+
         <Menu
           theme="light"
           mode="inline"
@@ -55,10 +63,17 @@ const App = () => {
           <Menu.Item key="settings" icon={<SettingOutlined />}>
             <Link to="/settings">Settings</Link>
           </Menu.Item>
+        </Menu>
+        
+        <div style={{ position:'absolute', bottom: '20px', left: 0, width: '100%'}}>
+        <Menu
+          theme="light"
+          mode="inline" >
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
         </Menu>
+        </div>
       </Sider>
       <Layout>
         <Header
