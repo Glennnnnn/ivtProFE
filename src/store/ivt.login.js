@@ -41,8 +41,8 @@ class LoginIvt {
     // this.result = res.data.code
     this.result = 200
     this.token = ''
+    //removeToken()？
     setToken(this.token)
-    //console.log(res.data)
   }
 }
 export default LoginIvt

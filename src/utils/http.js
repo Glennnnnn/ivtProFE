@@ -35,6 +35,7 @@ http.interceptors.response.use((response) => {
 }, (error) => {
   console.log(error)
   if (error.response.status === 401) {
+
     setToken('')
     history.push('/login')
   }
