@@ -2,22 +2,23 @@ import React, { useEffect, useState } from "react"
 import "./index.scss"
 
 import ItemCreateForm from "./itemCreateForm";
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Menu, Popconfirm, Drawer, Row, Col } from "antd";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Popconfirm, Drawer, Row, Col } from "antd";
 //import { Link } from "react-router-dom";
 import {
-  MailOutlined,
   EditOutlined,
   DeleteOutlined,
   PlusCircleOutlined,
-  MinusCircleOutlined
+  MinusCircleOutlined,
+  FolderOutlined
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
+import { NavLink } from "react-router-dom";
 // import { Content } from "antd/es/layout/layout";
 
 
 const IvtPage = () => {
-  const { Sider, Content } = Layout;
+  const { Content } = Layout;
   //const options = []
   const [searchTags, setSearchTags] = useState([])
   const [ivtResults, setIvtResults] = useState([])
@@ -45,7 +46,7 @@ const IvtPage = () => {
   const onClose = () => {
     setCartOpen(false);
   };
-  const [menuItems, setMenuItems] = useState([])
+
 
   useEffect(() => {
     const queryTags = async () => {
@@ -68,47 +69,6 @@ const IvtPage = () => {
 
   }, [searchParas])
 
-  useEffect(() => {
-    const catLEvelResult = async () => {
-      const res = await http.get("/queryCategoryLevel")
-      const origin = res.data.data
-      // console.log(origin)
-
-      // const items = getItem("Main", "main", <MailOutlined />, (function () {
-      //   let ivtCatArr = [];
-      //   for (let cat of origin) {
-      //     ivtCatArr.push(getItem(cat['ivtCatName'], cat['ivtCatId'], null, (function () {
-      //       let ivtClassArr = [];
-      //       for (let ivtClass of cat['ivtClassPos']) {
-      //         ivtClassArr.push(getItem(ivtClass['ivtClassName'], ivtClass['ivtClassId']))
-      //       }
-      //       return ivtClassArr
-      //     })(), 'group'))
-      //   }
-      //   return ivtCatArr
-      // })(), 'group')
-
-      let meunResultArr = []
-      const items = getItem("Main", "main", <MailOutlined />, (function () {
-        let ivtCatArr = [];
-        for (let cat of origin) {
-          ivtCatArr.push(getItem(cat['ivtCatName'], cat['ivtCatId'], null, (function () {
-            let ivtClassArr = [];
-            for (let ivtClass of cat['ivtClassPos']) {
-              ivtClassArr.push(getItem(ivtClass['ivtClassName'], ivtClass['ivtClassId']))
-            }
-            return ivtClassArr
-          })(), null))
-        }
-        return ivtCatArr
-      })(), 'group')
-      meunResultArr.push(items)
-
-      setMenuItems(meunResultArr)
-    }
-    catLEvelResult()
-  }, [])
-
   const handleButtonClick = async (values) => {
     // console.log(values)
     const { ivtClassName, tags } = values
@@ -120,16 +80,17 @@ const IvtPage = () => {
 
   }
 
-  const handleMenuClick = (e) => {
-    console.log(menuItems)
-    console.log('click ', e);
-  };
+  // const handleMenuClick = (e) => {
+  //   console.log(menuItems)
+  //   console.log('click ', e);
+  // };
 
-  const handlePageChange = (pageIndex) => {
+  const handlePageChange = (pageIndex, pageSize) => {
     console.log(pageIndex)
     setSearchParas({
       ...searchParas,
-      pageIndex
+      pageIndex,
+      pageSize
     })
   }
   //TODO delete an item from item table
@@ -146,45 +107,6 @@ const IvtPage = () => {
     deleteResult()
 
   }
-  //left menu setting params
-  function getItem(label, key, icon, children, type) {
-    return {
-      key,
-      icon,
-      children,
-      label,
-      type,
-    };
-  }
-
-  //left menu data
-  // const items = [
-  //   getItem('Navigation One', 'sub1', <MailOutlined />, [
-  //     getItem('Item 1', 'g1', null, [getItem('Option 1', '1'), getItem('Option 2', '2')], 'group'),
-  //     getItem('Item 2', 'g2', null, [getItem('Option 3', '3'), getItem('Option 4', '4')], 'group'),
-  //   ]),
-  //   getItem('Navigation Two', 'sub2', null, [
-  //     getItem('Option 5', '5'),
-  //     getItem('Option 6', '6'),
-  //     getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),
-  //   ]),
-  //   {
-  //     type: 'divider',
-  //   },
-  //   getItem('Navigation Three', 'sub4', null, [
-  //     getItem('Option 9', '9'),
-  //     getItem('Option 10', '10'),
-  //     getItem('Option 11', '11'),
-  //     getItem('Option 12', '12'),
-  //   ]),
-  //   getItem('Group', 'grp', null, [
-  //     getItem('Option 13', '13'),
-  //     getItem('Option 14', '14')], 'group'),
-  // ];
-
-  // var rowData = {
-  //   ivtId: "a"
-  // };
 
   const columns = [
     // {
@@ -198,7 +120,14 @@ const IvtPage = () => {
     {
       title: 'Name',
       dataIndex: 'ivtClassName',
-      width: 220
+      width: 220,
+      key: 'ivtClassName',
+      render: (ivtClassName, record) => {
+        // console.log(JSON.stringify(ivtClassName) + JSON.stringify(record))
+        return <NavLink to='/ivtDetail' state={JSON.stringify(record)} >{ivtClassName}</NavLink>
+      }
+
+
     },
     {
       title: 'Tags',
@@ -221,9 +150,31 @@ const IvtPage = () => {
       ),
     },
     {
+      title: 'Code',
+      dataIndex: 'ivtSubclassCode',
+    },
+    {
+      title: 'Category',
+      dataIndex: 'ivtCatName',
+    },
+    {
+      title: 'Note',
+      dataIndex: 'IvtNote',
+    },
+    {
       title: 'Quantity',
       dataIndex: 'ivtQty',
-      //render: data => <Tag color="green">审核通过</Tag>
+
+    },
+    {
+      title: 'Value',
+      dataIndex: 'ivtValue',
+
+    },
+    {
+      title: 'Price',
+      dataIndex: 'ivtPrice',
+
     },
     {
       title: 'Operations',
@@ -284,6 +235,66 @@ const IvtPage = () => {
       />
       <Layout>
         <Content>
+          <Breadcrumb
+            separator=">"
+            items={[
+              {
+                title: 'Home',
+              },
+              {
+                title: 'Application Center',
+                href: '',
+              },
+              {
+                title: 'Application List',
+                href: '',
+              },
+              {
+                title: 'An Application',
+              },
+            ]}
+            style={
+              { marginBottom: '20px' }
+            }
+          />
+          <div style={{ marginBottom: '20px' }}>
+            <Row gutter={[16, 64]}>
+              <Col span={12}>
+                <Card
+                  title={
+                    <div><FolderOutlined /> Inventory details</div>
+                  }
+                  bordered={false}
+                  style={{ height: '200px' }}>
+                  {<div style={{ paddingLeft: '10px', position: 'absolute', top: '60%', left: '3%' }}>
+                    <span style={{ fontSize: '20px' }}>All products</span><br />
+                    <span style={{ fontSize: '30px' }}>000</span>
+                  </div>}
+                  {<div style={{ paddingRight: '10px', position: 'absolute', top: '60%', right: '10%' }}>
+                    <span style={{ fontSize: '20px' }}>Active</span><br />
+                    <span style={{ fontSize: '30px' }}>000</span>
+                  </div>}
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card
+                  title={
+                    <div><FolderOutlined /> Inventory details</div>
+                  }
+                  bordered={false}
+                  style={{ height: '200px' }}>
+                  {<div style={{ paddingLeft: '10px', position: 'absolute', top: '60%', left: '3%' }}>
+                    <span style={{ fontSize: '20px' }}>All products</span><br />
+                    <span style={{ fontSize: '30px' }}>000</span>
+                  </div>}
+                  {<div style={{ paddingRight: '10px', position: 'absolute', top: '60%', right: '10%' }}>
+                    <span style={{ fontSize: '20px' }}>Active</span><br />
+                    <span style={{ fontSize: '30px' }}>000</span>
+                  </div>}
+                </Card>
+              </Col>
+            </Row>
+          </div>
           <Card
             headStyle={{ height: '5%' }}
             bodyStyle={{ height: '85%', width: '100%' }}

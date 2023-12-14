@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -13,10 +13,11 @@ import {
 import { Layout, Menu, Button, theme } from 'antd';
 
 import LoginPage from './pages/LoginPage/index.js'
-import IvtInfoPage from "./pages/IvtInfoPage/index.js";
+import IvtPage from "./pages/IvtInfoPage/ivtPage.js";
 import DashboardPage from './pages/DashboardPage/index.js';
 import OrderPage from './pages/OrderPage/index.js';
 import HomePage from './pages/HomePage/index.js';
+import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
 import { getToken, removeToken } from '@/utils'
 
 //components
@@ -28,7 +29,7 @@ const { Header, Sider, Content } = Layout;
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('dashboard');
-  const { token: { colorBgContainer },} = theme.useToken();
+  const { token: { colorBgContainer }, } = theme.useToken();
   const isAuthenticated = getToken();
 
   const handleLogout = () => {
@@ -39,9 +40,9 @@ const App = () => {
 
   return (
     <Layout>
-      <Sider theme='light' trigger={null} collapsible collapsed={collapsed} style={{height: '100vh'}}>
+      <Sider theme='light' trigger={null} collapsible collapsed={collapsed} style={{ height: '100vh' }}>
         <div className="demo-logo-vertical" />
-        
+
         {/* Company Icon and Name */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px' }}>
           <AppstoreTwoTone style={{ fontSize: "50px" }} />
@@ -65,15 +66,15 @@ const App = () => {
             <Link to="/settings">Settings</Link>
           </Menu.Item>
         </Menu>
-        
-        <div style={{ position:'absolute', bottom: '20px', left: 0, width: '100%'}}>
-        <Menu
-          theme="light"
-          mode="inline" >
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-            Logout
-          </Menu.Item>
-        </Menu>
+
+        <div style={{ position: 'absolute', bottom: '20px', left: 0, width: '100%' }}>
+          <Menu
+            theme="light"
+            mode="inline" >
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Logout
+            </Menu.Item>
+          </Menu>
         </div>
       </Sider>
       <Layout>
@@ -90,21 +91,22 @@ const App = () => {
               fontSize: '20px',
               width: 64,
               height: 64,
-            }}/>
+            }} />
           <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{selectedMenu.toUpperCase()}</span>
         </Header>
         <Content
           style={{
             margin: '16px 16px',
-            padding: 24,
+            padding: 12,
             minHeight: 280,
             background: colorBgContainer,
           }}>
           <Routes>
             <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />} />
             <Route path="/orders" element={isAuthenticated ? <OrderPage /> : <Navigate to="/login" />} />
-            <Route path="/inventory" element={isAuthenticated ? <IvtInfoPage /> : <Navigate to="/login" />} />
+            <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
+            <Route path="/ivtDetail" element={isAuthenticated ? <IvtDetailPage /> : <Navigate to="/login" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
           </Routes>
