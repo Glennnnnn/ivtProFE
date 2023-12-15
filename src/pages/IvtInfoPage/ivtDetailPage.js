@@ -1,19 +1,15 @@
 import { React, useState, useEffect } from 'react';
-import { PlusOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 
 import {
-  Checkbox,
   Form,
   Input,
   InputNumber,
-  Switch,
-  TreeSelect,
   Upload,
   Layout,
   Breadcrumb,
-  Tag,
   Space,
-  Select, Button
+  Select, Button, Divider
 } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { http } from "@/utils";
@@ -30,31 +26,31 @@ const IvtDetailPage = () => {
   let location = useLocation()
   const recordData = JSON.parse(location.state)
   const baseData = Object.assign({}, recordData)
-  const [modifiedTags, setModifiedTags] = useState(baseData.tags)
 
   //const { ivtCatId, ivtId, ivtClassId, tags } = recordData
   //const { ivtClassId, ivtCatName, ivtClassName, ivtNote, ivtPrice, ivtQty, ivtSubclassCode, ivtValue, tags } = modifiedData
   const { Content } = Layout;
-  const [componentDisabled, setComponentDisabled] = useState(true);
   //console.log(recordData)
 
   // const [editableTags, setEditableTags] = useState(modifiedData.tags)
   // const [tagEditOpen, setTagEditOpen] = useState(false)
   const [existTagList, setExistTagList] = useState([])
-  const [addNewTagOpen, setAddNewTagOpen] = useState(false)
-  const [addTagButtonOpen, setAddTagButtonOpen] = useState(true)
-  const [selectExistTagOpen, setSelectExistTagOpen] = useState(false)
-  let addNewTagName = ""
-  let addNewTagValue = ""
-  let addExistTagList = []
+  const [inputTagValue, setInputTagValue] = useState();
+
 
 
 
   useEffect(() => {
 
     const queryTagByIvtClassAsync = async () => {
-      let resJson = await http.post("/queryTag/queryTagByIvtClass", { "ivtClassId": baseData.ivtClassId, "ivtId": baseData.ivtId })
-      let res = JSON.parse(JSON.stringify(resJson.data))
+      let resJson = await http.post("/queryTag/queryTagResByIvtClass", { "ivtClassId": baseData.ivtClassId })
+      let res = JSON.parse(JSON.stringify(resJson.data.data))
+      // Object.keys(existTagList).map(tagName => {
+      //   setInputTagValues({
+      //     ...inputTagValues,
+      //     tagName: ""
+      //   })
+      // })
       // console.log(res)
       // form.setFieldsValue({
       //   ivtClassName: baseData.ivtClassName,
@@ -67,225 +63,147 @@ const IvtDetailPage = () => {
       // });
       setExistTagList(res)
     }
+    // console.log(baseData)
     queryTagByIvtClassAsync()
 
-  }, [baseData.ivtClassId, baseData.ivtId, form])
+  }, [baseData.ivtClassId])
 
-  const onFinish = (values) => {
+
+  const onTagValueInputChange = (event) => {
+    console.log(event.target.parentNode.parentNode.parentNode.parentNode)
+    setInputTagValue(event.target.value);
+  };
+
+  const addItem = (e) => {
+    e.preventDefault();
+    //setItems([...items, name || `New item ${index++}`]);
+    console.log(e.target.value)
+    setInputTagValue("")
+
+    // });
+    // setTimeout(() => {
+    //   inputRef.current?.focus();
+    // }, 0);
+  };
+  const onFinish = async (values) => {
     console.log('Received values of form: ', values);
+    let resJson = await http.post("/ivt/updateIvt", { values })
   };
 
-  const resetAddNewTagForm = () => {
-    form.setFieldsValue({
-      newTagName: '',
-      newTagValue: '',
-    });
-  }
-  const handleAddExistTag = (value) => {
-    addExistTagList = value
-    // console.log(addExistTagList)
-  }
-
-  const handleAddExistTagCancel = () => {
-    addExistTagList = []
-    // console.log(addExistTagList)
-  }
-
-  const handleAddExistTagConfirm = () => {
-    // console.log(addExistTagList)
-    for (let i = 0; i < addExistTagList.length; i++) {
-      for (let j = 0; j < existTagList.length; j++) {
-        //console.log(existTagList[j])
-        if (existTagList[j].tagId === addExistTagList[i]) {
-
-          //push these new exist tags into the base list
-          //put these codes inside the loop is because the addExitTagList does not have the whole tag info 
-          let _modifiedTags = modifiedTags.concat()
-          _modifiedTags.push(existTagList[j])
-          setModifiedTags(_modifiedTags)
-
-          //remove from exist tag list
-          let _existTagList = existTagList.concat()
-          _existTagList.splice(j, 1)
-          setExistTagList(_existTagList)
-          // console.log(modifiedData)
+  const generateInitFormData = () => {
+    let result = {
+      'ivtId': baseData.ivtId,
+      'ivtClassName': baseData.ivtClassName,
+      'ivtSubclassCode': baseData.ivtSubclassCode,
+      'ivtCatName': baseData.ivtCatName,
+      'ivtQty': baseData.ivtQty,
+      'ivtValue': baseData.ivtValue,
+      'ivtPrice': baseData.ivtPrice,
+      'ivtNote': baseData.ivtNote,
+      'tags': (function () {
+        let _tags = {}
+        for (let i = 0; i < baseData.tags.length; i++) {
+          _tags[baseData.tags[i].tagName] = baseData.tags[i].tagId
         }
-      }
-
-
+        return _tags
+      })()
     }
-  }
+    return result
 
-  const handleTagEditOpen = () => {
-    console.log("print")
-    //editTagList.push("a")
   }
 
 
-  const handleTagClose = (removedTag) => {
-    let newTags = modifiedTags.filter((tag) => tag !== removedTag);
-    //console.log(newTags);
-    let _modifiedTags = modifiedTags.concat()
-    _modifiedTags = newTags
-    setModifiedTags(
-      _modifiedTags
-    )
-    let _existTagList = existTagList.concat()
-    _existTagList.push(removedTag)
-    setExistTagList(_existTagList)
-  };
-
-  const tagForMap = (tag) => {
-    // console.log(tag)
-    const tagElem = (
-      <Tag
-        closable
-        onClick={handleTagEditOpen}
-        onClose={(e) => {
-          e.preventDefault();
-          handleTagClose(tag);
-        }}
-      >
-        {tag.tagName + ':' + tag.tagValue}
-      </Tag>
-    );
+  const renderTagForms = () => {
     return (
-      <span
-        key={tag.tagId}
-        style={{
-          display: 'inline-block',
-        }}
-      >
-        {tagElem}
-      </span>
-    );
-  };
+      Object.keys(existTagList).map(tagName => {
+        //console.log(existTagList[tagName])
+        return (
 
-  const processTagOptions = () => {
-    let tagOptions = []
-    for (var i = 0; i < existTagList.length; i++) {
-      tagOptions.push({
-        label: existTagList[i].tagName + ":" + existTagList[i].tagValue,
-        value: existTagList[i].tagId,
+          <Form.Item lable={tagName} name={["tags", tagName]} key={tagName} style={{ width: '300px' }}>
+            <Select
+              allowClear
+              style={{
+                width: '280px',
+              }}
+              placeholder={tagName}
+              // onChange={handleChange}
+              options={processTagOptions(existTagList[tagName])}
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: '8px 0',
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: '0 8px 4px',
+                    }}
+                  >
+                    <Input
+                      placeholder="Please enter item"
+                      style={{ width: '150px' }}
+                      value={inputTagValue}
+                      onChange={onTagValueInputChange}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem} style={{ width: '20px' }}>
+                      Add tag
+                    </Button>
+                  </Space>
+                </>
+              )}
+            >
+            </Select>
+          </Form.Item>
+
+
+        )
       })
+    )
+  }
+
+  // const tagForMap = (tag) => {
+  //   // console.log(tag)
+  //   const tagElem = (
+  //     <Tag
+  //       closable
+  //       onClick={handleTagEditOpen}
+  //       onClose={(e) => {
+  //         e.preventDefault();
+  //         handleTagClose(tag);
+  //       }}
+  //     >
+  //       {tag.tagName + ':' + tag.tagValue}
+  //     </Tag>
+  //   );
+  //   return (
+  //     <span
+  //       key={tag.tagId}
+  //       style={{
+  //         display: 'inline-block',
+  //       }}
+  //     >
+  //       {tagElem}
+  //     </span>
+  //   );
+  // };
+
+  const processTagOptions = (tagValues) => {
+    let tagValueOptions = []
+    //console.log(tagValues)
+    for (var i = 0; i < tagValues.length; i++) {
+      for (let obj in tagValues[i]) {
+        tagValueOptions.push({
+          label: tagValues[i][obj],
+          value: obj
+        })
+      }
     }
-    return tagOptions
+    //console.log(tagValueOptions)
+    return tagValueOptions
   }
-
-  const selectExistTag = () => {
-    return (
-      <Form.Item name="existTags" label="tags">
-        <Space
-
-        // direction="vertical"
-        >
-          <Select
-            mode="multiple"
-            allowClear
-            style={{
-              width: '150px',
-            }}
-            optionFilterProp="label"
-            placeholder="Please select"
-            defaultValue={[]}
-            // onChange={handleChange}
-            options={processTagOptions()}
-            onChange={handleAddExistTag}
-          />
-          <CheckOutlined
-            onClick={() => {
-              setSelectExistTagOpen(false)
-              setAddTagButtonOpen(true)
-              handleAddExistTagConfirm()
-            }}
-          />
-          <CloseOutlined
-            onClick={() => {
-              setSelectExistTagOpen(false)
-              setAddTagButtonOpen(true)
-              handleAddExistTagCancel()
-            }}
-
-          />
-          <PlusOutlined
-            onClick={() => {
-              setAddNewTagOpen(true)
-              setSelectExistTagOpen(false)
-            }}
-          />
-        </Space>
-      </Form.Item>
-    )
-  };
-
-  const addNewTagForm = () => {
-    return (
-      <Form.Item label="new tag">
-
-        <Space key='newTag'>
-          <Form.Item noStyle name='newTagName'>
-            <Input placeholder="tag name" value="aaa" onChange={(e) => {
-              addNewTagName = e.target.value
-            }} />
-          </Form.Item>
-          <Form.Item noStyle name='newTagValue'>
-            <Input placeholder="tag value" value={addNewTagValue} onChange={(e) => { addNewTagValue = e.target.value }} />
-          </Form.Item>
-          <CheckOutlined
-            onClick={async () => {
-              setAddNewTagOpen(false)
-              setSelectExistTagOpen(true)
-              let res = await http.post("/queryTag/checkTagAndCreate", { "tagName": addNewTagName, "tagValue": addNewTagValue })
-              let newAddedTag = JSON.parse(JSON.stringify(res.data.data))
-              let _modifiedTags = modifiedTags.concat()
-              _modifiedTags.push(newAddedTag)
-              setModifiedTags(
-                _modifiedTags
-              )
-
-              //in case this tag is already in the option tag list
-              for (let i = 0; i < existTagList.length; i++) {
-                //console.log(existTagList[j])
-                if (newAddedTag.tagId === existTagList[i]) {
-                  //remove from exist tag list
-                  let _existTagList = existTagList.concat()
-                  _existTagList.splice(i, 1)
-                  setExistTagList(_existTagList)
-                  // console.log(modifiedData)
-                }
-              }
-
-
-              resetAddNewTagForm()
-            }}
-          />
-          <CloseOutlined
-            onClick={() => {
-              setAddNewTagOpen(false)
-              setSelectExistTagOpen(true)
-              resetAddNewTagForm()
-            }}
-          />
-        </Space>
-      </Form.Item>
-    )
-  };
-
-  const addTggButton = () => {
-    return (
-      <Tag key='editTagButton' icon={<PlusOutlined />} onClick={() => {
-        setSelectExistTagOpen(true)
-        setAddTagButtonOpen(false)
-      }}>
-        Add Tag
-      </Tag>
-    )
-  }
-
-
-
-
-
 
   return (
 
@@ -313,12 +231,6 @@ const IvtDetailPage = () => {
             { marginBottom: '20px' }
           }
         />
-        <Checkbox
-          checked={componentDisabled}
-          onChange={(e) => setComponentDisabled(e.target.checked)}
-        >
-          Form disabled
-        </Checkbox>
         <Form
           labelCol={{
             span: 4,
@@ -332,49 +244,45 @@ const IvtDetailPage = () => {
             maxWidth: 600,
           }}
           form={form}
-          initialValues={{
-            'ivtClassName': baseData.ivtClassName,
-            'ivtSubclassCode': baseData.ivtSubclassCode,
-            'ivtCatName': baseData.ivtCatName,
-            'ivtQty': baseData.ivtQty,
-            'ivtValue': baseData.ivtValue,
-            'ivtPrice': baseData.ivtPrice,
-            'ivtNote': baseData.ivtNote
-          }}
+          initialValues={generateInitFormData()}
         >
+          <Form.Item name="ivtId" label="ivtId" hidden='true'>
+            <Input disabled={true} />
+          </Form.Item>
           <Form.Item name="ivtClassName" label="Name">
-            <Input disabled={true} defaultValue="aaa" />
+            <Input disabled={true} />
           </Form.Item>
           <Form.Item name="ivtSubclassCode" label="Code">
-            <Input disabled={componentDisabled} />
+            <Input />
           </Form.Item>
           <Form.Item name="ivtCatName" label="Category">
-            <Input disabled={componentDisabled} />
+            <Input disabled={true} />
           </Form.Item>
           <Form.Item name="ivtQty" label="Quantity">
-            <InputNumber disabled={componentDisabled} />
+            <InputNumber />
           </Form.Item>
           <Form.Item name="ivtValue" label="Value">
-            <InputNumber disabled={componentDisabled} />
+            <InputNumber />
           </Form.Item>
           <Form.Item name="ivtPrice" label="Price">
-            <InputNumber disabled={componentDisabled} />
+            <InputNumber />
           </Form.Item>
 
           <Form.Item name="ivtNote" label="TextArea">
-            <TextArea rows={4} disabled={componentDisabled} />
+            <TextArea rows={4} />
           </Form.Item>
           {/* <Form.Item label="Select">
             <Select>
               <Select.Option value="demo">Demo</Select.Option>
             </Select>
           </Form.Item> */}
-          <Form.Item name="tags" label="tags">
+          <Form.Item label="tags">
             <Space size={[0, 8]} wrap>
-              {
+              {/* {
                 modifiedTags.map(tagForMap)
-              }
-              {
+              } */}
+              {renderTagForms()}
+              {/* {
                 selectExistTagOpen === false ? <></> : selectExistTag()
               }
               {
@@ -382,13 +290,13 @@ const IvtDetailPage = () => {
               }
               {
                 addTagButtonOpen === false ? <></> : addTggButton()
-              }
+              } */}
               {/* <Tag closeIcon={<CloseCircleOutlined />} onClose={log}>
               Tag 2
             </Tag> */}
             </Space>
           </Form.Item>
-          <Form.Item label="TreeSelect">
+          {/* <Form.Item label="TreeSelect">
             <TreeSelect
               treeData={[
                 {
@@ -403,14 +311,14 @@ const IvtDetailPage = () => {
                 },
               ]}
             />
-          </Form.Item>
-          <Form.Item label="InputNumber">
+          </Form.Item> */}
+          {/* <Form.Item label="InputNumber">
             <InputNumber />
           </Form.Item>
 
           <Form.Item label="Switch" valuePropName="checked">
             <Switch />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
             <Upload action="/upload.do" listType="picture-card">
               <div>
