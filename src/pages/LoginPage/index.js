@@ -1,4 +1,6 @@
+import React, { useEffect, useState } from 'react';
 import { Card, Form, Input, Button, Checkbox } from 'antd'
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import logo from '@/assets/logo.png'
 import './index.scss'
 import { useIvt } from '@/store'
@@ -7,6 +9,14 @@ const LoginPage = () => {
 
   //解构 但到实例对象为止
   const { loginIvt } = useIvt();
+  const [form] = Form.useForm();
+  const [clientReady, setClientReady] = useState(false);
+
+  // To disable submit button at the beginning.
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
+
   const onFinish = async (values) => {
     const { username, password } = values
     try {
@@ -20,71 +30,50 @@ const LoginPage = () => {
   return (
     <div className="login">
       <Card className="login-container">
-        <img className="login-logo" src={logo} alt="" />
-        <Form
-          onFinish={onFinish}
-          validateTrigger={['onBlur', 'onChange']}
-          initialValues={{
-            remember: true,
-            password: '12111'
-          }}
-        >
+        <div className='login-div'>
+          <img className="login-logo" src={logo} alt="" />
+          <span style={{ fontSize: '25px', fontWeight: 'bold' }}>Welcome Back! </span>
+          <span style={{ fontSize: '18px', fontWeight: 'normal' }}>Login to your account</span>
+        </div>
+        <Form name={form} className="login-form" onFinish={onFinish}>
           <Form.Item
-            label="username"
             name="username"
             rules={[
               {
                 required: true,
-                message: 'Please input your username!',
+                message: 'Please input your Username!',
               },
-              // {
-              //   pattern: /^\d{8,}$/,
-              //   message: 'Incorrect format!',
-              //   validateTrigger: 'onBlur'
-              // }
-            ]}
-          >
-            <Input />
+            ]} >
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
           </Form.Item>
           <Form.Item
-            label="password"
             name="password"
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: 'Please input your Password!',
               },
-              // {
-              //   len: 8,
-              //   message: 'Password is not longer than 8 characters!',
-              //   validateTrigger: 'onBlur'
-              // },
-            ]}
-          >
-            <Input.Password />
+            ]}>
+            <Input
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Password" />
           </Form.Item>
-          <Form.Item
-            name="remember"
-            valuePropName="checked"
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
-          >
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
-          <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
-          >
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
+          <div className='login-div'>
+            <Form.Item shouldUpdate>
+              {() => (
+                <Button
+                  className='login-button'
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !clientReady ||
+                    !form.isFieldsTouched(true) ||
+                    !!form.getFieldsError().filter(({ errors }) => errors.length).length
+                  }> Log in</Button> )}
+            </Form.Item>
+          </div>
         </Form>
-
       </Card>
     </div>
   )

@@ -15,15 +15,27 @@
 
   .login-container {
     width: 440px;
-    height: 360px;
+    height: 440px;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     box-shadow: 0 0 50px rgb(0 0 0 / 10%);
   }
+  
+  .login-div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 16px;
+  }
 
   .login-checkbox-label {
     color: #1890ff;
+  }
+
+  .login-button {
+    width: 150px;
+    height: 40px;
   }
 }
