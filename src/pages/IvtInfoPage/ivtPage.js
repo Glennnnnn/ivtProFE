@@ -23,15 +23,6 @@ const IvtPage = () => {
 
   const [cartOpen, setCartOpen] = useState(false);
 
-  // const [editOpen, setEditOpen] = useState(false);
-  // const onEditCreate = (values) => {
-  //   console.log('Received values of form: ', values);
-  //   setEditOpen(false);
-  // };
-  // const [rowData, setRowData] = useState(
-  //   //solve the fist loading with a null value issue
-  //   { "ivtId": 1, "ivtClassName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
-  // )
 
   const showDrawer = () => {
     setCartOpen(true);
@@ -50,7 +41,7 @@ const IvtPage = () => {
   }, [])
 
   useEffect(() => {
-    // console.log('index useeffect02')
+
     const queryResults = async () => {
       const res = await http.post("/ivt/queryIvtResultByInfo", {
         searchParas
@@ -63,20 +54,13 @@ const IvtPage = () => {
   }, [searchParas])
 
   const handleButtonClick = async (values) => {
-    // console.log(values)
     const { ivtClassName, tags } = values
     setSearchParas({
       ...searchParas,
       ivtClassName,
       tags
     })
-
   }
-
-  // const handleMenuClick = (e) => {
-  //   console.log(menuItems)
-  //   console.log('click ', e);
-  // };
 
   const handlePageChange = (pageIndex, pageSize) => {
     console.log(pageIndex)
@@ -86,30 +70,8 @@ const IvtPage = () => {
       pageSize
     })
   }
-  //TODO delete an item from item table
-  // const handleDeleteItem = (ivtId) => {
-  //   console.log(ivtId)
-  //   const deleteResult = async () => {
-  //     const res = await http.post("/ivt/deleteIvtById", { "ivtId": ivtId })
-  //     console.log("delete " + res.data)
-  //     setSearchParas({
-  //       ...searchParas,
-  //       pageIndex: 1
-  //     })
-  //   }
-  //   deleteResult()
-
-  // }
 
   const columns = [
-    // {
-    //   title: 'image',
-    //   dataIndex: 'cover',
-    //   width: 120,
-    //   render: cover => {
-    //     return <img src={cover || img404} width={80} height={60} alt="" />
-    //   }
-    // },
     {
       title: 'Name',
       dataIndex: 'ivtClassName',
@@ -117,10 +79,8 @@ const IvtPage = () => {
       key: 'ivtClassName',
       render: (ivtClassName, record) => {
         // console.log(JSON.stringify(ivtClassName) + JSON.stringify(record))
-        return <NavLink to='/ivtDetail' state={JSON.stringify(record)} >{ivtClassName}</NavLink>
+        return <NavLink to='/ivtDetail' state={{ "ivtData": JSON.stringify(record), "prePage": "inventory" }} >{ivtClassName}</NavLink>
       }
-
-
     },
     {
       title: 'Tags',
@@ -169,63 +129,10 @@ const IvtPage = () => {
       dataIndex: 'ivtPrice',
 
     },
-    // {
-    //   title: 'Operations',
-    //   key: 'Operations',
-    //   render: record => {
-    //     return (
-    //       <Space size="middle">
-    //         <Button
-    //           type="primary"
-    //           shape="circle"
-    //           icon={<EditOutlined />}
-    //           onClick={() => {
-    //             //console.log("click" + editOpen + ' index ' + index + '\n text ' + JSON.stringify(text) + ' \n record' + JSON.stringify(record))
-    //             //console.log(' \n record' + JSON.stringify(record))
-    //             // console.log("set new row" + JSON.stringify(rowData))
-    //             // setEditOpen(true)
-    //             // setRowData(record)
-    //           }}
-    //         />
-    //         <Button
-    //           type="primary"
-    //           shape="circle"
-    //           icon={<PlusCircleOutlined />}
-    //         />
-    //         <Button
-    //           type="primary"
-    //           shape="circle"
-    //           icon={<MinusCircleOutlined />}
-    //         />
-    //         <Popconfirm
-    //           title="Sure to delete this item?"
-    //           onConfirm={() => handleDeleteItem(record.ivtId)}
-    //           okText="confirm"
-    //           cancelText="cancel"
-    //         >
-    //           <Button
-    //             type="primary"
-    //             danger
-    //             shape="circle"
-    //             icon={<DeleteOutlined />}
-    //           />
-    //         </Popconfirm>
-    //       </Space>
-    //     )
-    //   }
-    // }
   ]
 
   return (
     <div className="ivt-layout">
-      {/* <ItemCreateForm
-        open={editOpen}
-        onCreate={onEditCreate}
-        onCancel={() => {
-          setEditOpen(false);
-        }}
-        rowData={rowData}
-      /> */}
       <Layout>
         <Content>
           <Breadcrumb
@@ -233,17 +140,11 @@ const IvtPage = () => {
             items={[
               {
                 title: 'Home',
+                href: '/'
               },
               {
-                title: 'Application Center',
+                title: 'Inventory',
                 href: '',
-              },
-              {
-                title: 'Application List',
-                href: '',
-              },
-              {
-                title: 'An Application',
               },
             ]}
             style={
@@ -314,13 +215,6 @@ const IvtPage = () => {
                           label={searchTagName}
                           name={['tags', searchTagName]}
                           key={searchTagName}>
-                          {/* {tags[tagName].map(item => {
-                      options.push({
-                        value: item,
-                        label: item
-                      })
-                      return null;
-                    })} */}
                           {
                             searchTags[searchTagName].forEach(element => {
                               options.push({

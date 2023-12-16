@@ -24,8 +24,9 @@ const normFile = (e) => {
 const IvtDetailPage = () => {
   const [form] = Form.useForm();
   let location = useLocation()
-  const recordData = JSON.parse(location.state)
+  const recordData = JSON.parse(location.state.ivtData)
   const baseData = Object.assign({}, recordData)
+  const prePage = location.state.prePage
 
   //const { ivtCatId, ivtId, ivtClassId, tags } = recordData
   //const { ivtClassId, ivtCatName, ivtClassName, ivtNote, ivtPrice, ivtQty, ivtSubclassCode, ivtValue, tags } = modifiedData
@@ -214,17 +215,20 @@ const IvtDetailPage = () => {
           items={[
             {
               title: 'Home',
+              href: '/'
+            },
+
+            {
+              title: (function () {
+                return prePage.toLowerCase().replace(/\b([\w|']+)\b/g, function (word) {
+                  //return word.slice(0, 1).toUpperCase() + word.slice(1);  
+                  return word.replace(word.charAt(0), word.charAt(0).toUpperCase()) + ' List';
+                });
+              })(),
+              href: '/' + prePage,
             },
             {
-              title: 'Application Center',
-              href: '',
-            },
-            {
-              title: 'Application List',
-              href: '',
-            },
-            {
-              title: 'An Application',
+              title: 'Edit Inventory',
             },
           ]}
           style={
