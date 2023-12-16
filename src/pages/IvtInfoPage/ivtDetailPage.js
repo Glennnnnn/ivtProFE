@@ -87,7 +87,7 @@ const IvtDetailPage = () => {
   };
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
-    let resJson = await http.post("/ivt/updateIvt", { values })
+    await http.post("/ivt/updateIvt", { values })
   };
 
   const generateInitFormData = () => {

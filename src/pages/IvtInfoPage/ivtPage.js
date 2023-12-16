@@ -1,25 +1,18 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import ItemCreateForm from "./itemCreateForm";
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Popconfirm, Drawer, Row, Col } from "antd";
-//import { Link } from "react-router-dom";
+import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Drawer, Row, Col } from "antd";
 import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusCircleOutlined,
-  MinusCircleOutlined,
   FolderOutlined
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
 import { NavLink } from "react-router-dom";
-// import { Content } from "antd/es/layout/layout";
 
 
 const IvtPage = () => {
   const { Content } = Layout;
-  //const options = []
+
   const [searchTags, setSearchTags] = useState([])
   const [ivtResults, setIvtResults] = useState([])
   const [searchParas, setSearchParas] = useState({
@@ -27,18 +20,18 @@ const IvtPage = () => {
     pageSize: 10
   })
   const [ivtCount, setIvtCount] = useState()
-  //drawer
+
   const [cartOpen, setCartOpen] = useState(false);
-  //editForm
-  const [editOpen, setEditOpen] = useState(false);
-  const onEditCreate = (values) => {
-    console.log('Received values of form: ', values);
-    setEditOpen(false);
-  };
-  const [rowData, setRowData] = useState(
-    //solve the fist loading with a null value issue
-    { "ivtId": 1, "ivtClassName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
-  )
+
+  // const [editOpen, setEditOpen] = useState(false);
+  // const onEditCreate = (values) => {
+  //   console.log('Received values of form: ', values);
+  //   setEditOpen(false);
+  // };
+  // const [rowData, setRowData] = useState(
+  //   //solve the fist loading with a null value issue
+  //   { "ivtId": 1, "ivtClassName": "bolt", "ivtQty": 10, "tags": [{ "tagId": 5, "tagName": "wide", "tagValue": "15", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }, { "tagId": 1, "tagName": "long", "tagValue": "10", "createTime": null, "updateTime": null, "createBy": 0, "updateBy": 0, "delFlag": 0 }] }
+  // )
 
   const showDrawer = () => {
     setCartOpen(true);
@@ -94,19 +87,19 @@ const IvtPage = () => {
     })
   }
   //TODO delete an item from item table
-  const handleDeleteItem = (ivtId) => {
-    console.log(ivtId)
-    const deleteResult = async () => {
-      const res = await http.post("/ivt/deleteIvtById", { "ivtId": ivtId })
-      console.log("delete " + res.data)
-      setSearchParas({
-        ...searchParas,
-        pageIndex: 1
-      })
-    }
-    deleteResult()
+  // const handleDeleteItem = (ivtId) => {
+  //   console.log(ivtId)
+  //   const deleteResult = async () => {
+  //     const res = await http.post("/ivt/deleteIvtById", { "ivtId": ivtId })
+  //     console.log("delete " + res.data)
+  //     setSearchParas({
+  //       ...searchParas,
+  //       pageIndex: 1
+  //     })
+  //   }
+  //   deleteResult()
 
-  }
+  // }
 
   const columns = [
     // {
@@ -176,63 +169,63 @@ const IvtPage = () => {
       dataIndex: 'ivtPrice',
 
     },
-    {
-      title: 'Operations',
-      key: 'Operations',
-      render: record => {
-        return (
-          <Space size="middle">
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={() => {
-                //console.log("click" + editOpen + ' index ' + index + '\n text ' + JSON.stringify(text) + ' \n record' + JSON.stringify(record))
-                //console.log(' \n record' + JSON.stringify(record))
-                // console.log("set new row" + JSON.stringify(rowData))
-                setEditOpen(true)
-                setRowData(record)
-              }}
-            />
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<PlusCircleOutlined />}
-            />
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<MinusCircleOutlined />}
-            />
-            <Popconfirm
-              title="Sure to delete this item?"
-              onConfirm={() => handleDeleteItem(record.ivtId)}
-              okText="confirm"
-              cancelText="cancel"
-            >
-              <Button
-                type="primary"
-                danger
-                shape="circle"
-                icon={<DeleteOutlined />}
-              />
-            </Popconfirm>
-          </Space>
-        )
-      }
-    }
+    // {
+    //   title: 'Operations',
+    //   key: 'Operations',
+    //   render: record => {
+    //     return (
+    //       <Space size="middle">
+    //         <Button
+    //           type="primary"
+    //           shape="circle"
+    //           icon={<EditOutlined />}
+    //           onClick={() => {
+    //             //console.log("click" + editOpen + ' index ' + index + '\n text ' + JSON.stringify(text) + ' \n record' + JSON.stringify(record))
+    //             //console.log(' \n record' + JSON.stringify(record))
+    //             // console.log("set new row" + JSON.stringify(rowData))
+    //             // setEditOpen(true)
+    //             // setRowData(record)
+    //           }}
+    //         />
+    //         <Button
+    //           type="primary"
+    //           shape="circle"
+    //           icon={<PlusCircleOutlined />}
+    //         />
+    //         <Button
+    //           type="primary"
+    //           shape="circle"
+    //           icon={<MinusCircleOutlined />}
+    //         />
+    //         <Popconfirm
+    //           title="Sure to delete this item?"
+    //           onConfirm={() => handleDeleteItem(record.ivtId)}
+    //           okText="confirm"
+    //           cancelText="cancel"
+    //         >
+    //           <Button
+    //             type="primary"
+    //             danger
+    //             shape="circle"
+    //             icon={<DeleteOutlined />}
+    //           />
+    //         </Popconfirm>
+    //       </Space>
+    //     )
+    //   }
+    // }
   ]
 
   return (
     <div className="ivt-layout">
-      <ItemCreateForm
+      {/* <ItemCreateForm
         open={editOpen}
         onCreate={onEditCreate}
         onCancel={() => {
           setEditOpen(false);
         }}
         rowData={rowData}
-      />
+      /> */}
       <Layout>
         <Content>
           <Breadcrumb
