@@ -8,6 +8,7 @@ import {
   FolderOpenOutlined,
   SettingOutlined,
   LogoutOutlined,
+  TeamOutlined,
   AppstoreTwoTone
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
@@ -16,6 +17,7 @@ import LoginPage from './pages/LoginPage/index.js'
 import IvtPage from "./pages/IvtInfoPage/ivtPage.js";
 import DashboardPage from './pages/DashboardPage/index.js';
 import OrderPage from './pages/OrderPage/index.js';
+import CustomerPage from './pages/CustomerPage/index.js';
 import HomePage from './pages/HomePage/index.js';
 import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
 import { getToken, removeToken } from '@/utils'
@@ -58,6 +60,9 @@ const App = () => {
           </Menu.Item>
           <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setSelectedMenu('orders')}>
             <Link to="/orders">Orders</Link>
+          </Menu.Item>
+          <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setSelectedMenu('customers')}>
+            <Link to="/customers">Customers</Link>
           </Menu.Item>
           <Menu.Item key="inventory" icon={<FolderOpenOutlined />} onClick={() => setSelectedMenu('inventory')}>
             <Link to="/inventory">Inventory</Link>
@@ -104,6 +109,7 @@ const App = () => {
           <Routes>
             <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />} />
             <Route path="/orders" element={isAuthenticated ? <OrderPage /> : <Navigate to="/login" />} />
+            <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
             <Route path="/ivtDetail" element={isAuthenticated ? <IvtDetailPage /> : <Navigate to="/login" />} />
