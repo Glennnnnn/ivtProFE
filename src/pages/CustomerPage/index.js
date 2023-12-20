@@ -1,117 +1,91 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Drawer, Row, Col } from "antd";
+import { Card, Breadcrumb, Table, Tag, Layout, Row, Col } from "antd";
 import {
     TeamOutlined, ShoppingOutlined
 } from '@ant-design/icons'
-//import img404 from '@/assets/error.png'
-import { http } from "@/utils";
 import { NavLink } from "react-router-dom";
+import { customerList } from '../../api/api.js'
 
 const CustomerPage = () => {
     const { Content } = Layout;
 
-    const [searchParas, setSearchParas] = useState({
-        pageIndex: 1,
-        pageSize: 10
+    const [loading, setLoading] = useState(false);
+    const [dataSource, setDataSource] = useState([]);
+    const [searchParams, setSearchParams] = useState({
+        pagination: {
+            current: 1,
+            pageSize: 10,
+        },
     })
 
-    const dataSource = [
-        {
-            customerId: '1',
-            name: 'aaa',
-            companyName: 'AA Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'aa Road, AA, VIC, 3000',
-            status: 'Active',
-        },
-        {
-            customerId: '2',
-            name: 'bbb',
-            companyName: 'BB Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'bb Road, BB, VIC, 3000',
-            status: 'Active',
-        },
-        {
-            customerId: '3',
-            name: 'ccc',
-            companyName: 'cc Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'cc Road, CC, VIC, 3000',
-            status: 'Active',
-        },
-        {
-            customerId: '4',
-            name: 'ddd',
-            companyName: 'dd Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'dd Road, DD, VIC, 3000',
-            status: 'Active',
-        },
-        {
-            customerId: '5',
-            name: 'eee',
-            companyName: 'ee Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'ee Road, EE, VIC, 3000',
-            status: 'Inactive',
-        },
-        {
-            customerId: '6',
-            name: 'fff',
-            companyName: 'ff Pty Ltd',
-            email: 'aa@aa.com',
-            phone: '0123-456-789',
-            orders: '1',
-            address: 'ff Road, FF, VIC, 3000',
-            status: 'Inactive',
-        },
-    ];
+    useEffect(() => {
+        const fetchDataAndUpdateState = async () => {
+            try {
+                setDataSource([]);
+                setLoading(true);
+                const posts = await customerList(searchParams);
+                console.log(posts);
+                if (posts['code'] === 200) {
+                    setDataSource(JSON.parse(JSON.stringify(posts.data)));
+                    setSearchParams({
+                        ...searchParams,
+                        pagination: {
+                            ...searchParams.pagination,
+                            total: posts['data'].length,
+                          },
+                    });
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+            finally{
+                setLoading(false);
+            }
+        };
 
-    const handlePageChange = (pageIndex, pageSize) => {
-        setSearchParas({
-            ...searchParas,
-            pageIndex,
-            pageSize
-        })
-    }
+        fetchDataAndUpdateState();
+    }, [JSON.stringify(searchParams)])
+
+    const handlePageChange = ((pagination, filters, sorter) => {
+        if (pagination.pageSize !== searchParams.pagination?.pageSize) {
+            console.log('page size changed');
+            pagination.current = 1;
+            setDataSource([]);
+        }
+
+        setSearchParams({
+            pagination,
+            filters,
+            ...sorter,
+        });
+    });
 
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            sorter: true,
+            title: 'Company Name',
+            dataIndex: 'companyName',
             width: 220,
+            sorter: true,
             key: 'customerId',
             render: (customerName, record) => {
                 return <NavLink>{customerName}</NavLink>
             }
         },
         {
-            title: 'Company Name',
-            dataIndex: 'companyName',
-            sorter: true,
+            title: 'Customer Name',
+            dataIndex: 'customerName',
+            width: 220,
         },
         {
             title: 'Email',
-            dataIndex: 'email',
-            sorter: true,
+            dataIndex: 'customerEmail',
         },
         {
             title: 'Phone',
-            dataIndex: 'phone',
+            dataIndex: 'customerPhone',
         },
         {
             title: 'Orders',
@@ -119,14 +93,14 @@ const CustomerPage = () => {
         },
         {
             title: 'Status',
-            dataIndex: 'status',
+            dataIndex: 'delFlag',
             filters: [
-                { text: 'Active', value: 'Active' },
-                { text: 'Inactive', value: 'Inactive' },
-             ],
+                { text: 'active', value: 'active' },
+                { text: 'inactive', value: 'inactive' },
+            ],
             render: (status) => (
                 <span>
-                    <Tag color={status === "Active" ? 'green' : 'volcano'}> {status} </Tag>
+                    <Tag color={status === "active" ? 'green' : 'volcano'}> {status} </Tag>
                 </span>
             ),
         }
@@ -167,11 +141,11 @@ const CustomerPage = () => {
                                     </div>}
                                     {<div key="active-customers" style={{ paddingRight: '10px', position: 'absolute', top: '50%', left: '45%' }}>
                                         <span style={{ fontSize: '15px' }}>Active</span><br />
-                                        <span style={{ fontSize: '20px' }}>{dataSource.filter(obj => obj.status === "Active").length}</span>
+                                        <span style={{ fontSize: '20px' }}>{dataSource.filter(obj => obj.delFlag === "active").length}</span>
                                     </div>}
                                     {<div key="inactive-customers" style={{ paddingRight: '10px', position: 'absolute', top: '50%', right: '3%' }}>
                                         <span style={{ fontSize: '15px' }}>In-Active</span><br />
-                                        <span style={{ fontSize: '20px', color: 'red' }}>{dataSource.filter(obj => obj.status !== "Active").length}</span>
+                                        <span style={{ fontSize: '20px', color: 'red' }}>{dataSource.filter(obj => obj.delFlag !== "active").length}</span>
                                     </div>}
                                 </Card>
                             </Col>
@@ -196,16 +170,12 @@ const CustomerPage = () => {
                     </div>
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
                         <Table
-                            rowKey={"id"}
+                            rowKey={"customerId"}
                             columns={columns}
                             dataSource={dataSource}
-                            pagination={{
-                                position: ['bottomCenter'],
-                                current: searchParas.pageIndex,
-                                pageSize: searchParas.pageSize,
-                                total: dataSource.length,
-                                onChange: handlePageChange
-                            }}
+                            pagination={searchParams.pagination}
+                            loading={loading}
+                            onChange={handlePageChange}
                         />
                     </Card>
                 </Content>
