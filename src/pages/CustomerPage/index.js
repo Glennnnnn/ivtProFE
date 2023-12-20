@@ -29,25 +29,18 @@ const CustomerPage = () => {
                 console.log(posts);
                 if (posts['code'] === 200) {
                     setDataSource(JSON.parse(JSON.stringify(posts.data)));
-                    setSearchParams({
-                        ...searchParams,
-                        pagination: {
-                            ...searchParams.pagination,
-                            total: posts['data'].length,
-                          },
-                    });
                 }
             }
             catch (error) {
                 console.log(error);
             }
-            finally{
+            finally {
                 setLoading(false);
             }
         };
 
         fetchDataAndUpdateState();
-    }, [JSON.stringify(searchParams)])
+    }, [searchParams])
 
     const handlePageChange = ((pagination, filters, sorter) => {
         if (pagination.pageSize !== searchParams.pagination?.pageSize) {
