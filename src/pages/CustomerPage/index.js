@@ -13,34 +13,43 @@ const CustomerPage = () => {
 
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
+    const [customerNo, setCustomerNo] = useState(0);
     const [searchParams, setSearchParams] = useState({
         pagination: {
             current: 1,
             pageSize: 10,
+            total: 0,
         },
     })
 
-    useEffect(() => {
-        const fetchDataAndUpdateState = async () => {
-            try {
-                setDataSource([]);
-                setLoading(true);
-                const posts = await customerList(searchParams);
-                console.log(posts);
-                if (posts['code'] === 200) {
-                    setDataSource(JSON.parse(JSON.stringify(posts.data)));
-                }
+    const fetchDataAndUpdateState = async () => {
+        try {
+            setDataSource([]);
+            setLoading(true);
+            const posts = await customerList(searchParams);
+            if (posts.code === 200) {
+                setDataSource(posts.data.customerInterPos);
+                setCustomerNo(posts.data.queryCount);
+                setSearchParams({
+                    ...searchParams,
+                    pagination:{
+                        ...searchParams.pagination,
+                        total: posts.data.queryCount
+                    }
+                })
             }
-            catch (error) {
-                console.log(error);
-            }
-            finally {
-                setLoading(false);
-            }
-        };
+        }
+        catch (error) {
+            console.log(error);
+        }
+        finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchDataAndUpdateState();
-    }, [searchParams])
+    }, [JSON.stringify(searchParams)])
 
     const handlePageChange = ((pagination, filters, sorter) => {
         if (pagination.pageSize !== searchParams.pagination?.pageSize) {
@@ -130,7 +139,7 @@ const CustomerPage = () => {
                                     style={{ height: '200px' }}>
                                     {<div key="all-customers" style={{ paddingLeft: '10px', position: 'absolute', top: '50%', left: '3%' }}>
                                         <span style={{ fontSize: '15px' }}>All Customers</span><br />
-                                        <span style={{ fontSize: '20px' }}>{dataSource.length}</span>
+                                        <span style={{ fontSize: '20px' }}>{customerNo}</span>
                                     </div>}
                                     {<div key="active-customers" style={{ paddingRight: '10px', position: 'absolute', top: '50%', left: '45%' }}>
                                         <span style={{ fontSize: '15px' }}>Active</span><br />
