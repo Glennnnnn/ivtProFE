@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Card, Breadcrumb, Table, Tag, Layout, Row, Col } from "antd";
+import { Button, Card, Breadcrumb, Table, Tag, Layout, Row, Col, Modal, Form, Input, Select, Switch } from "antd";
 import {
-    TeamOutlined, ShoppingOutlined
+    TeamOutlined, ShoppingOutlined, PlusOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { customerList } from '../../api/api.js'
 
 const CustomerPage = () => {
     const { Content } = Layout;
+    const { Option } = Select;
+    const [form] = Form.useForm();
 
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -22,6 +24,29 @@ const CustomerPage = () => {
         },
     })
 
+    const [visible, setVisible] = useState(false);
+    const [addLoading, setAddLoading] = useState(false);
+    const showModel = () => {
+        setVisible(true);
+    }
+    const handleOk = () => {
+        form.validateFields().then((values) => {
+            console.log(values);
+
+            setAddLoading(true);
+
+            //setVisible(false);
+            form.resetFields();
+        }).catch((errorInfo) => {
+            console.log("Validation failed:", errorInfo);
+        });
+    }
+    const handleCancel = () => {
+        setVisible(false);
+        setAddLoading(false);
+        form.resetFields();
+    }
+
     const fetchDataAndUpdateState = async () => {
         try {
             setDataSource([]);
@@ -32,7 +57,7 @@ const CustomerPage = () => {
                 setCustomerNo(posts.data.queryCount);
                 setSearchParams({
                     ...searchParams,
-                    pagination:{
+                    pagination: {
                         ...searchParams.pagination,
                         total: posts.data.queryCount
                     }
@@ -111,7 +136,7 @@ const CustomerPage = () => {
     return (
         <div className="ivt-layout">
             <Layout>
-                <Content>
+                <Content style={{ margin: '10px' }}>
                     <Breadcrumb
                         separator=">"
                         items={[
@@ -124,10 +149,129 @@ const CustomerPage = () => {
                                 href: '',
                             },
                         ]}
-                        style={
-                            { marginBottom: '20px' }
-                        }
-                    />
+                        style={{ marginBottom: '20px' }} />
+                    <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
+                        <div style={{ marginLeft: 'auto' }}>
+                            <Button type="primary" icon={<PlusOutlined />} size="default" onClick={showModel}> New Customers</Button>
+                        </div>
+                    </div>
+
+                    <Modal
+                        title="Add a New Customer"
+                        open={visible}
+                        onOk={handleOk}
+                        onCancel={handleCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered
+                        footer={[
+                            <Button key="back" onClick={handleCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)'}} size="large">
+                                Cancel
+                            </Button>,
+                            <Button key="submit" type="primary" loading={addLoading} onClick={handleOk}  style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
+                                Add
+                            </Button>,
+                        ]}>
+
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>Customer Information</span>
+
+                        <Form form={form} name="customerForm" style={{ maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', marginBottom: '60px' }} >
+                            <Form.Item
+                                name="companyName"
+                                rules={[{ required: true, message: "Please enter the company name" }]}>
+                                <Input placeholder="Company Name" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="customerFirstName"
+                                style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}>
+                                <Input placeholder="Customer First Name" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="customerLastName"
+                                style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}>
+                                <Input placeholder="Customer Last Name" className="form-item"/>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="customerEmail"
+                                rules={[
+                                    { type: "email", message: "Invalid email format" },
+                                ]}>
+                                <Input placeholder="Email" className="form-item"/>
+                            </Form.Item>
+
+                            <Form.Item name="customerPhone">
+                                <Input placeholder="Phone Number" className="form-item"/>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="creditTerm"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please select credit term!',
+                                    },
+                                ]}>
+                                <Select placeholder="Credit Term" className="form-item">
+                                    <Option value="0">Immediately</Option>
+                                    <Option value="30">30 days</Option>
+                                    <Option value="60">60 days</Option>
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item name="note">
+                                <Input.TextArea placeholder="Note" style={{height: '150px'}}/>
+                            </Form.Item>
+
+                            <Form.Item label="Add Delivery Address" name="enableAddress" valuePropName="checked" labelCol={{ span: 7 }} wrapperCol={{ span: 2, offset: 14 }}>
+                                <Switch />
+                            </Form.Item>
+
+                            <Form.Item
+                                noStyle
+                                shouldUpdate={(prevValues, currentValues) =>
+                                    prevValues.enableAddress !== currentValues.enableAddress
+                                }>
+
+                                {({ getFieldValue }) => {
+                                    const enableAddress = getFieldValue("enableAddress");
+
+                                    return enableAddress ? (
+                                        <>
+                                            <Form.Item name="customerDeliveryAddress">
+                                                <Input placeholder="Delivery Address" className="form-item"/>
+                                            </Form.Item>
+
+                                            <Form.Item label="Billing Address Same as Delivery Address" name="enableBilling" valuePropName="checked" initialValue={true}
+                                                labelCol={{ span: 13 }} wrapperCol={{ span: 2, offset: 8 }}>
+                                                <Switch />
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                noStyle
+                                                shouldUpdate={(prevValues, currentValues) =>
+                                                    prevValues.enableBilling !== currentValues.enableBilling
+                                                }>
+                                                {({ getFieldValue }) => {
+                                                    const enableBilling = getFieldValue("enableBilling");
+
+                                                    return enableBilling ? (<></>) : (
+                                                        <Form.Item
+                                                            name="customerBillingAddress">
+                                                            <Input placeholder="Billing Address" className="form-item"/>
+                                                        </Form.Item>
+                                                    );
+                                                }}
+                                            </Form.Item>
+                                        </>
+                                    ) : null;
+                                }}
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+
                     <div style={{ marginBottom: '20px' }}>
                         <Row gutter={[16, 64]}>
                             <Col span={12}>
