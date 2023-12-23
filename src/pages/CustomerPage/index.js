@@ -112,7 +112,7 @@ const CustomerPage = () => {
             sorter: true,
             key: 'customerId',
             render: (customerName, record) => {
-                return <NavLink>{customerName}</NavLink>
+                return <NavLink to='/customerDetails' state={{ "customerDetails": JSON.stringify(record) }}>{customerName}</NavLink>
             }
         },
         {
@@ -167,7 +167,7 @@ const CustomerPage = () => {
                         style={{ marginBottom: '20px' }} />
                     <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
-                            <Button type="primary" icon={<PlusOutlined />} size="default" onClick={showModel}> New Customers</Button>
+                            <Button type="primary" icon={<PlusOutlined />} size="large" onClick={showModel} className="new-customer-button"> New Customer</Button>
                         </div>
                     </div>
 
