@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Button, Card, Breadcrumb, Table, Tag, Layout, Row, Col, Modal, Form, Input, Select, Switch } from "antd";
+import { Button, Card, Breadcrumb, Table, Tag, Layout, Row, Col, Modal, Form, Input, Select, Switch, message } from "antd";
 import {
     TeamOutlined, ShoppingOutlined, PlusOutlined
 } from '@ant-design/icons'
@@ -11,6 +11,7 @@ import { customerList } from '../../api/api.js'
 const CustomerPage = () => {
     const { Content } = Layout;
     const { Option } = Select;
+    const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
 
     const [loading, setLoading] = useState(false);
@@ -38,7 +39,10 @@ const CustomerPage = () => {
             //setVisible(false);
             form.resetFields();
         }).catch((errorInfo) => {
-            console.log("Validation failed:", errorInfo);
+            messageApi.open({
+                type: 'error',
+                content: 'Please fill in the required fields!'
+            })
         });
     }
     const handleCancel = () => {
@@ -63,9 +67,19 @@ const CustomerPage = () => {
                     }
                 })
             }
+            else{
+                messageApi.open({
+                    type: 'error',
+                    content: 'Loading Customers Error!'
+                })
+            }
         }
         catch (error) {
             console.log(error);
+            messageApi.open({
+                type: 'error',
+                content: 'Loading Customers Error!'
+            })
         }
         finally {
             setLoading(false);
@@ -136,6 +150,7 @@ const CustomerPage = () => {
     return (
         <div className="ivt-layout">
             <Layout>
+                {contextHolder}
                 <Content style={{ margin: '10px' }}>
                     <Breadcrumb
                         separator=">"
@@ -165,10 +180,10 @@ const CustomerPage = () => {
                         width={600}
                         centered
                         footer={[
-                            <Button key="back" onClick={handleCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)'}} size="large">
+                            <Button key="back" onClick={handleCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)' }} size="large">
                                 Cancel
                             </Button>,
-                            <Button key="submit" type="primary" loading={addLoading} onClick={handleOk}  style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
+                            <Button key="submit" type="primary" loading={addLoading} onClick={handleOk} style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
                                 Add
                             </Button>,
                         ]}>
@@ -179,7 +194,7 @@ const CustomerPage = () => {
                             <Form.Item
                                 name="companyName"
                                 rules={[{ required: true, message: "Please enter the company name" }]}>
-                                <Input placeholder="Company Name" className="form-item" />
+                                <Input placeholder="* Company Name" className="form-item" />
                             </Form.Item>
 
                             <Form.Item
@@ -191,7 +206,7 @@ const CustomerPage = () => {
                             <Form.Item
                                 name="customerLastName"
                                 style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}>
-                                <Input placeholder="Customer Last Name" className="form-item"/>
+                                <Input placeholder="Customer Last Name" className="form-item" />
                             </Form.Item>
 
                             <Form.Item
@@ -199,11 +214,11 @@ const CustomerPage = () => {
                                 rules={[
                                     { type: "email", message: "Invalid email format" },
                                 ]}>
-                                <Input placeholder="Email" className="form-item"/>
+                                <Input placeholder="Email" className="form-item" />
                             </Form.Item>
 
                             <Form.Item name="customerPhone">
-                                <Input placeholder="Phone Number" className="form-item"/>
+                                <Input placeholder="Phone Number" className="form-item" />
                             </Form.Item>
 
                             <Form.Item
@@ -214,7 +229,7 @@ const CustomerPage = () => {
                                         message: 'Please select credit term!',
                                     },
                                 ]}>
-                                <Select placeholder="Credit Term" className="form-item">
+                                <Select placeholder="* Credit Term" className="form-item">
                                     <Option value="0">Immediately</Option>
                                     <Option value="30">30 days</Option>
                                     <Option value="60">60 days</Option>
@@ -222,7 +237,7 @@ const CustomerPage = () => {
                             </Form.Item>
 
                             <Form.Item name="note">
-                                <Input.TextArea placeholder="Note" style={{height: '150px'}}/>
+                                <Input.TextArea placeholder="Note" style={{ height: '150px' }} />
                             </Form.Item>
 
                             <Form.Item label="Add Delivery Address" name="enableAddress" valuePropName="checked" labelCol={{ span: 7 }} wrapperCol={{ span: 2, offset: 14 }}>
@@ -241,7 +256,7 @@ const CustomerPage = () => {
                                     return enableAddress ? (
                                         <>
                                             <Form.Item name="customerDeliveryAddress">
-                                                <Input placeholder="Delivery Address" className="form-item"/>
+                                                <Input placeholder="Delivery Address" className="form-item" />
                                             </Form.Item>
 
                                             <Form.Item label="Billing Address Same as Delivery Address" name="enableBilling" valuePropName="checked" initialValue={true}
@@ -260,7 +275,7 @@ const CustomerPage = () => {
                                                     return enableBilling ? (<></>) : (
                                                         <Form.Item
                                                             name="customerBillingAddress">
-                                                            <Input placeholder="Billing Address" className="form-item"/>
+                                                            <Input placeholder="Billing Address" className="form-item" />
                                                         </Form.Item>
                                                     );
                                                 }}
