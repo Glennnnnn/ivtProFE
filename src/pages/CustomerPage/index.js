@@ -6,7 +6,7 @@ import {
     TeamOutlined, ShoppingOutlined, PlusOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { customerList, customersSummary } from '../../api/api.js'
+import { addCustomer, customerList, customersSummary } from '../../api/api.js'
 
 const CustomerPage = () => {
     const { Content } = Layout;
@@ -34,19 +34,40 @@ const CustomerPage = () => {
     const showModel = () => {
         setVisible(true);
     }
-    const handleOk = () => {
-        form.validateFields().then((values) => {
-            console.log(values);
+    const handleOk = async () => {
 
+        form.validateFields().then(async (values) => {
             setAddLoading(true);
 
-            //setVisible(false);
-            form.resetFields();
+            try {
+                const posts = await addCustomer(values);
+                if (posts.code === 200) {
+                    setVisible(false);
+                    form.resetFields();
+                    window.location.reload();
+                }
+                else{
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Add New Customer Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Add New Customer Error!'
+                })
+            }
         }).catch((errorInfo) => {
             messageApi.open({
                 type: 'error',
                 content: 'Please fill in the required fields!'
             })
+
+        }).finally(() => {
+            setAddLoading(false);
         });
     }
     const handleCancel = () => {
@@ -255,9 +276,9 @@ const CustomerPage = () => {
                                     },
                                 ]}>
                                 <Select placeholder="* Credit Term" className="form-item">
-                                    <Option value="0">Immediately</Option>
-                                    <Option value="30">30 days</Option>
-                                    <Option value="60">60 days</Option>
+                                    <Option value="immidiately">Immediately</Option>
+                                    <Option value="30 days">30 days</Option>
+                                    <Option value="60 days">60 days</Option>
                                 </Select>
                             </Form.Item>
 
