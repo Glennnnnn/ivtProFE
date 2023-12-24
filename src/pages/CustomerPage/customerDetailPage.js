@@ -123,7 +123,18 @@ const CustomerDetailsPage = () => {
                         <Row gutter={[16, 64]}>
                             <Col span={8}>
                                 <Card
-                                    title={<div><UserOutlined />  Details </div>}
+                                    title={
+                                        <Row>
+                                            <Col span={2}>
+                                                <UserOutlined />
+                                            </Col>
+                                            <Col span={16}>
+                                                {recordData.companyName}
+                                            </Col>
+                                            <Col span={6}>
+                                                <Tag color={recordData.delFlag === "active" ? 'green' : 'volcano'}> {recordData.delFlag}</Tag>
+                                            </Col>
+                                        </Row>}
                                     bordered={false}
                                     style={{ height: 'auto' }}>
                                     <Row gutter={[16, 16]}>
@@ -148,24 +159,40 @@ const CustomerDetailsPage = () => {
                             </Col>
                             <Col span={8}>
                                 <Card
-                                    title={<div><CarOutlined />  Addresses </div>}
+                                    title={
+                                        <Row>
+                                            <Col span={2}>
+                                                <CarOutlined />
+                                            </Col>
+                                            <Col span={18}>
+                                                Addresses
+                                            </Col>
+                                        </Row>}
                                     bordered={false}
                                     style={{ height: 'auto' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Delivery Address</span><br />
-                                            <span style={{ fontSize: '12px' }}>{recordData.address}</span>
+                                            <span style={{ fontSize: '12px' }}>{recordData.deliveryAddress}</span>
                                         </Col>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Billing Address</span><br />
-                                            <span style={{ fontSize: '12px' }}>{recordData.address}</span>
+                                            <span style={{ fontSize: '12px' }}>{recordData.billingAddress}</span>
                                         </Col>
                                     </Row>
                                 </Card>
                             </Col>
                             <Col span={8}>
                                 <Card
-                                    title={<div><AccountBookOutlined />  Notes </div>}
+                                    title={
+                                        <Row>
+                                            <Col span={2}>
+                                                <AccountBookOutlined />
+                                            </Col>
+                                            <Col span={18}>
+                                                Notes
+                                            </Col>
+                                        </Row>}
                                     bordered={false}
                                     style={{ height: 'auto', minHeight: '200px' }}>
                                     <Row gutter={[16, 16]}>

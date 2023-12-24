@@ -6,7 +6,7 @@ import {
     TeamOutlined, ShoppingOutlined, PlusOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { customerList } from '../../api/api.js'
+import { customerList, customersSummary } from '../../api/api.js'
 
 const CustomerPage = () => {
     const { Content } = Layout;
@@ -16,7 +16,11 @@ const CustomerPage = () => {
 
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
-    const [customerNo, setCustomerNo] = useState(0);
+    const [customerNo, setCustomerNo] = useState({
+        total: 0,
+        active: 0,
+        inactive: 0,
+    });
     const [searchParams, setSearchParams] = useState({
         pagination: {
             current: 1,
@@ -58,7 +62,6 @@ const CustomerPage = () => {
             const posts = await customerList(searchParams);
             if (posts.code === 200) {
                 setDataSource(posts.data.customerInterPos);
-                setCustomerNo(posts.data.queryCount);
                 setSearchParams({
                     ...searchParams,
                     pagination: {
@@ -67,7 +70,7 @@ const CustomerPage = () => {
                     }
                 })
             }
-            else{
+            else {
                 messageApi.open({
                     type: 'error',
                     content: 'Loading Customers Error!'
@@ -89,6 +92,36 @@ const CustomerPage = () => {
     useEffect(() => {
         fetchDataAndUpdateState();
     }, [JSON.stringify(searchParams)])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const posts = await customersSummary();
+                if (posts.code === 200) {
+                    setCustomerNo({
+                        total: posts.data.total,
+                        active: posts.data.active,
+                        inactive: posts.data.inactive,
+                    })
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Loading Customers Summary Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Loading Customers Summary Error!'
+                })
+            }
+        }
+
+        fetchData();
+    }, []);
 
     const handlePageChange = ((pagination, filters, sorter) => {
         if (pagination.pageSize !== searchParams.pagination?.pageSize) {
@@ -197,16 +230,8 @@ const CustomerPage = () => {
                                 <Input placeholder="* Company Name" className="form-item" />
                             </Form.Item>
 
-                            <Form.Item
-                                name="customerFirstName"
-                                style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}>
-                                <Input placeholder="Customer First Name" className="form-item" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="customerLastName"
-                                style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}>
-                                <Input placeholder="Customer Last Name" className="form-item" />
+                            <Form.Item name="customerName">
+                                <Input placeholder="Customer Name" className="form-item" />
                             </Form.Item>
 
                             <Form.Item
@@ -292,39 +317,59 @@ const CustomerPage = () => {
                             <Col span={12}>
                                 <Card
                                     title={
-                                        <div><TeamOutlined /> Customers Summary</div>
+                                        <Row>
+                                            <Col span={2}>
+                                                <TeamOutlined />
+                                            </Col>
+                                            <Col span={18}>
+                                                Customers Summary
+                                            </Col>
+                                        </Row>
                                     }
                                     bordered={false}
-                                    style={{ height: '200px' }}>
-                                    {<div key="all-customers" style={{ paddingLeft: '10px', position: 'absolute', top: '50%', left: '3%' }}>
-                                        <span style={{ fontSize: '15px' }}>All Customers</span><br />
-                                        <span style={{ fontSize: '20px' }}>{customerNo}</span>
-                                    </div>}
-                                    {<div key="active-customers" style={{ paddingRight: '10px', position: 'absolute', top: '50%', left: '45%' }}>
-                                        <span style={{ fontSize: '15px' }}>Active</span><br />
-                                        <span style={{ fontSize: '20px' }}>{dataSource.filter(obj => obj.delFlag === "active").length}</span>
-                                    </div>}
-                                    {<div key="inactive-customers" style={{ paddingRight: '10px', position: 'absolute', top: '50%', right: '3%' }}>
-                                        <span style={{ fontSize: '15px' }}>In-Active</span><br />
-                                        <span style={{ fontSize: '20px', color: 'red' }}>{dataSource.filter(obj => obj.delFlag !== "active").length}</span>
-                                    </div>}
+                                    style={{ height: 'auto' }}>
+                                    <Row gutter={[16, 16]}>
+                                        <Col span={8}>
+                                            <span style={{ fontSize: '15px' }}>All Customers</span><br />
+                                            <span style={{ fontSize: '20px' }}>{customerNo.total}</span>
+                                        </Col>
+                                        <Col span={8}>
+                                            <span style={{ fontSize: '15px' }}>Active</span><br />
+                                            <span style={{ fontSize: '20px' }}>{customerNo.active}</span>
+                                        </Col>
+                                        <Col span={8}>
+                                            <span style={{ fontSize: '15px' }}>In-Active</span><br />
+                                            <span style={{ fontSize: '20px', color: 'red' }}>{customerNo.inactive}</span>
+                                        </Col>
+                                    </Row>
                                 </Card>
                             </Col>
                             <Col span={12}>
                                 <Card
                                     title={
-                                        <div><ShoppingOutlined /> Cusomters Summary </div>
+                                        <Row>
+                                            <Col span={2}>
+                                                <ShoppingOutlined />
+                                            </Col>
+                                            <Col span={18}>
+                                                Customers Summary
+                                            </Col>
+                                        </Row>
                                     }
                                     bordered={false}
-                                    style={{ height: '200px' }}>
-                                    {<div key="new-customers" style={{ paddingLeft: '10px', position: 'absolute', top: '50%', left: '3%' }}>
-                                        <span style={{ fontSize: '15px' }}>New Customers</span><br />
-                                        <span style={{ fontSize: '20px' }}>100</span>
-                                    </div>}
-                                    {<div key="total-orders" style={{ paddingRight: '10px', position: 'absolute', top: '50%', right: '10%' }}>
-                                        <span style={{ fontSize: '15px' }}>Orders</span><br />
-                                        <span style={{ fontSize: '20px' }}>987</span>
-                                    </div>}
+                                    style={{ height: 'auto' }}>
+
+                                    <Row gutter={[16, 16]}>
+                                        <Col span={12}>
+                                            <span style={{ fontSize: '15px' }}>New Customers</span><br />
+                                            <span style={{ fontSize: '20px' }}>100</span>
+                                        </Col>
+                                        <Col span={12}>
+                                            <span style={{ fontSize: '15px' }}>Orders</span><br />
+                                            <span style={{ fontSize: '20px' }}>987</span>
+                                        </Col>
+                                    </Row>
+
                                 </Card>
                             </Col>
                         </Row>
