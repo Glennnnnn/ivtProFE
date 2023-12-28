@@ -1,215 +1,154 @@
-import { React, useState, useEffect } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-
+import { useLocation, NavLink } from 'react-router-dom';
 import {
-  Form,
-  Input,
-  InputNumber,
-  Upload,
   Layout,
   Breadcrumb,
-  Space,
-  Select, Button, Divider
+  Button,
+  Row,
+  Col,
+  Card,
+  Tag,
+  Table,
 } from 'antd';
-import { useLocation } from 'react-router-dom';
-import { http } from "@/utils";
-//const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-const normFile = (e) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
-};
-const IvtDetailPage = () => {
-  const [form] = Form.useForm();
+import {
+  EditOutlined, DeleteOutlined, CarOutlined, AccountBookOutlined, ShoppingCartOutlined
+} from '@ant-design/icons'
+import { useEffect, useState } from 'react';
+function IvtDetailPage() {
+
   let location = useLocation()
+  const { Content } = Layout;
   const recordData = JSON.parse(location.state.ivtData)
   const baseData = Object.assign({}, recordData)
   const prePage = location.state.prePage
-
-  //const { ivtCatId, ivtId, ivtClassId, tags } = recordData
-  //const { ivtClassId, ivtCatName, ivtClassName, ivtNote, ivtPrice, ivtQty, ivtSubclassCode, ivtValue, tags } = modifiedData
-  const { Content } = Layout;
-  //console.log(recordData)
-
-  // const [editableTags, setEditableTags] = useState(modifiedData.tags)
-  // const [tagEditOpen, setTagEditOpen] = useState(false)
-  const [existTagList, setExistTagList] = useState([])
-  const [inputTagValue, setInputTagValue] = useState();
-
-
-
+  const [orderDataSource, setOrderDataSource] = useState([]);
+  const [restockSource, setRestockSource] = useState([]);
 
   useEffect(() => {
+    console.log(baseData)
+  })
 
-    const queryTagByIvtClassAsync = async () => {
-      let resJson = await http.post("/queryTag/queryTagResByIvtClass", { "ivtClassId": baseData.ivtClassId })
-      let res = JSON.parse(JSON.stringify(resJson.data.data))
-      // Object.keys(existTagList).map(tagName => {
-      //   setInputTagValues({
-      //     ...inputTagValues,
-      //     tagName: ""
-      //   })
-      // })
-      // console.log(res)
-      // form.setFieldsValue({
-      //   ivtClassName: baseData.ivtClassName,
-      //   ivtSubclassCode: baseData.ivtSubclassCode,
-      //   ivtCatName: baseData.ivtCatName,
-      //   ivtQty: baseData.ivtQty,
-      //   ivtValue: baseData.ivtValue,
-      //   ivtPrice: baseData.ivtPrice,
-      //   ivtNote: baseData.ivtNote,
-      // });
-      setExistTagList(res)
+  const [orderSearchParams, setOrderSearchParams] = useState({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    },
+  })
+  const [restockSearchParams, setRestockSearchParams] = useState({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    },
+  })
+
+
+  const handleOrderPageChange = ((pagination, filters, sorter) => {
+    if (pagination.pageSize !== orderSearchParams.pagination?.pageSize) {
+      pagination.current = 1;
+      setOrderDataSource([]);
     }
-    // console.log(baseData)
-    queryTagByIvtClassAsync()
 
-  }, [baseData.ivtClassId])
-
-
-  const onTagValueInputChange = (event) => {
-    console.log(event.target.parentNode.parentNode.parentNode.parentNode)
-    setInputTagValue(event.target.value);
-  };
-
-  const addItem = (e) => {
-    e.preventDefault();
-    //setItems([...items, name || `New item ${index++}`]);
-    console.log(e.target.value)
-    setInputTagValue("")
-
-    // });
-    // setTimeout(() => {
-    //   inputRef.current?.focus();
-    // }, 0);
-  };
-  const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
-    await http.post("/ivt/updateIvt", { values })
-  };
-
-  const generateInitFormData = () => {
-    let result = {
-      'ivtId': baseData.ivtId,
-      'ivtClassName': baseData.ivtClassName,
-      'ivtSubclassCode': baseData.ivtSubclassCode,
-      'ivtCatName': baseData.ivtCatName,
-      'ivtQty': baseData.ivtQty,
-      'ivtValue': baseData.ivtValue,
-      'ivtPrice': baseData.ivtPrice,
-      'ivtNote': baseData.ivtNote,
-      'tags': (function () {
-        let _tags = {}
-        for (let i = 0; i < baseData.tags.length; i++) {
-          _tags[baseData.tags[i].tagName] = baseData.tags[i].tagId
-        }
-        return _tags
-      })()
+    setOrderSearchParams({
+      pagination,
+      filters,
+      ...sorter,
+    });
+  });
+  const handleRestockPageChange = ((pagination, filters, sorter) => {
+    if (pagination.pageSize !== restockSearchParams.pagination?.pageSize) {
+      pagination.current = 1;
+      setRestockSource([]);
     }
-    return result
 
-  }
-
-
-  const renderTagForms = () => {
-    return (
-      Object.keys(existTagList).map(tagName => {
-        //console.log(existTagList[tagName])
-        return (
-
-          <Form.Item lable={tagName} name={["tags", tagName]} key={tagName} style={{ width: '300px' }}>
-            <Select
-              allowClear
-              style={{
-                width: '280px',
-              }}
-              placeholder={tagName}
-              // onChange={handleChange}
-              options={processTagOptions(existTagList[tagName])}
-              dropdownRender={(menu) => (
-                <>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: '8px 0',
-                    }}
-                  />
-                  <Space
-                    style={{
-                      padding: '0 8px 4px',
-                    }}
-                  >
-                    <Input
-                      placeholder="Please enter item"
-                      style={{ width: '150px' }}
-                      value={inputTagValue}
-                      onChange={onTagValueInputChange}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem} style={{ width: '20px' }}>
-                      Add tag
-                    </Button>
-                  </Space>
-                </>
-              )}
-            >
-            </Select>
-          </Form.Item>
-
-
-        )
-      })
-    )
-  }
-
-  // const tagForMap = (tag) => {
-  //   // console.log(tag)
-  //   const tagElem = (
-  //     <Tag
-  //       closable
-  //       onClick={handleTagEditOpen}
-  //       onClose={(e) => {
-  //         e.preventDefault();
-  //         handleTagClose(tag);
-  //       }}
-  //     >
-  //       {tag.tagName + ':' + tag.tagValue}
-  //     </Tag>
-  //   );
-  //   return (
-  //     <span
-  //       key={tag.tagId}
-  //       style={{
-  //         display: 'inline-block',
-  //       }}
-  //     >
-  //       {tagElem}
-  //     </span>
-  //   );
-  // };
-
-  const processTagOptions = (tagValues) => {
-    let tagValueOptions = []
-    //console.log(tagValues)
-    for (var i = 0; i < tagValues.length; i++) {
-      for (let obj in tagValues[i]) {
-        tagValueOptions.push({
-          label: tagValues[i][obj],
-          value: obj
-        })
+    setRestockSearchParams({
+      pagination,
+      filters,
+      ...sorter,
+    });
+  });
+  const orderColumns = [
+    {
+      title: 'orderId',
+      dataIndex: 'orderId',
+      // width: 220,
+      key: 'orderId',
+      render: (orderId, record) => {
+        return <NavLink>{orderId}</NavLink>
       }
+    },
+    {
+      title: 'Order Price',
+      dataIndex: 'orderPrice',
+      // width: 220,
+    },
+    {
+      title: 'Order Quantity',
+      dataIndex: 'orderQty',
+    },
+    {
+      title: 'Order Discount',
+      dataIndex: 'orderDiscount',
+    },
+    {
+      title: 'Order Date',
+      dataIndex: 'date',
+      sorter: true,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'delFlag',
+      filters: [
+        { text: 'active', value: 'active' },
+        { text: 'inactive', value: 'inactive' },
+      ],
+      render: (status) => (
+        <span>
+          <Tag color={status === "active" ? 'green' : 'volcano'}> {status} </Tag>
+        </span>
+      ),
     }
-    //console.log(tagValueOptions)
-    return tagValueOptions
-  }
+  ]
+
+  const restockColumns = [
+    {
+      title: 'Restock Id',
+      dataIndex: 'restockId',
+      width: 220,
+      key: 'orderId',
+      render: (orderId, record) => {
+        return <NavLink>{orderId}</NavLink>
+      }
+    },
+    {
+      title: 'Restock Date',
+      dataIndex: 'restockDate',
+      width: 220,
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'restocQty',
+    },
+    {
+      title: 'Restock Type',
+      dataIndex: 'restockType',
+      filters: [
+        { text: 'instock', value: 'instock' },
+        { text: 'offstock', value: 'instock' },
+      ],
+      render: (status) => (
+        <span>
+          <Tag color={status === "instock" ? 'green' : 'volcano'}> {status} </Tag>
+        </span>
+      ),
+    }
+  ]
+
+
 
   return (
-
-    <Layout>
-      <Content>
+    <div className="ivt-layout">
+      <Content style={{ margin: '10px' }}>
         <Breadcrumb
           separator=">"
           items={[
@@ -217,7 +156,6 @@ const IvtDetailPage = () => {
               title: 'Home',
               href: '/'
             },
-
             {
               title: (function () {
                 return prePage.toLowerCase().replace(/\b([\w|']+)\b/g, function (word) {
@@ -228,138 +166,142 @@ const IvtDetailPage = () => {
               href: '/' + prePage,
             },
             {
-              title: 'Edit Inventory',
-            },
+              title: baseData.ivtClassName + " " + baseData.ivtSubclassCode
+            }
           ]}
           style={
             { marginBottom: '20px' }
           }
         />
-        <Form
-          labelCol={{
-            span: 4,
-          }}
-          wrapperCol={{
-            span: 14,
-          }}
-          layout="horizontal"
-          onFinish={onFinish}
-          style={{
-            maxWidth: 600,
-          }}
-          form={form}
-          initialValues={generateInitFormData()}
-        >
-          <Form.Item name="ivtId" label="ivtId" hidden='true'>
-            <Input disabled={true} />
-          </Form.Item>
-          <Form.Item name="ivtClassName" label="Name">
-            <Input disabled={true} />
-          </Form.Item>
-          <Form.Item name="ivtSubclassCode" label="Code">
-            <Input />
-          </Form.Item>
-          <Form.Item name="ivtCatName" label="Category">
-            <Input disabled={true} />
-          </Form.Item>
-          <Form.Item name="ivtQty" label="Quantity">
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name="ivtValue" label="Value">
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name="ivtPrice" label="Price">
-            <InputNumber />
-          </Form.Item>
+        <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
+          <div style={{ marginLeft: 'auto' }}>
+            <Button type="default" size="large" className="edit-customer-details-button" ><EditOutlined /><NavLink to='/ivtEditPage' state={{ "ivtData": JSON.stringify(recordData), "prePage": baseData.ivtClassName + " " + baseData.ivtSubclassCode }} >Edit</NavLink></Button>
+            <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"> Inactive</Button>
+          </div>
+        </div>
 
-          <Form.Item name="ivtNote" label="TextArea">
-            <TextArea rows={4} />
-          </Form.Item>
-          {/* <Form.Item label="Select">
-            <Select>
-              <Select.Option value="demo">Demo</Select.Option>
-            </Select>
-          </Form.Item> */}
-          <Form.Item label="tags">
-            <Space size={[0, 8]} wrap>
-              {/* {
-                modifiedTags.map(tagForMap)
-              } */}
-              {renderTagForms()}
-              {/* {
-                selectExistTagOpen === false ? <></> : selectExistTag()
-              }
-              {
-                addNewTagOpen === false ? <></> : addNewTagForm()
-              }
-              {
-                addTagButtonOpen === false ? <></> : addTggButton()
-              } */}
-              {/* <Tag closeIcon={<CloseCircleOutlined />} onClose={log}>
-              Tag 2
-            </Tag> */}
-            </Space>
-          </Form.Item>
-          {/* <Form.Item label="TreeSelect">
-            <TreeSelect
-              treeData={[
-                {
-                  title: 'Light',
-                  value: 'light',
-                  children: [
-                    {
-                      title: 'Bamboo',
-                      value: 'bamboo',
-                    },
-                  ],
-                },
-              ]}
-            />
-          </Form.Item> */}
-          {/* <Form.Item label="InputNumber">
-            <InputNumber />
-          </Form.Item>
+        <div style={{ marginBottom: '20px' }}>
+          <Row gutter={[16, 64]}>
+            <Col span={8}>
+              <Card
+                title={
+                  <Row>
+                    <Col span={2}>
+                      <ShoppingCartOutlined />
+                    </Col>
+                    <Col span={8}>
+                      {baseData.ivtClassName}
+                    </Col>
+                    <Col span={14}>
+                      <span>
+                        {baseData.tags.map((tag) => {
+                          let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
+                          if (tag.tagName === 'color') {
+                            color = tag.tagValue;
+                          }
+                          return (
+                            <Tag color={color} key={tag.tagName}>
+                              {tag.tagName + ':' + tag.tagValue}
+                              {/* {tag.toUpperCase()} */}
+                            </Tag>
+                          );
+                        })}
+                      </span>
+                    </Col>
+                    {/* <Col span={6}>
+                      <Tag color={recordData.delFlag === "active" ? 'green' : 'volcano'}> {recordData.delFlag}</Tag>
+                    </Col> */}
+                  </Row>}
+                bordered={false}
+                style={{ height: 'auto' }}>
+                <Row gutter={[16, 16]}>
 
-          <Form.Item label="Switch" valuePropName="checked">
-            <Switch />
-          </Form.Item> */}
-          <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            wrapperCol={{
-              span: 12,
-              offset: 6,
-            }}
-          >
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-              <Button htmlType="reset">reset</Button>
-            </Space>
-          </Form.Item>
-
-
-        </Form>
-
-
-
+                </Row>
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card
+                title={
+                  <Row>
+                    <Col span={2}>
+                      <CarOutlined />
+                    </Col>
+                    <Col span={18}>
+                      Basic information
+                    </Col>
+                  </Row>}
+                bordered={false}
+                style={{ height: 'auto' }}>
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Code</span><br />
+                    <span style={{ fontSize: '12px' }}>{baseData.ivtSubclassCode}</span>
+                  </Col>
+                  <Col span={12}>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Price</span><br />
+                    <span style={{ fontSize: '12px' }}>{baseData.ivtPrice}</span>
+                  </Col>
+                  <Col span={12}>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Quantity</span><br />
+                    <span style={{ fontSize: '12px' }}>{baseData.ivtQty}</span>
+                  </Col>
+                  <Col span={12}>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Value</span><br />
+                    <span style={{ fontSize: '12px' }}>{baseData.ivtValue}</span>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card
+                title={
+                  <Row>
+                    <Col span={2}>
+                      <AccountBookOutlined />
+                    </Col>
+                    <Col span={18}>
+                      Notes
+                    </Col>
+                  </Row>}
+                bordered={false}
+                style={{ height: 'auto', minHeight: '200px' }}>
+                <Row gutter={[16, 16]}>
+                  <Col span={24}>
+                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Note</span><br />
+                    <span style={{ fontSize: '12px' }}>{baseData.ivtNote}</span>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+        <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
+          <Table
+            title={() => 'Orders'}
+            rowKey={"orderId"}
+            columns={orderColumns}
+            dataSource={orderDataSource}
+            pagination={orderSearchParams.pagination}
+            // loading={loading}
+            onChange={handleOrderPageChange}
+          />
+        </Card>
+        <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
+          <Table
+            title={() => 'Restock History'}
+            rowKey={"restockId"}
+            columns={restockColumns}
+            dataSource={restockSource}
+            pagination={restockSearchParams.pagination}
+            // loading={loading}
+            onChange={handleRestockPageChange}
+          />
+        </Card>
       </Content>
-    </Layout >
+    </div>
+
 
   )
-};
+}
+
 export default IvtDetailPage
