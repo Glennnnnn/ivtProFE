@@ -12,6 +12,7 @@ import {
   Select, Button, Divider
 } from 'antd';
 import { NavLink, useLocation } from 'react-router-dom';
+// import { createBrowserHistory } from 'history'
 import { http } from "@/utils";
 //const { RangePicker } = DatePicker;
 const { TextArea } = Input;
@@ -69,6 +70,10 @@ const IvtEditPage = () => {
 
   }, [baseData.ivtClassId])
 
+  const breadcrumbRender = (item, params, items, paths) => {
+    const isPrevious = items.indexOf(item) !== items.length - 2;
+    return isPrevious ? <NavLink to={item.href}>{item.title}</NavLink> : <NavLink to='/ivtDetailPage' state={{ "ivtData": JSON.stringify(recordData), "prePage": "Inventory List" }}>{item.title + "aa"}</NavLink>;
+  }
 
   const onTagValueInputChange = (event) => {
     console.log(event.target.parentNode.parentNode.parentNode.parentNode)
@@ -210,6 +215,7 @@ const IvtEditPage = () => {
     <Layout>
       <Content>
         <Breadcrumb
+          itemRender={breadcrumbRender}
           separator=">"
           items={[
             {
@@ -217,7 +223,8 @@ const IvtEditPage = () => {
               href: '/'
             },
             {
-              title: 'Inventory List'
+              title: 'Inventory List',
+              href: '/inventory'
             },
             // {
             //   title: (function () {
@@ -230,9 +237,6 @@ const IvtEditPage = () => {
             // },
             {
               title: prePage,
-              onClick: () => {
-
-              }
             },
             {
               title: 'Edit Inventory',
