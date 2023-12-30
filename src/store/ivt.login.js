@@ -25,7 +25,7 @@ class LoginIvt {
     //   history.push('/')
     // }
 
-    this.token = "abcd"
+    this.token = "a"
     this.result = 200
     setToken(this.token)
     history.push('/')

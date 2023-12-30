@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Link, Navigate, withRouter } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -35,12 +35,19 @@ const App = () => {
   const [selectedMenu, setSelectedMenu] = useState('dashboard');
   const { token: { colorBgContainer }, } = theme.useToken();
   const isAuthenticated = getToken();
+  useEffect(() => {
+    setSelectedMenu(window.location.pathname.split('/')[1])
+  }, [])
 
   const handleLogout = () => {
     removeToken();
     // You can use window.location.href or any other navigation method
     window.location.href = '/login';
   };
+
+  const setMenu = (menuName) => {
+    setSelectedMenu(menuName)
+  }
 
   return (
     <Layout>
@@ -56,20 +63,20 @@ const App = () => {
         <Menu
           theme="light"
           mode="inline"
-          defaultSelectedKeys={['dashboard']}>
-          <Menu.Item key="dashboard" icon={<DashboardOutlined />} onClick={() => setSelectedMenu('dashboard')}>
+          defaultSelectedKeys={[window.location.pathname.split('/')[1]]}>
+          <Menu.Item key="dashboard" icon={<DashboardOutlined />} onClick={() => setMenu('dashboard')}>
             <Link to="/dashboard">Dashboard</Link>
           </Menu.Item>
-          <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setSelectedMenu('orders')}>
+          <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setMenu('orders')}>
             <Link to="/orders">Orders</Link>
           </Menu.Item>
-          <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setSelectedMenu('customers')}>
+          <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setMenu('customers')}>
             <Link to="/customers">Customers</Link>
           </Menu.Item>
-          <Menu.Item key="inventory" icon={<FolderOpenOutlined />} onClick={() => setSelectedMenu('inventory')}>
+          <Menu.Item key="inventory" icon={<FolderOpenOutlined />} onClick={() => setMenu('inventory')}>
             <Link to="/inventory">Inventory</Link>
           </Menu.Item>
-          <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => setSelectedMenu('settings')}>
+          <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => setMenu('settings')}>
             <Link to="/settings">Settings</Link>
           </Menu.Item>
         </Menu>
