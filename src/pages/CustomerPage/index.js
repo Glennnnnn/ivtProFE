@@ -11,6 +11,7 @@ import { addCustomer, customerList, customersSummary } from '../../api/api.js'
 const CustomerPage = () => {
     const { Content } = Layout;
     const { Option } = Select;
+    const { Search } = Input;
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
 
@@ -28,14 +29,15 @@ const CustomerPage = () => {
             total: 0,
         },
     })
+    const [searchName, setSearchName] = useState("");
 
     const [visible, setVisible] = useState(false);
     const [addLoading, setAddLoading] = useState(false);
     const showModel = () => {
         setVisible(true);
     }
-    const handleOk = async () => {
 
+    const handleOk = async () => {
         form.validateFields().then(async (values) => {
             setAddLoading(true);
 
@@ -46,7 +48,7 @@ const CustomerPage = () => {
                     form.resetFields();
                     window.location.reload();
                 }
-                else{
+                else {
                     messageApi.open({
                         type: 'error',
                         content: 'Add New Customer Error!'
@@ -70,10 +72,37 @@ const CustomerPage = () => {
             setAddLoading(false);
         });
     }
+
     const handleCancel = () => {
         setVisible(false);
         setAddLoading(false);
         form.resetFields();
+    }
+
+    const onSearch = (value, _e) => {
+        setSearchParams({
+            ...searchParams,
+            pagination: {
+                ...searchParams.pagination,
+                current: 1
+            },
+            searchName: value,
+        })
+    }
+
+    const onChange = (e) => {
+        if(e.target.value != searchName) {
+            setSearchParams({
+                ...searchParams,
+                pagination: {
+                    ...searchParams.pagination,
+                    current: 1
+                },
+                searchName: e.target.value,
+            })
+            setSearchName(e.target.value);
+        }
+
     }
 
     const fetchDataAndUpdateState = async () => {
@@ -396,6 +425,13 @@ const CustomerPage = () => {
                         </Row>
                     </div>
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
+                        <Row justify={"end"}>
+                            <Col>
+                                <Search placeholder="Search Customer" onSearch={onSearch}
+                                    enterButton style={{ width: 320, marginBottom: 20 }} 
+                                    onChange={onChange}/>
+                            </Col>
+                        </Row>
                         <Table
                             rowKey={"customerId"}
                             columns={columns}
