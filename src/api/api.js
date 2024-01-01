@@ -9,7 +9,6 @@ export const customerList = async (searchingParams) => {
         "delFlag": searchingParams.filters?.delFlag ?? [],
         "order": searchingParams.order ?? "ascend"
     }
-    console.log(111);
     const response = await http.post(`/queryCustomerData`, queryBody);
     return response.data;
 }
