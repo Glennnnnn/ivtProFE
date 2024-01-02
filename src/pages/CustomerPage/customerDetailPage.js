@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState, useEffect } from "react"
 import "./index.scss"
 import {
     Form,
@@ -10,20 +10,53 @@ import {
     Tag,
     Row,
     Col,
+    message,
+    Modal,
+    Input,
+    Select,
 } from 'antd';
 import {
     EditOutlined, DeleteOutlined, UserOutlined, CarOutlined, AccountBookOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
+import { editCustomer, deleteCustomer, getCustomerDetailById } from '../../api/api.js'
 
 
 const CustomerDetailsPage = () => {
     const { Content } = Layout;
-
+    const { Option } = Select;
+    const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
+    const [deleteForm] = Form.useForm();
     let location = useLocation();
-    const recordData = JSON.parse(location.state.customerDetails);
+
+    const [recordData, setRecordData] = useState({});
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const posts = await getCustomerDetailById(JSON.parse(location.state.customerDetails).customerId);
+                if (posts.code === 200) {
+                    console.log(posts.data);
+                    setRecordData(posts.data);
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Loading Customer Detail Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Loading Customer Detail Error!'
+                })
+            }
+        }
+        fetchData();
+    }, []);
 
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -34,6 +67,101 @@ const CustomerDetailsPage = () => {
             total: 0,
         },
     })
+
+    const [editVisible, setEditVisible] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
+    const showEditModel = () => {
+        setEditVisible(true);
+    }
+
+    const [deleteVisible, setDeleteVisible] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const showDeleteModel = () => {
+        setDeleteVisible(true);
+    }
+
+    const handleEditOk = async () => {
+        form.validateFields().then(async (values) => {
+            setEditLoading(true);
+
+            try {
+                const posts = await editCustomer(values, recordData.customerId);
+                if (posts.code === 200) {
+                    setEditVisible(false);
+                    form.resetFields();
+                    window.location.reload();
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Edit Customer Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Edit Customer Error!'
+                })
+            }
+        }).catch((errorInfo) => {
+            messageApi.open({
+                type: 'error',
+                content: 'Please fill in the required fields!'
+            })
+
+        }).finally(() => {
+            setEditLoading(false);
+        });
+    }
+
+    const handleEditCancel = () => {
+        setEditVisible(false);
+        setEditLoading(false);
+        form.resetFields();
+    }
+
+    const handleDeleteOk = async () => {
+        deleteForm.validateFields().then(async (values) => {
+            setDeleteLoading(true);
+
+            try {
+                const posts = await deleteCustomer(values, recordData.customerId);
+                if (posts.code === 200) {
+                    setEditVisible(false);
+                    deleteForm.resetFields();
+                    window.location.reload();
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Inactive Customer Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Inactive Customer Error!'
+                })
+            }
+        }).catch((errorInfo) => {
+            messageApi.open({
+                type: 'error',
+                content: 'Please fill in the required fields!'
+            })
+        }).finally(() => {
+            setDeleteLoading(false);
+        });
+    }
+
+    const handleDeleteCancel = () => {
+        setDeleteVisible(false);
+        setDeleteLoading(false);
+        deleteForm.resetFields();
+    }
 
     const handlePageChange = ((pagination, filters, sorter) => {
         if (pagination.pageSize !== searchParams.pagination?.pageSize) {
@@ -91,6 +219,7 @@ const CustomerDetailsPage = () => {
     return (
         <div className="ivt-layout">
             <Layout>
+                {contextHolder}
                 <Content style={{ margin: '10px' }}>
                     <Breadcrumb
                         separator=">"
@@ -114,10 +243,113 @@ const CustomerDetailsPage = () => {
 
                     <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
-                            <Button type="default" icon={<EditOutlined />} size="large" className="edit-customer-details-button" > Edit</Button>
-                            <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"> Inactive</Button>
+                            <Button type="default" icon={<EditOutlined />} size="large" onClick={showEditModel} className="edit-customer-details-button" > Edit</Button>
+                            <Button danger icon={<DeleteOutlined />} size="large" onClick={showDeleteModel} className="edit-customer-details-button" disabled={recordData.delFlag !== "active"}> Inactive</Button>
                         </div>
                     </div>
+
+                    <Modal
+                        title="Edit Customer"
+                        open={editVisible}
+                        onOk={handleEditOk}
+                        onCancel={handleEditCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered
+                        footer={[
+                            <Button key="back" onClick={handleEditCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)' }} size="large">
+                                Cancel
+                            </Button>,
+                            <Button key="submit" type="primary" loading={editLoading} onClick={handleEditOk} style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
+                                Save
+                            </Button>,
+                        ]}>
+
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>Customer Information</span>
+
+                        <Form form={form} name="customerForm" style={{ maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', marginBottom: '60px' }}
+                            layout="vertical">
+                            <Form.Item
+                                label="Company Name"
+                                name="companyName"
+                                rules={[{ required: true, message: "Please enter the company name" }]}
+                                initialValue={recordData.companyName}>
+                                <Input placeholder="* Company Name" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item name="customerName" initialValue={recordData.customerName}>
+                                <Input placeholder="Customer Name" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Customer Name"
+                                name="customerEmail"
+                                rules={[
+                                    { type: "email", message: "Invalid email format" },
+                                ]}
+                                initialValue={recordData.customerEmail}>
+                                <Input placeholder="Email" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item label="Phone Number" name="customerPhone" initialValue={recordData.customerPhone}>
+                                <Input placeholder="Phone Number" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Credit Term"
+                                name="creditTerm"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please select credit term!',
+                                    },
+                                ]}
+                                initialValue={recordData.creditTerm}>
+                                <Select placeholder="* Credit Term" className="form-item">
+                                    <Option value="immidiately">Immediately</Option>
+                                    <Option value="30 days">30 days</Option>
+                                    <Option value="60 days">60 days</Option>
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item label="Note" name="note" initialValue={recordData.customerNote}>
+                                <Input.TextArea placeholder="Note" style={{ height: '150px' }} />
+                            </Form.Item>
+
+                            <Form.Item label="Delivery Address" name="customerDeliveryAddress" initialValue={recordData.deliveryAddress}>
+                                <Input placeholder="Delivery Address" className="form-item" />
+                            </Form.Item>
+
+                            <Form.Item label="Billing Address" name="customerBillingAddress" initialValue={recordData.billingAddress}>
+                                <Input placeholder="Billing Address" className="form-item" />
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+
+                    <Modal
+                        title="Inactive Customer"
+                        open={deleteVisible}
+                        onOk={handleDeleteOk}
+                        onCancel={handleDeleteCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered
+                        footer={[
+                            <Button key="back" onClick={handleDeleteCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)' }} size="large">
+                                Cancel
+                            </Button>,
+                            <Button key="submit" danger loading={deleteLoading} onClick={handleDeleteOk} style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
+                                Inactive
+                            </Button>,
+                        ]}>
+
+                        <Form form={deleteForm} name="deleteForm" style={{ maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', marginBottom: '60px' }}
+                            layout="vertical">
+                            <Form.Item label="Reason" name="reason">
+                                <Input.TextArea placeholder="Reason" style={{ height: '150px' }} />
+                            </Form.Item>
+                        </Form>
+                    </Modal>
 
                     <div style={{ marginBottom: '20px' }}>
                         <Row gutter={[16, 64]}>
@@ -136,7 +368,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Company Name</span><br />
@@ -169,7 +401,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Delivery Address</span><br />
@@ -194,7 +426,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto', minHeight: '200px' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={24}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Credit Term</span><br />
@@ -204,6 +436,14 @@ const CustomerDetailsPage = () => {
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Note</span><br />
                                             <span style={{ fontSize: '12px' }}>{recordData.customerNote}</span>
                                         </Col>
+                                        {
+                                            recordData.delFlag !== "active" ? (
+                                                <Col span={24}>
+                                                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Inactive Reason</span><br />
+                                                    <span style={{ fontSize: '12px' }}>{recordData.customerDelNote ?? ""}</span>
+                                                </Col>
+                                            ): (<></>)
+                                        }
                                     </Row>
                                 </Card>
                             </Col>
