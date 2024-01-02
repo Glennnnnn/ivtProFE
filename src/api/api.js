@@ -53,9 +53,9 @@ export const editCustomer = async (formData, customerId) => {
     var queryBody = {
         "customerId": customerId,
         "customerName": formData.customerName ?? "",
-        "companyName": formData.companyName,
-        "deliveryAddress": formData.customerDeliveryAddress,
-        "billingAddress": formData.customerBillingAddress,
+        "companyName": formData.companyName ?? "",
+        "deliveryAddress": formData.customerDeliveryAddress ?? "",
+        "billingAddress": formData.customerBillingAddress ?? "",
         "customerPhone": formData.customerPhone ?? "",
         "customerEmail": formData.customerEmail ?? "",
         "customerNote": formData.note ?? "",
