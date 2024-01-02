@@ -44,6 +44,34 @@ export const addCustomer = async (formData) => {
     return response.data;
 }
 
+export const editCustomer = async (formData, customerId) => {
+    var queryBody = {
+        "customerId": customerId,
+        "customerName": formData.customerName ?? "",
+        "companyName": formData.companyName,
+        "deliveryAddress": formData.customerDeliveryAddress,
+        "billingAddress": formData.customerBillingAddress,
+        "customerPhone": formData.customerPhone ?? "",
+        "customerEmail": formData.customerEmail ?? "",
+        "customerNote": formData.note ?? "",
+        "creditTerm": formData.creditTerm,
+        "delFlag": "active",
+        "createTime": null,
+        "updateTime": null,
+    }
+    console.log(queryBody);
+    const response = await http.post(`/updateCustomer`, queryBody);
+    return response.data;
+}
+
+export const deleteCustomer = async(formData, customerId) => {
+    var queryBody = {
+        "customerId": customerId,
+        "reason": formData.reason ?? ""
+    }
+    console.log(queryBody);
+} 
+
 export const customersSummary = async () => {
     const response = await http.get(`/countCustomerByLabel`);
     return response.data;
