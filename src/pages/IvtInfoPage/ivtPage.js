@@ -54,10 +54,10 @@ const IvtPage = () => {
   }, [searchParas])
 
   const handleButtonClick = async (values) => {
-    const { ivtClassName, tags } = values
+    const { searchInfo, tags } = values
     setSearchParas({
       ...searchParas,
-      ivtClassName,
+      searchInfo,
       tags
     })
   }
@@ -198,10 +198,10 @@ const IvtPage = () => {
               onFinish={handleButtonClick}
               initialValues={{ status: 'a', channel_id: 'a' }}>
 
-              <Form.Item label="name" name={'ivtClassName'}>
+              <Form.Item label="search parameters" name={'searchInfo'}>
                 <Input
                   style={{ width: 240 }}
-                  placeholder="please enter the name">
+                  placeholder="please enter the search parameters">
                 </Input>
               </Form.Item>
 
