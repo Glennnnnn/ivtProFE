@@ -44,6 +44,11 @@ export const addCustomer = async (formData) => {
     return response.data;
 }
 
+export const getCustomerDetailById = async(customerId) => {
+    const response = await http.get(`/queryCustomerDataById?customerId=${customerId}`);
+    return response.data;
+}
+
 export const editCustomer = async (formData, customerId) => {
     var queryBody = {
         "customerId": customerId,
@@ -59,7 +64,6 @@ export const editCustomer = async (formData, customerId) => {
         "createTime": null,
         "updateTime": null,
     }
-    console.log(queryBody);
     const response = await http.post(`/updateCustomer`, queryBody);
     return response.data;
 }
@@ -67,9 +71,11 @@ export const editCustomer = async (formData, customerId) => {
 export const deleteCustomer = async(formData, customerId) => {
     var queryBody = {
         "customerId": customerId,
-        "reason": formData.reason ?? ""
+        "delNote": formData.reason ?? ""
     }
-    console.log(queryBody);
+    console.log(customerId);
+    const response = await http.delete(`/deleteCustomer`, queryBody);
+    return response.data;
 } 
 
 export const customersSummary = async () => {

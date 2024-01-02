@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import "./index.scss"
 import {
     Form,
@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
-import { editCustomer, deleteCustomer } from '../../api/api.js'
+import { editCustomer, deleteCustomer, getCustomerDetailById } from '../../api/api.js'
 
 
 const CustomerDetailsPage = () => {
@@ -30,7 +30,33 @@ const CustomerDetailsPage = () => {
     const [form] = Form.useForm();
     const [deleteForm] = Form.useForm();
     let location = useLocation();
-    const recordData = JSON.parse(location.state.customerDetails);
+
+    const [recordData, setRecordData] = useState({});
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const posts = await getCustomerDetailById(JSON.parse(location.state.customerDetails).customerId);
+                if (posts.code === 200) {
+                    console.log(posts.data);
+                    setRecordData(posts.data);
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Loading Customer Detail Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Loading Customer Detail Error!'
+                })
+            }
+        }
+        fetchData();
+    }, []);
 
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -342,7 +368,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Company Name</span><br />
@@ -375,7 +401,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Delivery Address</span><br />
@@ -400,7 +426,7 @@ const CustomerDetailsPage = () => {
                                             </Col>
                                         </Row>}
                                     bordered={false}
-                                    style={{ height: 'auto', minHeight: '200px' }}>
+                                    style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
                                         <Col span={24}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Credit Term</span><br />
@@ -410,6 +436,14 @@ const CustomerDetailsPage = () => {
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Note</span><br />
                                             <span style={{ fontSize: '12px' }}>{recordData.customerNote}</span>
                                         </Col>
+                                        {
+                                            recordData.delFlag !== "active" ? (
+                                                <Col span={24}>
+                                                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Inactive Reason</span><br />
+                                                    <span style={{ fontSize: '12px' }}>{recordData.customerDelNote ?? ""}</span>
+                                                </Col>
+                                            ): (<></>)
+                                        }
                                     </Row>
                                 </Card>
                             </Col>
