@@ -73,8 +73,7 @@ export const deleteCustomer = async(formData, customerId) => {
         "customerId": customerId,
         "delNote": formData.reason ?? ""
     }
-    console.log(customerId);
-    const response = await http.delete(`/deleteCustomer`, queryBody);
+    const response = await http.delete(`/deleteCustomer`, { data: queryBody });
     return response.data;
 } 
 
