@@ -20,6 +20,7 @@ import OrderPage from './pages/OrderPage/index.js';
 import CustomerPage from './pages/CustomerPage/index.js';
 import CustomerDetailsPage from './pages/CustomerPage/customerDetailPage.js';
 import HomePage from './pages/HomePage/index.js';
+import IvtCreatePage from './pages/IvtInfoPage/ivtCreatePage.js';
 import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
 import IvtEditPage from './pages/IvtInfoPage/ivtEditPage.js';
 import { getToken, removeToken } from '@/utils'
@@ -124,6 +125,7 @@ const App = () => {
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
+            <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/ivtCreatePage" />} />
             <Route path='/ivtEditPage' element={isAuthenticated ? <IvtEditPage /> : <Navigate to="/login" />} />
             <Route path="/ivtDetailPage" element={isAuthenticated ? <IvtDetailPage /> : <Navigate to="/login" />} />
             <Route path="/login" element={<LoginPage />} />

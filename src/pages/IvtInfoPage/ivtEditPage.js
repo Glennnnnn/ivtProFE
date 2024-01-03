@@ -76,14 +76,15 @@ const IvtEditPage = () => {
   }
 
   const onTagValueInputChange = (event) => {
-    console.log(event.target.parentNode.parentNode.parentNode.parentNode)
+    // console.log(event.target.parentNode.parentNode.parentNode.parentNode)
+    console.log(event.target.id)
     setInputTagValue(event.target.value);
   };
 
   const addItem = (e) => {
     e.preventDefault();
     //setItems([...items, name || `New item ${index++}`]);
-    console.log(e.target.value)
+    console.log(inputTagValue)
     setInputTagValue("")
 
     // });
@@ -124,47 +125,50 @@ const IvtEditPage = () => {
       Object.keys(existTagList).map(tagName => {
         //console.log(existTagList[tagName])
         return (
+          <div key={"outer" + tagName}>
+            <div>{tagName}</div>
+            <Form.Item lable={tagName} name={["tags", tagName]} key={tagName} style={{ width: '300px' }}>
 
-          <Form.Item lable={tagName} name={["tags", tagName]} key={tagName} style={{ width: '300px' }}>
-            <Select
-              allowClear
-              style={{
-                width: '280px',
-              }}
-              placeholder={tagName}
-              // onChange={handleChange}
-              options={processTagOptions(existTagList[tagName])}
-              dropdownRender={(menu) => (
-                <>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: '8px 0',
-                    }}
-                  />
-                  <Space
-                    style={{
-                      padding: '0 8px 4px',
-                    }}
-                  >
-                    <Input
-                      placeholder="Please enter item"
-                      style={{ width: '150px' }}
-                      value={inputTagValue}
-                      onChange={onTagValueInputChange}
-                      onKeyDown={(e) => e.stopPropagation()}
+              <Select
+                allowClear
+                style={{
+                  width: '280px',
+                }}
+                placeholder={tagName}
+                // onChange={handleChange}
+                options={processTagOptions(existTagList[tagName])}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider
+                      style={{
+                        margin: '8px 0',
+                      }}
                     />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem} style={{ width: '20px' }}>
-                      Add tag
-                    </Button>
-                  </Space>
-                </>
-              )}
-            >
-            </Select>
-          </Form.Item>
+                    <Space
+                      style={{
+                        padding: '0 8px 4px',
+                      }}
+                    >
+                      <Input
+                        id={tagName}
+                        placeholder="Please enter item"
+                        style={{ width: '150px' }}
+                        value={inputTagValue}
+                        onChange={onTagValueInputChange}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                      <Button type="text" icon={<PlusOutlined />} onClick={addItem} style={{ width: '20px' }}>
+                        Add tag
+                      </Button>
+                    </Space>
+                  </>
+                )}
+              >
+              </Select>
+            </Form.Item>
 
-
+          </div>
         )
       })
     )

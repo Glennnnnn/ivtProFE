@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Select, Card, Breadcrumb, Form, Button, Table, Tag, Space, Input, Layout, Drawer, Row, Col } from "antd";
+import { Card, Breadcrumb, Form, Button, Table, Tag, Input, Layout, Row, Col, Flex } from "antd";
 import {
-  FolderOutlined
+  FolderOutlined, PlusOutlined
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
@@ -13,7 +13,9 @@ import { NavLink } from "react-router-dom";
 const IvtPage = () => {
   const { Content } = Layout;
 
-  const [searchTags, setSearchTags] = useState([])
+  //along with tag search, deprecated
+  // const [searchTags, setSearchTags] = useState([])
+
   const [ivtResults, setIvtResults] = useState([])
   const [searchParas, setSearchParas] = useState({
     pageIndex: 1,
@@ -21,24 +23,14 @@ const IvtPage = () => {
   })
   const [ivtCount, setIvtCount] = useState()
 
-  const [cartOpen, setCartOpen] = useState(false);
-
-
-  const showDrawer = () => {
-    setCartOpen(true);
-  };
-  const onClose = () => {
-    setCartOpen(false);
-  };
-
-
-  useEffect(() => {
-    const queryTags = async () => {
-      const res = await http.get("/queryTag/querySearchInfo")
-      setSearchTags(res.data.data)
-    }
-    queryTags()
-  }, [])
+  // search tags data, deprecated
+  // useEffect(() => {
+  //   const queryTags = async () => {
+  //     const res = await http.get("/queryTag/querySearchInfo")
+  //     setSearchTags(res.data.data)
+  //   }
+  //   queryTags()
+  // }, [])
 
   useEffect(() => {
 
@@ -54,16 +46,15 @@ const IvtPage = () => {
   }, [searchParas])
 
   const handleButtonClick = async (values) => {
-    const { searchInfo, tags } = values
+    let searchInfo = values
     setSearchParas({
       ...searchParas,
+      pageIndex: 1,
       searchInfo,
-      tags
     })
   }
 
   const handlePageChange = (pageIndex, pageSize) => {
-    console.log(pageIndex)
     setSearchParas({
       ...searchParas,
       pageIndex,
@@ -151,6 +142,20 @@ const IvtPage = () => {
               { marginBottom: '20px' }
             }
           />
+
+          <Flex align="flex-end" justify="flex-end">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              size="large"
+              href="/ivtCreatePage"
+              className="new-customer-button"
+            >
+              New Inventory
+            </Button>
+          </Flex>
+
+
           <div style={{ marginBottom: '20px' }}>
             <Row gutter={[16, 64]}>
               <Col span={12}>
@@ -194,115 +199,16 @@ const IvtPage = () => {
             bodyStyle={{ height: '85%', width: '100%' }}
 
           >
-            <Form
-              onFinish={handleButtonClick}
-              initialValues={{ status: 'a', channel_id: 'a' }}>
-
-              <Form.Item label="search parameters" name={'searchInfo'}>
-                <Input
-                  style={{ width: 240 }}
-                  placeholder="please enter the search parameters">
-                </Input>
-              </Form.Item>
-
-              <Form.Item>
-                <Space>
-                  {
-                    Object.keys(searchTags).map(searchTagName => {
-                      const options = []
-                      return (
-                        <Form.Item
-                          label={searchTagName}
-                          name={['tags', searchTagName]}
-                          key={searchTagName}>
-                          {
-                            searchTags[searchTagName].forEach(element => {
-                              options.push({
-                                value: element,
-                                label: element
-                              })
-                            })
-                          }
-                          <Select
-                            placeholder={searchTagName}
-                            style={{ width: 120 }}
-                            options={options}
-                          ></Select>
-                        </Form.Item>
-                      )
-                    })
-                  }
-                </Space>
-                <Button type="primary" onClick={showDrawer}>
-                  Open
-                </Button>
-                <Drawer
-                  title="Check the variables."
-                  width={720}
-                  onClose={onClose}
-                  open={cartOpen}
-                  styles={{
-                    body: {
-                      paddingBottom: 80,
-                    },
-                  }}
-                  extra={
-                    <Space>
-                      <Button onClick={onClose}>Cancel</Button>
-                      <Button onClick={onClose} type="primary">
-                        Submit
-                      </Button>
-                    </Space>
-                  }
-                >
-                  <Form layout="vertical" hideRequiredMark>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="name"
-                          label="Name"
-                          rules={[
-                            {
-                              required: true,
-                              message: 'Please enter user name',
-                            },
-                          ]}
-                        >
-                          <Input placeholder="Please enter user name" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          name="url"
-                          label="Url"
-                          rules={[
-                            {
-                              required: true,
-                              message: 'Please enter url',
-                            },
-                          ]}
-                        >
-                          <Input
-                            style={{
-                              width: '100%',
-                            }}
-                            addonBefore="http://"
-                            addonAfter=".com"
-                            placeholder="Please enter url"
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  </Form>
-                </Drawer>
-              </Form.Item>
-
-              <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ marginLeft: 80 }}>
-                  筛选
-                </Button>
-              </Form.Item>
-            </Form>
+            <Row justify={"end"}>
+              <Col>
+                <Input.Search
+                  placeholder="Search Inventory"
+                  onSearch={handleButtonClick}
+                  enterButton
+                  style={{ width: 320, marginBottom: 20 }}
+                />
+              </Col>
+            </Row>
             <Table
               rowKey={"ivtId"}
               columns={columns}
