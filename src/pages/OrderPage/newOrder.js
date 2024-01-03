@@ -12,13 +12,42 @@ import {
     Input,
     DatePicker,
     Select,
-    Switch
+    Switch,
+    Table,
+    InputNumber,
+    Form,
 } from 'antd';
 import {
-    EditOutlined, DeleteOutlined
+    PlusOutlined, EditOutlined, DeleteOutlined
 } from '@ant-design/icons'
 import moment from "moment";
 import { searchCustomerList } from "@/api/api.js";
+
+const EditableCell = ({
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    ...restProps
+}) => {
+    const inputNode = inputType === 'number' ? <InputNumber min="0" /> : <Input />;
+    return (
+        <td {...restProps}>
+            {editing ? (
+                <Form.Item
+                    name={`${dataIndex}_${record.rowNo}`}
+                    style={{ margin: 0, }}>
+                    {inputNode}
+                </Form.Item>
+            ) : (
+                children
+            )}
+        </td>
+    );
+};
 
 
 const NewOrderPage = () => {
@@ -37,6 +66,131 @@ const NewOrderPage = () => {
     const [loading, setLoading] = useState(false);
     const [customerList, setCustomerList] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState();
+
+    const [form] = Form.useForm();
+    const [data, setData] = useState(
+        [
+            {
+                rowNo: 1,
+                product: '',
+                description: '',
+                qty: 0,
+                amount: 0,
+            }
+        ]
+    );
+
+    const columns = [
+        {
+            title: '#',
+            dataIndex: 'rowNo',
+            width: '5%',
+            key: 'rowNo'
+        },
+        {
+            title: 'Product',
+            dataIndex: 'product',
+            width: '35%',
+            editable: true,
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            width: '20%',
+            editable: true,
+        },
+        {
+            title: 'QTY',
+            dataIndex: 'qty',
+            width: '10%',
+            editable: true,
+        },
+        {
+            title: 'Amount(AUD)',
+            dataIndex: 'amount',
+            width: '15%',
+            editable: true,
+        },
+        {
+            title: 'Operation',
+            dataIndex: 'operation',
+            width: '15%',
+            render: (_, record) => {
+                const editable = true; // Assuming you want buttons for all rows
+                return (
+                    <span>
+                        {editable ? (
+                            <span>
+                                <Button type="danger" icon={<PlusOutlined />} onClick={() => handleAddRow(record)} style={{ marginRight: 8 }} />
+                                <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleDeleteRow(record)} />
+                            </span>
+                        ) : null}
+                    </span>
+                );
+            },
+        },
+    ];
+
+    const handleAddRow = (key) => {
+        const newRow = {
+            rowNo: data.length + 1,
+            product: '',
+            description: '',
+            qty: 0,
+            amount: 0,
+        };
+
+        setData((prevData) => {
+            const updatedData = [
+                ...prevData.slice(0, key.rowNo),
+                newRow,
+                ...prevData.slice(key.rowNo),
+            ];
+            const updatedDataWithRowNo = updatedData.map((row, index) => ({
+                ...row,
+                rowNo: index + 1,
+            }));
+            return updatedDataWithRowNo;
+        });
+    };
+
+    const handleDeleteRow = (key) => {
+        if (data.length !== 1) {
+            const updatedData = data.filter((item) => item.rowNo !== key.rowNo);
+            const updatedDataWithRowNo = updatedData.map((row, index) => ({
+                ...row,
+                rowNo: index + 1,
+            }));
+            setData(updatedDataWithRowNo);
+        }
+        else {
+            form.resetFields();
+
+            setData([{
+                rowNo: 1,
+                product: '',
+                description: '',
+                qty: 0,
+                amount: 0,
+            }])
+        }
+    };
+
+    const mergedColumns = columns.map((col) => {
+        if (!col.editable) {
+            return col;
+        }
+        return {
+            ...col,
+            onCell: (record) => ({
+                record,
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "amount" ? 'number' : 'text',
+                dataIndex: col.dataIndex,
+                title: col.title,
+                editing: true,
+            }),
+        };
+    });
 
     const handleOrderIdChange = (e) => {
         setOrderId(e.target.value);
@@ -110,7 +264,6 @@ const NewOrderPage = () => {
                                 title: 'Home',
                                 href: '/'
                             },
-
                             {
                                 title: 'Orders',
                                 href: '/orders',
@@ -221,6 +374,23 @@ const NewOrderPage = () => {
                             </Col>
                         </Row>
                     </div>
+
+                    <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
+                        <Form form={form} component={false}>
+                            <Table
+                                components={{
+                                    body: {
+                                        cell: EditableCell,
+                                    },
+                                }}
+                                rowKey={"rowNo"}
+                                bordered
+                                dataSource={data}
+                                columns={mergedColumns}
+                                rowClassName="editable-row" />
+                        </Form>
+                    </Card>
+
 
                 </Content>
             </Layout >
