@@ -78,7 +78,7 @@ const List = () => {
 	};
 
 	const onChange = (e) => {
-		if (e.target.value !== searchName) {
+		if (e.target.value !== searchName && loading === false) {
 			setSearchParams({
 				...searchParams,
 				pagination: {

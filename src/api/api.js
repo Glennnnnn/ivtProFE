@@ -4,10 +4,22 @@ import { http } from '@/utils';
 export const customerList = async (searchingParams) => {
     var queryBody = {
         "searchParams": searchingParams.searchName ?? "",
-        "pageOffset": searchingParams.pagination.current,
-        "pageSize": searchingParams.pagination.pageSize,
+        "pageOffset": searchingParams.pagination.current ?? 1,
+        "pageSize": searchingParams.pagination.pageSize ?? 10,
         "delFlag": searchingParams.filters?.delFlag ?? [],
         "order": searchingParams.order ?? "ascend"
+    }
+    const response = await http.post(`/queryCustomerData`, queryBody);
+    return response.data;
+}
+
+export const searchCustomerList = async (searchName) => {
+    var queryBody = {
+        "searchParams": searchName,
+        "pageOffset": 1,
+        "pageSize": 30,
+        "delFlag": ["active"],
+        "order": "ascend"
     }
     const response = await http.post(`/queryCustomerData`, queryBody);
     return response.data;
