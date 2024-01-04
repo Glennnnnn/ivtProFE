@@ -12,18 +12,86 @@ import {
     Input,
     DatePicker,
     Select,
-    Switch
+    Switch,
+    Table,
+    InputNumber,
+    Form,
 } from 'antd';
 import {
-    EditOutlined, DeleteOutlined
+    PlusOutlined, EditOutlined, DeleteOutlined
 } from '@ant-design/icons'
 import moment from "moment";
 import { searchCustomerList } from "@/api/api.js";
 
+const { Option } = Select;
+
+const EditableCell = ({
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    form,
+    onDataChange,
+    onSearchChange,
+    productList,
+    ...restProps
+}) => {
+    const isNumberInput = inputType === 'number';
+
+    const handleInputChange = (value) => {
+        onDataChange(record.rowNo, dataIndex, value);
+    };
+
+    const handleSearchChange = (value) => {
+        onSearchChange(value);
+    }
+
+    const inputNode =
+        inputType === 'select' ? (
+            <Select
+                showSearch
+                onSearch={handleSearchChange}
+                placeholder="Search for product"
+                optionLabelProp="label"
+                defaultActiveFirstOption={false}
+                filterOption={false}
+                style={{ width: '100%' }}>
+                {productList.map((customer) => (
+                    <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
+                        <div>{`${customer.companyName}`}</div>
+                        {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
+                        {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
+                        {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
+                    </Option>
+                ))}
+            </Select>
+        ) : isNumberInput ? (
+            <InputNumber min={0} onChange={handleInputChange} placeholder="0" />
+        ) : (
+            <Input onChange={(e) => handleInputChange(e.target.value)} />
+        );
+
+    return (
+        <td {...restProps}>
+            {editing ? (
+                <Form.Item
+                    name={`${dataIndex}_${record.key}`}
+                    style={{ margin: 0, }}>
+                    {inputNode}
+                </Form.Item>
+            ) : (
+                children
+            )}
+        </td>
+    );
+};
+
 
 const NewOrderPage = () => {
     const { Content } = Layout;
-    const { Option } = Select;
     const [messageApi, contextHolder] = message.useMessage();
     const today = moment();
 
@@ -37,6 +105,149 @@ const NewOrderPage = () => {
     const [loading, setLoading] = useState(false);
     const [customerList, setCustomerList] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState();
+
+    const [productList, setProductList] = useState([]);
+
+    const [form] = Form.useForm();
+    const [data, setData] = useState(
+        [
+            {
+                rowNo: 1,
+                product: '',
+                description: '',
+                qty: 0,
+                amount: 0,
+                key: 1,
+            }
+        ]
+    );
+
+    const columns = [
+        {
+            title: '#',
+            dataIndex: 'rowNo',
+            width: '5%',
+            key: 'rowNo'
+        },
+        {
+            title: 'Product',
+            dataIndex: 'product',
+            width: '35%',
+            editable: true,
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            width: '20%',
+            editable: true,
+        },
+        {
+            title: 'QTY',
+            dataIndex: 'qty',
+            width: '10%',
+            editable: true,
+        },
+        {
+            title: 'Amount(AUD)',
+            dataIndex: 'amount',
+            width: '15%',
+            editable: true,
+        },
+        {
+            title: 'Operation',
+            dataIndex: 'operation',
+            width: '15%',
+            render: (_, record) => {
+                return (
+                    <span>
+                        <Button type="danger" icon={<PlusOutlined />} onClick={() => handleAddRow(record)} style={{ marginRight: 8 }} />
+                        <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleDeleteRow(record)} />
+                    </span>
+                );
+            },
+        },
+    ];
+
+    const handleAddRow = (key) => {
+        const newRow = {
+            rowNo: data.length + 1,
+            product: '',
+            description: '',
+            qty: 0,
+            amount: 0,
+            key: new Date().getTime(),
+        };
+
+        setData((prevData) => {
+            const updatedData = [
+                ...prevData.slice(0, key.rowNo),
+                newRow,
+                ...prevData.slice(key.rowNo),
+            ];
+            const updatedDataWithRowNo = updatedData.map((row, index) => ({
+                ...row,
+                rowNo: index + 1,
+            }));
+            return updatedDataWithRowNo;
+        });
+    };
+
+    const handleDeleteRow = (key) => {
+        if (data.length !== 1) {
+            const updatedData = data.filter((item) => item.rowNo !== key.rowNo);
+            const updatedDataWithRowNo = updatedData.map((row, index) => ({
+                ...row,
+                rowNo: index + 1,
+            }));
+            setData(updatedDataWithRowNo);
+        }
+        else {
+            form.resetFields();
+
+            setData([{
+                rowNo: 1,
+                product: '',
+                description: '',
+                qty: 0,
+                amount: 0,
+            }])
+        }
+    };
+
+    const handleInputChange = (rowNo, dataIndex, value) => {
+        const newData = data.map((item) => {
+            if (item.rowNo === rowNo) {
+                return { ...item, [dataIndex]: value };
+            }
+            return item;
+        });
+
+        setData(newData);
+    };
+
+    const handleSearchChange = (value) => {
+        console.log(value);
+    }
+
+    const mergedColumns = columns.map((col) => {
+        if (!col.editable) {
+            return col;
+        }
+        return {
+            ...col,
+            onCell: (record) => ({
+                record,
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "amount" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
+                dataIndex: col.dataIndex,
+                title: col.title,
+                editing: true,
+                form,
+                onDataChange: handleInputChange,
+                onSearchChange: handleSearchChange,
+                productList: productList,
+            }),
+        };
+    });
 
     const handleOrderIdChange = (e) => {
         setOrderId(e.target.value);
@@ -60,7 +271,7 @@ const NewOrderPage = () => {
     }
 
     const onMenuClick = (e) => {
-        console.log('click', e.key);
+        console.log(data);
     };
 
     useEffect(() => {
@@ -110,7 +321,6 @@ const NewOrderPage = () => {
                                 title: 'Home',
                                 href: '/'
                             },
-
                             {
                                 title: 'Orders',
                                 href: '/orders',
@@ -221,6 +431,23 @@ const NewOrderPage = () => {
                             </Col>
                         </Row>
                     </div>
+
+                    <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
+                        <Form form={form} component={false}>
+                            <Table
+                                components={{
+                                    body: {
+                                        cell: EditableCell,
+                                    },
+                                }}
+                                rowKey={"rowNo"}
+                                bordered
+                                dataSource={data}
+                                columns={mergedColumns}
+                                rowClassName="editable-row" />
+                        </Form>
+                    </Card>
+
 
                 </Content>
             </Layout >

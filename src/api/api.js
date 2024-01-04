@@ -93,3 +93,13 @@ export const customersSummary = async () => {
     const response = await http.get(`/countCustomerByLabel`);
     return response.data;
 }
+
+export const searchProductList = async (searchName) => {
+    var queryBody = {
+        "searchParams": searchName,
+        "pageIndex": 1,
+        "pageSize": 30,
+    }
+    const response = await http.post(`/ivt/queryIvtResultByInfo`, queryBody);
+    return response.data;
+}
