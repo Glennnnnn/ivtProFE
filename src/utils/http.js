@@ -6,7 +6,7 @@ import JSONbig from 'json-bigint'
 
 //const JSONbig = require('json-bigint')({ 'storeAsString': true });
 const http = axios.create({
-  baseURL: 'http://localhost:8081',
+  baseURL: 'http://3.25.98.192:8081',
   timeout: 5000,
   transformResponse: [function (data) {
     try {
