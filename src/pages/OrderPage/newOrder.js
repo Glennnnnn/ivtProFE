@@ -16,12 +16,13 @@ import {
     Table,
     InputNumber,
     Form,
+    Tag
 } from 'antd';
 import {
     PlusOutlined, EditOutlined, DeleteOutlined
 } from '@ant-design/icons'
 import moment from "moment";
-import { searchCustomerList } from "@/api/api.js";
+import { searchCustomerList, searchProductList } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const EditableCell = ({
     form,
     onDataChange,
     onSearchChange,
+    onSelectChange,
     productList,
     ...restProps
 }) => {
@@ -49,22 +51,44 @@ const EditableCell = ({
         onSearchChange(value);
     }
 
+    const handleSelectChange = (value) => {
+        const selectedProduct = productList.find(product => product.ivtId.toString() === value);
+        onSelectChange(record.rowNo, selectedProduct);
+    }
+
     const inputNode =
         inputType === 'select' ? (
             <Select
                 showSearch
                 onSearch={handleSearchChange}
+                onChange={handleSelectChange}
                 placeholder="Search for product"
                 optionLabelProp="label"
                 defaultActiveFirstOption={false}
                 filterOption={false}
                 style={{ width: '100%' }}>
-                {productList.map((customer) => (
-                    <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
-                        <div>{`${customer.companyName}`}</div>
-                        {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
-                        {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
-                        {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
+                {productList.map((product) => (
+                    <Option key={product.ivtId.toString()}
+                        value={product.ivtId.toString()}
+                        label={product.ivtClassName.toString() + " " + product.tags.map((tag) => {
+                            return (
+                                tag.tagName + ':' + tag.tagValue
+                            );
+                        })}>
+                        <div>{`${product.ivtClassName} - ${product.ivtSubclassCode}`}</div>
+                        <span style={{ whiteSpace: 'pre-wrap' }}>
+                            {product.tags.map((tag) => {
+                                let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
+                                if (tag.tagName === 'color') {
+                                    color = tag.tagValue;
+                                }
+                                return (
+                                    <Tag color={color} key={tag.tagName}>
+                                        {tag.tagName + ': ' + tag.tagValue}
+                                    </Tag>
+                                );
+                            })}
+                        </span>
                     </Option>
                 ))}
             </Select>
@@ -116,7 +140,8 @@ const NewOrderPage = () => {
                 product: '',
                 description: '',
                 qty: 0,
-                amount: 0,
+                price: 0,
+                total: 0,
                 key: 1,
             }
         ]
@@ -138,7 +163,7 @@ const NewOrderPage = () => {
         {
             title: 'Description',
             dataIndex: 'description',
-            width: '20%',
+            width: '15%',
             editable: true,
         },
         {
@@ -148,15 +173,24 @@ const NewOrderPage = () => {
             editable: true,
         },
         {
-            title: 'Amount(AUD)',
-            dataIndex: 'amount',
-            width: '15%',
+            title: 'Price(AUD)',
+            dataIndex: 'price',
+            width: '10%',
             editable: true,
         },
         {
-            title: 'Operation',
+            title: 'Total(AUD)',
+            dataIndex: 'total',
+            width: '10%',
+            render: (_, record) => {
+                const formattedTotal = record.total.toFixed(2);
+                return ` ${formattedTotal}`;
+            },
+        },
+        {
+            title: '',
             dataIndex: 'operation',
-            width: '15%',
+            width: '10%',
             render: (_, record) => {
                 return (
                     <span>
@@ -174,7 +208,8 @@ const NewOrderPage = () => {
             product: '',
             description: '',
             qty: 0,
-            amount: 0,
+            price: 0,
+            total: 0,
             key: new Date().getTime(),
         };
 
@@ -209,7 +244,8 @@ const NewOrderPage = () => {
                 product: '',
                 description: '',
                 qty: 0,
-                amount: 0,
+                price: 0,
+                total: 0,
             }])
         }
     };
@@ -217,7 +253,13 @@ const NewOrderPage = () => {
     const handleInputChange = (rowNo, dataIndex, value) => {
         const newData = data.map((item) => {
             if (item.rowNo === rowNo) {
-                return { ...item, [dataIndex]: value };
+                if (dataIndex === 'qty') {
+                    return { ...item, [dataIndex]: value, total: value * item.price }
+                }
+                if (dataIndex === 'price') {
+                    return { ...item, [dataIndex]: value, total: value * item.qty }
+                }
+                return { ...item, [dataIndex]: value, };
             }
             return item;
         });
@@ -225,8 +267,36 @@ const NewOrderPage = () => {
         setData(newData);
     };
 
-    const handleSearchChange = (value) => {
-        console.log(value);
+    const handleSearchChange = async (value) => {
+        try {
+            const posts = await searchProductList(value);
+            setProductList(posts.ivtResultPos);
+        }
+        catch (error) {
+            console.error('Error fetching data:', error);
+            messageApi.open({
+                type: "error",
+                content: "Loading Product Error!",
+            });
+        }
+    }
+
+    const handleSelectChange = (rowNo, selectedProduct) => {
+        const newData = data.map((item) => {
+            if (item.rowNo === rowNo) {
+                form.setFieldsValue({ [`description_${item.key}`]: selectedProduct.ivtNote ?? "" });
+                form.setFieldsValue({ [`price_${item.key}`]: selectedProduct.ivtPrice ?? "" });
+                return {
+                    ...item, product: selectedProduct.ivtId,
+                    description: selectedProduct.ivtNote,
+                    price: selectedProduct.ivtPrice,
+                    total: item.qty * selectedProduct.ivtPrice
+                };
+            }
+            return item;
+        });
+
+        setData(newData);
     }
 
     const mergedColumns = columns.map((col) => {
@@ -237,13 +307,14 @@ const NewOrderPage = () => {
             ...col,
             onCell: (record) => ({
                 record,
-                inputType: col.dataIndex === 'qty' || col.dataIndex === "amount" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "price" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: true,
                 form,
                 onDataChange: handleInputChange,
                 onSearchChange: handleSearchChange,
+                onSelectChange: handleSelectChange,
                 productList: productList,
             }),
         };
@@ -275,7 +346,25 @@ const NewOrderPage = () => {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchProductData = async () => {
+            try {
+                const posts = await searchProductList("");
+                setProductList(posts.ivtResultPos);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+                messageApi.open({
+                    type: "error",
+                    content: "Loading Product Error!",
+                });
+            }
+        }
+
+        fetchProductData();
+    }, []);
+
+    useEffect(() => {
+        const fetchCustomerData = async () => {
             try {
                 setLoading(true);
                 const posts = await searchCustomerList(searchValue);
@@ -295,7 +384,7 @@ const NewOrderPage = () => {
             }
         };
 
-        fetchData();
+        fetchCustomerData();
     }, [searchValue]);
 
     const buttonItems = [
