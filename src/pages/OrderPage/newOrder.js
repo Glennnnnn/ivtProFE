@@ -23,6 +23,8 @@ import {
 import moment from "moment";
 import { searchCustomerList } from "@/api/api.js";
 
+const { Option } = Select;
+
 const EditableCell = ({
     editing,
     dataIndex,
@@ -33,6 +35,8 @@ const EditableCell = ({
     children,
     form,
     onDataChange,
+    onSearchChange,
+    productList,
     ...restProps
 }) => {
     const isNumberInput = inputType === 'number';
@@ -41,7 +45,34 @@ const EditableCell = ({
         onDataChange(record.rowNo, dataIndex, value);
     };
 
-    const inputNode = isNumberInput ? <InputNumber min={0} onChange={handleInputChange} /> : <Input onChange={(e) => handleInputChange(e.target.value)} />;
+    const handleSearchChange = (value) => {
+        onSearchChange(value);
+    }
+
+    const inputNode =
+        inputType === 'select' ? (
+            <Select
+                showSearch
+                onSearch={handleSearchChange}
+                placeholder="Search for product"
+                optionLabelProp="label"
+                defaultActiveFirstOption={false}
+                filterOption={false}
+                style={{ width: '100%' }}>
+                {productList.map((customer) => (
+                    <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
+                        <div>{`${customer.companyName}`}</div>
+                        {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
+                        {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
+                        {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
+                    </Option>
+                ))}
+            </Select>
+        ) : isNumberInput ? (
+            <InputNumber min={0} onChange={handleInputChange} placeholder="0" />
+        ) : (
+            <Input onChange={(e) => handleInputChange(e.target.value)} />
+        );
 
     return (
         <td {...restProps}>
@@ -61,7 +92,6 @@ const EditableCell = ({
 
 const NewOrderPage = () => {
     const { Content } = Layout;
-    const { Option } = Select;
     const [messageApi, contextHolder] = message.useMessage();
     const today = moment();
 
@@ -75,6 +105,8 @@ const NewOrderPage = () => {
     const [loading, setLoading] = useState(false);
     const [customerList, setCustomerList] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState();
+
+    const [productList, setProductList] = useState([]);
 
     const [form] = Form.useForm();
     const [data, setData] = useState(
@@ -193,6 +225,10 @@ const NewOrderPage = () => {
         setData(newData);
     };
 
+    const handleSearchChange = (value) => {
+        console.log(value);
+    }
+
     const mergedColumns = columns.map((col) => {
         if (!col.editable) {
             return col;
@@ -201,12 +237,14 @@ const NewOrderPage = () => {
             ...col,
             onCell: (record) => ({
                 record,
-                inputType: col.dataIndex === 'qty' || col.dataIndex === "amount" ? 'number' : 'text',
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "amount" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: true,
                 form,
                 onDataChange: handleInputChange,
+                onSearchChange: handleSearchChange,
+                productList: productList,
             }),
         };
     });
