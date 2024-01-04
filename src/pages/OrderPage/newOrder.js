@@ -31,14 +31,23 @@ const EditableCell = ({
     record,
     index,
     children,
+    form,
+    onDataChange,
     ...restProps
 }) => {
-    const inputNode = inputType === 'number' ? <InputNumber min="0" /> : <Input />;
+    const isNumberInput = inputType === 'number';
+
+    const handleInputChange = (value) => {
+        onDataChange(record.rowNo, dataIndex, value);
+    };
+
+    const inputNode = isNumberInput ? <InputNumber min={0} onChange={handleInputChange} /> : <Input onChange={(e) => handleInputChange(e.target.value)} />;
+
     return (
         <td {...restProps}>
             {editing ? (
                 <Form.Item
-                    name={`${dataIndex}_${record.rowNo}`}
+                    name={`${dataIndex}_${record.key}`}
                     style={{ margin: 0, }}>
                     {inputNode}
                 </Form.Item>
@@ -76,6 +85,7 @@ const NewOrderPage = () => {
                 description: '',
                 qty: 0,
                 amount: 0,
+                key: 1,
             }
         ]
     );
@@ -116,15 +126,10 @@ const NewOrderPage = () => {
             dataIndex: 'operation',
             width: '15%',
             render: (_, record) => {
-                const editable = true; // Assuming you want buttons for all rows
                 return (
                     <span>
-                        {editable ? (
-                            <span>
-                                <Button type="danger" icon={<PlusOutlined />} onClick={() => handleAddRow(record)} style={{ marginRight: 8 }} />
-                                <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleDeleteRow(record)} />
-                            </span>
-                        ) : null}
+                        <Button type="danger" icon={<PlusOutlined />} onClick={() => handleAddRow(record)} style={{ marginRight: 8 }} />
+                        <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleDeleteRow(record)} />
                     </span>
                 );
             },
@@ -138,6 +143,7 @@ const NewOrderPage = () => {
             description: '',
             qty: 0,
             amount: 0,
+            key: new Date().getTime(),
         };
 
         setData((prevData) => {
@@ -176,6 +182,17 @@ const NewOrderPage = () => {
         }
     };
 
+    const handleInputChange = (rowNo, dataIndex, value) => {
+        const newData = data.map((item) => {
+            if (item.rowNo === rowNo) {
+                return { ...item, [dataIndex]: value };
+            }
+            return item;
+        });
+
+        setData(newData);
+    };
+
     const mergedColumns = columns.map((col) => {
         if (!col.editable) {
             return col;
@@ -188,6 +205,8 @@ const NewOrderPage = () => {
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: true,
+                form,
+                onDataChange: handleInputChange,
             }),
         };
     });
@@ -214,7 +233,7 @@ const NewOrderPage = () => {
     }
 
     const onMenuClick = (e) => {
-        console.log('click', e.key);
+        console.log(data);
     };
 
     useEffect(() => {
