@@ -93,6 +93,20 @@ const IvtEditPage = () => {
     // }, 0);
   };
   const onFinish = async (values) => {
+
+
+    if (values["ivtQty"] !== baseData.ivtQty) {
+      values.isQtyModified = true
+      let modifiedQty = values["ivtQty"] - baseData.ivtQty
+      values.modifiedQty = modifiedQty
+      if (modifiedQty > 0) {
+        values.modifiedQtyType = "restock"
+      } else {
+        values.modifiedQtyType = "reduce stock"
+      }
+    } else {
+      values.isQtyModified = false
+    }
     console.log('Received values of form: ', values);
     await http.post("/ivt/updateIvt", { values })
   };
@@ -130,6 +144,7 @@ const IvtEditPage = () => {
             <Form.Item lable={tagName} name={["tags", tagName]} key={tagName} style={{ width: '300px' }}>
 
               <Select
+                disabled={true}
                 allowClear
                 style={{
                   width: '280px',
@@ -273,7 +288,7 @@ const IvtEditPage = () => {
             <Input disabled={true} />
           </Form.Item>
           <Form.Item name="ivtSubclassCode" label="Code">
-            <Input />
+            <Input disabled={true} />
           </Form.Item>
           <Form.Item name="ivtCatName" label="Category">
             <Input disabled={true} />

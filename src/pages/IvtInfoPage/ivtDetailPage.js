@@ -176,7 +176,7 @@ function IvtDetailPage() {
         <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
           <div style={{ marginLeft: 'auto' }}>
             <Button type="default" size="large" className="edit-customer-details-button" ><EditOutlined /><NavLink to='/ivtEditPage' state={{ "ivtData": JSON.stringify(recordData), "prePage": baseData.ivtClassName + " " + baseData.ivtSubclassCode }} >Edit</NavLink></Button>
-            <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"> Inactive</Button>
+            {/* <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"> Inactive</Button> */}
           </div>
         </div>
 

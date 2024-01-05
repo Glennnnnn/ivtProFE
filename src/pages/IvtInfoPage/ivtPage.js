@@ -103,7 +103,7 @@ const IvtPage = () => {
     },
     {
       title: 'Note',
-      dataIndex: 'IvtNote',
+      dataIndex: 'ivtNote',
     },
     {
       title: 'Quantity',
@@ -143,7 +143,7 @@ const IvtPage = () => {
             }
           />
 
-          <Flex align="flex-end" justify="flex-end">
+          {/* <Flex align="flex-end" justify="flex-end">
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -153,7 +153,7 @@ const IvtPage = () => {
             >
               New Inventory
             </Button>
-          </Flex>
+          </Flex> */}
 
 
           <div style={{ marginBottom: '20px' }}>
