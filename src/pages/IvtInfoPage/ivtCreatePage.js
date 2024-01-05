@@ -1,143 +1,239 @@
 import { React, useState, useEffect } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import {
+  EditableProTable,
+  ProCard,
+  ProFormField,
+  ProForm,
+  ProFormText,
+  stringify
+} from '@ant-design/pro-components';
 
 import {
+  message,
   Form,
   Input,
-  InputNumber,
-  Upload,
-  Layout,
   Breadcrumb,
   Space,
-  Select, Button, Divider
+  Select, Button, Divider, Layout, Row, Col, Card, Tag
 } from 'antd';
 import { http } from "@/utils";
+import TextArea from 'antd/es/input/TextArea';
 //const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-const normFile = (e) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
+const waitTime = (time) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
 };
+
+const options = [];
+
+
+const columns = [
+  {
+    title: 'tags',
+    dataIndex: 'tags',
+    width: '15%',
+    valueType: 'select',
+    valueEnum: {
+      all: { text: '全部', status: 'Default' },
+      open: {
+        text: '未解决',
+        status: 'Error',
+      },
+      closed: {
+        text: '已解决',
+        status: 'Success',
+      },
+    },
+  },
+  {
+    title: 'Quantity',
+    key: 'ivtQty',
+    dataIndex: 'ivtQty',
+    valueType: 'digit',
+  },
+  {
+    title: 'Value',
+    key: 'ivtValue',
+    dataIndex: 'ivtValue',
+    valueType: () => ({ type: 'money', locale: "en-US" })
+  },
+  {
+    title: 'Price',
+    key: 'ivtPrice',
+    dataIndex: 'ivtPrice',
+    valueType: () => ({ type: 'money', locale: "en-US" })
+  },
+  {
+    title: 'note',
+    dataIndex: 'ivtNote',
+    width: '30%',
+  },
+  {
+    title: '操作',
+    valueType: 'option',
+    width: 250,
+    render: () => {
+      return null;
+    },
+  },
+];
+
+const defaultData = [
+  {
+    id: 624748504,
+    ivtQty: '10',
+    decs: '这个活动真好玩',
+    state: 'open',
+    created_at: 1590486176000,
+  },
+  {
+    id: 624691229,
+    ivtQty: '10',
+    decs: '这个活动真好玩',
+    state: 'closed',
+    created_at: 1590481162000,
+  },
+];
+
 const IvtCreatePage = () => {
-  const [form] = Form.useForm();
   const { Content } = Layout;
+  const [dataSource, setDataSource] = useState(() => defaultData);
+  const [editableKeys, setEditableRowKeys] = useState(
+    defaultData.map((item) => item.id),
+  );
+  const [basicTagOpts, setBasicTAgOpts] = useState([
+    { a: [1, 2, 3] },
+    { b: [1, 2, 3] },
+    { c: [1, 2, 3] },
+  ])
 
-  const onFinish = async (values) => {
-    console.log('Received values of form: ', values);
-    //await http.post("/ivt/updateIvt", { values })
-  };
-
-  const clickTest = () => {
-    console.log()
+  const renderTagOpts = () => {
+    console.log(basicTagOpts[1].b)
+    basicTagOpts.forEach(tagGroup => {
+      for (let tagKey in tagGroup) {
+        console.log(tagKey + ':', tagGroup[tagKey]);
+      }
+    });
   }
-
-
+  const handleChange = (value, option) => {
+    console.log("selected" + JSON.stringify(option));
+    console.log(value)
+  };
   return (
-    <Layout>
-      <Content>
-        <Breadcrumb
-          separator=">"
-          items={[
-            {
-              title: 'Home',
-              href: '/'
-            },
-            {
-              title: 'Inventory List',
-              href: '/inventory'
-            },
-            {
-              title: 'Create Inventory',
-
-            },
-          ]}
-          style={
-            { marginBottom: '20px' }
-          }
-        />
-        <button onClick={clickTest}>test button</button>
-        <Form
-          labelCol={{
-            span: 4,
-          }}
-          wrapperCol={{
-            span: 14,
-          }}
-          layout="horizontal"
-          onFinish={onFinish}
-          style={{
-            maxWidth: 600,
-          }}
-          form={form}
-        >
-          <Form.Item name="ivtId" label="ivtId" hidden='true'>
-            <Input disabled={true} />
-          </Form.Item>
-          <Form.Item name="ivtClassName" label="Name">
-            <Select
-              showSearch
-              allowClear
-              style={{
-                width: '280px',
-              }}
-              placeholder="Inventory Name"
-            >
-            </Select>
-          </Form.Item>
-          <Form.Item name="ivtSubclassCode" label="Code">
-            <Input />
-          </Form.Item>
-          <Form.Item name="ivtCatName" label="Category">
-            <Input />
-          </Form.Item>
-          <Form.Item name="ivtQty" label="Quantity">
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name="ivtValue" label="Value">
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name="ivtPrice" label="Price">
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item name="ivtNote" label="Note">
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            wrapperCol={{
-              span: 12,
-              offset: 6,
+    <div className="ivt-layout">
+      <Layout>
+        <Content style={{ margin: '10px' }}>
+          <ProForm
+            grid
+            onFinish={async (values) => {
+              await waitTime(2000);
+              console.log(values);
             }}
           >
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-              <Button htmlType="reset">reset</Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Content>
-    </Layout >
+            <div style={{ marginBottom: '20px', width: '100%' }}>
+              <Row gutter={[16, 16]}>
 
-  )
+                <Col span={8}>
+                  <ProForm.Group>
+                    <Card bordered={false} style={{ height: 'auto', minHeight: '220px', width: '100%' }}>
+                      <Row gutter={[16, 16]}>
+
+                        <Col span={24}>
+                          <ProFormText
+                            width="md"
+                            name="ivtClassName"
+                            label="Inventory Name"
+                            tooltip="maximum length is 24"
+                            placeholder="Inventory Name"
+                          />
+                        </Col>
+
+                        <Col span={24}>
+                          <ProFormText
+                            width="md"
+                            name="ivtSubclassCode"
+                            label="Code"
+                            placeholder="Code"
+                          />
+                        </Col>
+                      </Row>
+
+                    </Card>
+                  </ProForm.Group>
+                </Col>
+                <Col span={16}>
+                  <Card bordered={false} style={{ height: 'auto', minHeight: '220px' }}>
+                    <Row gutter={[16, 16]}>
+                      <Col span={6}><span className="item-span">Customer Order No</span></Col>
+                      <Col span={18}>
+                        <Select
+                          mode="tags"
+                          style={{
+                            width: '100%',
+                          }}
+                          placeholder="Tags Mode"
+                          open={false}
+                          option={{ id: "10" }}
+                          //labelInValue={true}
+                          suffixIcon={<PlusOutlined />}
+                          defaultValue={basicTagOpts[1].b}
+                          onChange={handleChange}
+                        //onChange={handleChange}
+                        />
+                      </Col>
+                      <Col span={6}><span className="item-span">Customer Order No1</span></Col>
+                      <Col span={18}>
+
+                      </Col>
+                    </Row>
+                  </Card>
+                </Col>
+              </Row>
+
+            </div>
+
+            <ProForm.Item
+              label="Inventory Items"
+              name="dataSource"
+              // initialValue={defaultData}
+              trigger="onValuesChange"
+            >
+              <EditableProTable
+                rowKey="id"
+                toolBarRender={false}
+                columns={columns}
+                defaultValue={dataSource}
+                recordCreatorProps={{
+                  newRecordType: 'dataSource',
+                  position: 'bottom',
+                  record: () => ({
+                    id: Date.now(),
+                    addonBefore: 'ccccccc',
+                    decs: 'testdesc',
+                  }),
+                }}
+                editable={{
+                  type: 'multiple',
+                  editableKeys,
+                  onChange: setEditableRowKeys,
+                  actionRender: (row, config, defaultDoms) => {
+                    return [defaultDoms.delete];
+                  },
+                }}
+              />
+            </ProForm.Item>
+          </ProForm >
+          <button onClick={renderTagOpts}>cccc</button>
+        </Content>
+      </Layout >
+    </div>
+
+  );
+
 };
 
 export default IvtCreatePage
