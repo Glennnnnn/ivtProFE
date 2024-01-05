@@ -96,10 +96,17 @@ export const customersSummary = async () => {
 
 export const searchProductList = async (searchName) => {
     var queryBody = {
-        "searchParams": searchName,
-        "pageIndex": 1,
-        "pageSize": 30,
+        "searchParas": {
+            "searchInfo": searchName,
+            "pageIndex": 1,
+            "pageSize": 30,
+        }
     }
     const response = await http.post(`/ivt/queryIvtResultByInfo`, queryBody);
+    return response.data;
+}
+
+export const addOrder = async (queryBody) => {
+    const response = await http.post(`/insertNewOrder`, queryBody);
     return response.data;
 }

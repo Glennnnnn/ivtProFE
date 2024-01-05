@@ -99,9 +99,10 @@ const List = () => {
 			sorter: true,
 			key: "customerId",
 			render: (customerName, record) => {
+				const url = `/customerDetails?customerId=${record.customerId}`;
 				return (
 					<NavLink
-						to="/customerDetails"
+						to={url}
 						state={{ customerDetails: JSON.stringify(record) }}
 					>
 						{customerName}

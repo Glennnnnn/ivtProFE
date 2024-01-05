@@ -19,7 +19,6 @@ import {
     EditOutlined, DeleteOutlined, UserOutlined, CarOutlined, AccountBookOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
 import { editCustomer, deleteCustomer, getCustomerDetailById } from '../../api/api.js'
 
 
@@ -29,13 +28,15 @@ const CustomerDetailsPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
     const [deleteForm] = Form.useForm();
-    let location = useLocation();
 
     const [recordData, setRecordData] = useState({});
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const posts = await getCustomerDetailById(JSON.parse(location.state.customerDetails).customerId);
+                const urlParams = new URLSearchParams(window.location.search);
+                const customerId = urlParams.get('customerId');
+
+                const posts = await getCustomerDetailById(customerId);
                 if (posts.code === 200) {
                     console.log(posts.data);
                     setRecordData(posts.data);
@@ -277,12 +278,12 @@ const CustomerDetailsPage = () => {
                                 <Input placeholder="* Company Name" className="form-item" />
                             </Form.Item>
 
-                            <Form.Item name="customerName" initialValue={recordData.customerName}>
+                            <Form.Item name="customerName" label="Customer Name" initialValue={recordData.customerName}>
                                 <Input placeholder="Customer Name" className="form-item" />
                             </Form.Item>
 
                             <Form.Item
-                                label="Customer Name"
+                                label="Customer Email"
                                 name="customerEmail"
                                 rules={[
                                     { type: "email", message: "Invalid email format" },
