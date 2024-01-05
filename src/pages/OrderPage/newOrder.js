@@ -16,13 +16,14 @@ import {
     Table,
     InputNumber,
     Form,
-    Tag
+    Tag,
 } from 'antd';
 import {
-    PlusOutlined, EditOutlined, DeleteOutlined
+    PlusOutlined, EditOutlined, DeleteOutlined, RedoOutlined
 } from '@ant-design/icons'
 import moment from "moment";
-import { searchCustomerList, searchProductList } from "@/api/api.js";
+import { useNavigate } from 'react-router-dom';
+import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -116,6 +117,7 @@ const EditableCell = ({
 
 const NewOrderPage = () => {
     const { Content } = Layout;
+    const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
     const today = moment();
 
@@ -128,11 +130,14 @@ const NewOrderPage = () => {
     const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
     const [customerList, setCustomerList] = useState([]);
-    const [selectedCustomer, setSelectedCustomer] = useState();
+    const [selectedCustomer, setSelectedCustomer] = useState('');
+    const [customerDetails, setCustomerDetails] = useState({});
 
     const [productList, setProductList] = useState([]);
 
     const [form] = Form.useForm();
+    const [newCustomerForm] = Form.useForm();
+
     const [data, setData] = useState(
         [
             {
@@ -246,6 +251,7 @@ const NewOrderPage = () => {
                 qty: 0,
                 price: 0,
                 total: 0,
+                key: 1,
             }])
         }
     };
@@ -339,10 +345,139 @@ const NewOrderPage = () => {
     const handleSelectedCustomer = (e) => {
         setSearchValue('');
         setSelectedCustomer(e);
+        fetchCustomerDetail(e);
     }
 
-    const onMenuClick = (e) => {
-        console.log(data);
+    const handleEditCustomer = () => {
+        window.open(`/customerDetails?customerId=${selectedCustomer}`);
+    }
+
+    const fetchCustomerDetail = async (customerId) => {
+        try {
+            const posts = await getCustomerDetailById(customerId);
+            if (posts.code === 200) {
+                setCustomerDetails(posts.data);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    const handleRefreshCustomer = () => {
+        fetchCustomerDetail(selectedCustomer);
+    }
+
+    const onCancelClick = () => {
+        navigate(-1);
+    }
+
+    const validateSave = () => {
+        let isValid = true;
+        let reason = "";
+
+        if (orderId.trim() === '') {
+            isValid = false;
+            reason = "Order Id cannot be empty!";
+            return { isValid, reason };
+        }
+
+        if (orderDate === null) {
+            isValid = false;
+            reason = "Order Date cannot be empty!";
+            return { isValid, reason };
+        }
+
+        if (showCustomer) {
+            const customerFormData = newCustomerForm.getFieldValue();
+            if (!customerFormData.hasOwnProperty('companyName') || (customerFormData.companyName?.trim() === '')) {
+                isValid = false;
+                reason = "Company name cannot be empty!";
+                return { isValid, reason };
+            }
+            if (!customerFormData.hasOwnProperty('creditTerm')) {
+                isValid = false;
+                reason = "Credit Term cannot be empty!";
+                return { isValid, reason };
+            }
+
+        }
+        else {
+            if (selectedCustomer.trim() === '') {
+                isValid = false;
+                reason = "Customer cannot be empty!";
+                return { isValid, reason };
+            }
+        }
+
+        data.forEach(item => {
+            if (item.product === '') {
+                isValid = false;
+                reason = "Product cannot be empty!";
+                return { isValid, reason };
+            }
+
+            if (item.qty === 0) {
+                isValid = false;
+                reason = "QTY cannot be 0!";
+                return { isValid, reason };
+            }
+        })
+
+        return { isValid, reason };
+    }
+
+    const onMenuClick = async (e) => {
+        const { isValid, reason } = validateSave();
+        if (isValid) {
+            try {
+                const newCustomerDetails = newCustomerForm.getFieldValue()
+                const queryBody = {
+                    "orderId": orderId,
+                    "orderDate": moment(orderDate).format("DD/MM/YYYY"),
+                    "orderNote": orderNote,
+                    "customerOrderNo": customerOrderNo,
+                    "isNewCustomer": showCustomer,
+                    "customerId": selectedCustomer,
+                    "newCustomerDetails": {
+                        "companyName": newCustomerDetails.companyName ?? "",
+                        "customerName": newCustomerDetails.customerName ?? "",
+                        "deliveryAddress": newCustomerDetails.customerDeliveryAddress ?? "",
+                        "billingAddress": newCustomerDetails.customerBillingAddress ?? "",
+                        "customerPhone": newCustomerDetails.customerPhone ?? "",
+                        "customerEmail": newCustomerDetails.customerEmail ?? "",
+                        "customerNote": newCustomerDetails.note ?? "",
+                        "creditTerm": newCustomerDetails.creditTerm ?? "",
+                        "isSaveCustomer": newCustomerDetails.isSaveCustomer ?? false,
+                    },
+                    "productList": data,
+                };
+                // const posts = await addOrder(queryBody);
+                // if (posts.code === 200) {
+                //     if (e.key === "2") {
+                //         navigate(-1);
+                //     }
+                //     else {
+                //         window.location.reload();
+                //     }
+                // }
+                console.log(queryBody);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+                messageApi.open({
+                    type: "error",
+                    content: "Save Order Error!",
+                });
+            }
+
+        }
+        else {
+            messageApi.open({
+                type: "error",
+                content: reason,
+            });
+        }
+
     };
 
     useEffect(() => {
@@ -423,7 +558,7 @@ const NewOrderPage = () => {
                         } />
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-                        <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" > Cancel </Button>
+                        <Button danger icon={<DeleteOutlined />} size="large" onClick={onCancelClick} className="edit-customer-details-button" > Cancel </Button>
                         <Dropdown.Button type="default" icon={<EditOutlined />} size="large" className="edit-customer-details-button" onClick={onMenuClick}
                             menu={{ items: buttonItems, onClick: onMenuClick }} > Save and New
                         </Dropdown.Button>
@@ -448,7 +583,7 @@ const NewOrderPage = () => {
                                         <Col span={6}><span className="item-span">* Order Date</span></Col>
                                         <Col span={18}>
                                             <DatePicker
-                                                format='YYYY/MM/DD'
+                                                format='DD/MM/YYYY'
                                                 value={orderDate}
                                                 onChange={handleOrderDateChange}
                                                 defaultValue={today}
@@ -460,7 +595,7 @@ const NewOrderPage = () => {
                                         <Col span={18}>
                                             <Input.TextArea
                                                 placeholder="Order Note"
-                                                style={{ minHeight: "150px" }}
+                                                style={{ minHeight: "300px" }}
                                                 value={orderNote}
                                                 onChange={handleOrderNoteChange}
                                             />
@@ -483,35 +618,128 @@ const NewOrderPage = () => {
 
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
-                                            <Switch value={showCustomer} onChange={(value) => setShowCustomer(value)} />
+                                            <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields();}} />
                                         </Col>
 
                                         {
-                                            showCustomer ? (<></>) : (<>
-                                                <Col span={6}><span className="item-span">Existing Customer</span></Col>
-                                                <Col span={18}>
-                                                    <Select
-                                                        showSearch
-                                                        value={selectedCustomer}
-                                                        placeholder="Search for customer"
-                                                        onSearch={(value) => setSearchValue(value)}
-                                                        onChange={handleSelectedCustomer}
-                                                        optionLabelProp="label"
-                                                        loading={loading}
-                                                        defaultActiveFirstOption={false}
-                                                        filterOption={false}
-                                                        style={{ width: '100%' }}>
-                                                        {customerList.map((customer) => (
-                                                            <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
-                                                                <div>{`${customer.companyName}`}</div>
-                                                                {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
-                                                                {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
-                                                                {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
-                                                            </Option>
-                                                        ))}
-                                                    </Select>
-                                                </Col>
-                                            </>
+                                            showCustomer ? (
+                                                <>
+                                                    <Col span={24}>
+                                                        <Form form={newCustomerForm} name="customerForm" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}
+                                                            style={{ maxWidth: "100%", marginLeft: 'auto', marginRight: 'auto', marginTop: '20px' }}>
+                                                            <Form.Item
+                                                                label="Save Customer"
+                                                                name="isSaveCustomer"
+                                                                valuePropName="checked">
+                                                                <Switch />
+                                                            </Form.Item>
+                                                            <Form.Item
+                                                                label="* Company Name"
+                                                                name="companyName">
+                                                                <Input placeholder="* Company Name" className="form-item" />
+                                                            </Form.Item>
+
+                                                            <Form.Item name="customerName" label="Customer Name">
+                                                                <Input placeholder="Customer Name" className="form-item" />
+                                                            </Form.Item>
+
+                                                            <Form.Item
+                                                                label="Customer Email"
+                                                                name="customerEmail"
+                                                                rules={[
+                                                                    { type: "email", message: "Invalid email format" },
+                                                                ]}>
+                                                                <Input placeholder="Email" className="form-item" />
+                                                            </Form.Item>
+
+                                                            <Form.Item label="Phone Number" name="customerPhone">
+                                                                <Input placeholder="Phone Number" className="form-item" />
+                                                            </Form.Item>
+
+                                                            <Form.Item
+                                                                label="* Credit Term"
+                                                                name="creditTerm">
+                                                                <Select placeholder="* Credit Term" className="form-item">
+                                                                    <Option value="immidiately">Immediately</Option>
+                                                                    <Option value="30 days">30 days</Option>
+                                                                    <Option value="60 days">60 days</Option>
+                                                                </Select>
+                                                            </Form.Item>
+
+                                                            <Form.Item label="Note" name="note">
+                                                                <Input.TextArea placeholder="Note" style={{ height: '50px' }} />
+                                                            </Form.Item>
+
+                                                            <Form.Item label="Delivery Address" name="customerDeliveryAddress">
+                                                                <Input placeholder="Delivery Address" className="form-item" />
+                                                            </Form.Item>
+
+                                                            <Form.Item label="Billing Address" name="customerBillingAddress">
+                                                                <Input placeholder="Billing Address" className="form-item" />
+                                                            </Form.Item>
+                                                        </Form>
+                                                    </Col>
+                                                </>) : (<>
+                                                    <Col span={6}><span className="item-span">Existing Customer</span></Col>
+                                                    <Col span={18}>
+                                                        <Select
+                                                            showSearch
+                                                            value={selectedCustomer}
+                                                            placeholder="Search for customer"
+                                                            onSearch={(value) => setSearchValue(value)}
+                                                            onChange={handleSelectedCustomer}
+                                                            optionLabelProp="label"
+                                                            loading={loading}
+                                                            defaultActiveFirstOption={false}
+                                                            filterOption={false}
+                                                            style={{ width: '100%' }}>
+                                                            {customerList.map((customer) => (
+                                                                <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
+                                                                    <div>{`${customer.companyName}`}</div>
+                                                                    {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
+                                                                    {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
+                                                                    {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
+                                                                </Option>
+                                                            ))}
+                                                        </Select>
+                                                    </Col>
+
+                                                    <Col span={12} style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <Button type="default" icon={<EditOutlined />} size="large"
+                                                            onClick={handleEditCustomer}
+                                                            disabled={selectedCustomer === ''}
+                                                            className="edit-customer-details-button" > Edit </Button>
+                                                    </Col>
+                                                    <Col span={12} style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <Button type="default" icon={<RedoOutlined />} size="large"
+                                                            onClick={handleRefreshCustomer}
+                                                            disabled={selectedCustomer === ''}
+                                                            className="edit-customer-details-button" > Refresh </Button>
+                                                    </Col>
+                                                    {
+                                                        selectedCustomer === '' ? (<></>) : (
+                                                            <>
+                                                                <Col span={6}><span className="item-span">Company Name</span></Col>
+                                                                <Col span={18}>{customerDetails.companyName}</Col>
+
+                                                                <Col span={6}><span className="item-span">Customer Name</span></Col>
+                                                                <Col span={18}>{customerDetails.customerName}</Col>
+
+                                                                <Col span={6}><span className="item-span">Phone</span></Col>
+                                                                <Col span={18}>{customerDetails.customerPhone}</Col>
+
+                                                                <Col span={6}><span className="item-span">Email</span></Col>
+                                                                <Col span={18}>{customerDetails.customerEmail}</Col>
+
+                                                                <Col span={6}><span className="item-span">Delivery Address</span></Col>
+                                                                <Col span={18}>{customerDetails.deliveryAddress}</Col>
+
+                                                                <Col span={6}><span className="item-span">Billing Address</span></Col>
+                                                                <Col span={18}>{customerDetails.billingAddress}</Col>
+                                                            </>
+                                                        )
+                                                    }
+                                                </>
                                             )
                                         }
 

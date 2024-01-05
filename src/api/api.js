@@ -105,3 +105,8 @@ export const searchProductList = async (searchName) => {
     const response = await http.post(`/ivt/queryIvtResultByInfo`, queryBody);
     return response.data;
 }
+
+export const addOrder = async (queryBody) => {
+    const response = await http.post(`/insertNewOrder`, queryBody);
+    return response.data;
+}
