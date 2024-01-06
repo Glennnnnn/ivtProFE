@@ -430,10 +430,10 @@ const NewOrderPage = () => {
         const { isValid, reason } = validateSave();
         if (isValid) {
             try {
-                const newCustomerDetails = newCustomerForm.getFieldValue()
+                const newCustomerDetails = newCustomerForm.getFieldValue();
                 const queryBody = {
                     "orderId": orderId,
-                    "orderDate": moment(orderDate).format("DD/MM/YYYY"),
+                    "orderDate": moment(orderDate.toString()).format("YYYY/MM/DD"),
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
                     "isNewCustomer": showCustomer,
@@ -451,16 +451,22 @@ const NewOrderPage = () => {
                     },
                     "productList": data,
                 };
-                // const posts = await addOrder(queryBody);
-                // if (posts.code === 200) {
-                //     if (e.key === "2") {
-                //         navigate(-1);
-                //     }
-                //     else {
-                //         window.location.reload();
-                //     }
-                // }
-                console.log(queryBody);
+                
+                const posts = await addOrder(queryBody);
+                if (posts.code === 200) {
+                    if (e.key === "2") {
+                        navigate(-1);
+                    }
+                    else {
+                        window.location.reload();
+                    }
+                }
+                else{
+                    messageApi.open({
+                        type: "error",
+                        content: "Save Order Error!",
+                    });
+                }
             }
             catch (error) {
                 console.error('Error fetching data:', error);

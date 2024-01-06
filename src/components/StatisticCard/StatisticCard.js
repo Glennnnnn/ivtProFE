@@ -1,7 +1,7 @@
 import { Card, Row, Col } from "antd";
 import { TeamOutlined } from "@ant-design/icons";
 
-const StatisticCard = ({ data, spanNumber = 8 }) => {
+const StatisticCard = ({ title, data, spanNumber = 8 }) => {
 	return (
 		<Card
 			bordered={false}
@@ -11,7 +11,7 @@ const StatisticCard = ({ data, spanNumber = 8 }) => {
 					<Col span={2}>
 						<TeamOutlined />
 					</Col>
-					<Col span={18}>Customers Summary</Col>
+					<Col span={18}>{title}</Col>
 				</Row>
 			}
 		>

@@ -369,10 +369,10 @@ const CustomerPage = () => {
 
 						<Row gutter={[16, 16]}>
 							<Col span={12}>
-								<StatisticCard data={customerNo} />
+								<StatisticCard title="Customer Summary" data={customerNo} />
 							</Col>
 							<Col span={12}>
-								<StatisticCard
+								<StatisticCard title="Customer Summary"
 									data={customerSummary}
 									spanNumber={12}
 								/>

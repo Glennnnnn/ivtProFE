@@ -106,6 +106,19 @@ export const searchProductList = async (searchName) => {
     return response.data;
 }
 
+export const orderList = async (searchingParams) => {
+    var queryBody = {
+        "searchParams": searchingParams.searchName ?? "",
+        "pageOffset": searchingParams.pagination.current ?? 1,
+        "pageSize": searchingParams.pagination.pageSize ?? 10,
+        "orderStatus": searchingParams.filters?.orderStatus ?? [],
+        "order": searchingParams.order ?? "ascend"
+    }
+    const response = await http.post(`/queryOrderData`, queryBody);
+    return response.data;
+}
+
+
 export const addOrder = async (queryBody) => {
     const response = await http.post(`/insertNewOrder`, queryBody);
     return response.data;
