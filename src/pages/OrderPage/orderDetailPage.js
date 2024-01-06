@@ -25,10 +25,21 @@ import moment from "moment";
 
 const OrderDetailsPage = () => {
     const { Content } = Layout;
+    const [reverseForm] = Form.useForm();
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState(false);
 
     const [recordData, setRecordData] = useState({});
+    const [completeVisible, setCompleteVisible] = useState(false);
+    const showCompleteModel = () => {
+        setCompleteVisible(true);
+    }
+
+    const [reverseVisible, setReverseVisible] = useState(false);
+    const showReverseModel = () => {
+        setReverseVisible(true);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -70,6 +81,54 @@ const OrderDetailsPage = () => {
             total: 0,
         },
     })
+
+    const handleCompleteOk = async () => {
+        setCompleteVisible(false);
+        window.location.reload();
+    }
+
+    const handleCompleteCancel = () => {
+        setCompleteVisible(false);
+    }
+
+    const handleReverseOk = async () => {
+        reverseForm.validateFields().then(async (values) => {
+            try {
+                // const posts = await deleteCustomer(values, recordData.customerId);
+                // if (posts.code === 200) {
+                //     setEditVisible(false);
+                //     deleteForm.resetFields();
+                //     window.location.reload();
+                setReverseVisible(false);
+                window.location.reload();
+                // }
+                // else {
+                //     messageApi.open({
+                //         type: 'error',
+                //         content: 'Reverse Order Error!'
+                //     })
+                // }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Reverse Order Error!'
+                })
+            }
+        }).catch((errorInfo) => {
+            messageApi.open({
+                type: 'error',
+                content: 'Please fill in the required fields!'
+            })
+        })
+
+    }
+
+    const handleReverseCancel = () => {
+        setReverseVisible(false);
+        reverseForm.resetFields();
+    }
 
     const columns = [
         {
@@ -138,10 +197,10 @@ const OrderDetailsPage = () => {
 
                     <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
-                            <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button"
-                                style={{ backgroundColor: "green", color: "white" }}> Complete</Button>
-                            <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={false}
-                                style={{ backgroundColor: "red", color: "white" }}> Reverse</Button>
+                            <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"} onClick={showCompleteModel}
+                                style={{ backgroundColor: recordData.orderStatus !== "processing" ? "" : "green", color: "white" }}> Complete</Button>
+                            <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus === "reversed"} onClick={showReverseModel}
+                                style={{ backgroundColor: recordData.orderStatus === "reversed" ? "" : "red", color: "white" }}> Reverse</Button>
                         </div>
                     </div>
 
@@ -223,6 +282,42 @@ const OrderDetailsPage = () => {
                             </Col>
                         </Row>
                     </div>
+
+                    <Modal
+                        title="Do you want to complete this order?"
+                        open={completeVisible}
+                        onOk={handleCompleteOk}
+                        onCancel={handleCompleteCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  You cannot move this order to processing</span>
+                    </Modal>
+
+                    <Modal
+                        title="Reverse this order"
+                        open={reverseVisible}
+                        onOk={handleReverseOk}
+                        onCancel={handleReverseCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered
+                        footer={[
+                            <Button key="back" onClick={handleReverseCancel} style={{ display: 'inline-block', width: 'calc(50% - 12px)' }} size="large">
+                                Cancel
+                            </Button>,
+                            <Button key="submit" danger onClick={handleReverseOk} style={{ display: 'inline-block', width: 'calc(50% - 12px)', margin: '0 12px' }} size="large">
+                                Reverse
+                            </Button>,
+                        ]}>
+
+                        <Form form={reverseForm} name="reverseForm" style={{ maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', marginBottom: '60px' }}
+                            layout="vertical">
+                            <Form.Item label="Reason" name="reason">
+                                <Input.TextArea placeholder="Reason" style={{ height: '150px' }} />
+                            </Form.Item>
+                        </Form>
+                    </Modal>
 
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
                         <Table

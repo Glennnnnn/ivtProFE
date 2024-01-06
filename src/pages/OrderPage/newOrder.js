@@ -22,6 +22,7 @@ import {
     PlusOutlined, EditOutlined, DeleteOutlined, RedoOutlined
 } from '@ant-design/icons'
 import moment from "moment";
+import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
 import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder } from "@/api/api.js";
 
@@ -119,10 +120,9 @@ const NewOrderPage = () => {
     const { Content } = Layout;
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
-    const today = moment();
 
     const [orderId, setOrderId] = useState('');
-    const [orderDate, setOrderDate] = useState(null);
+    const [orderDate, setOrderDate] = useState(dayjs());
     const [customerOrderNo, setCustomerOrderNo] = useState('');
     const [orderNote, setOrderNote] = useState('');
 
@@ -592,8 +592,17 @@ const NewOrderPage = () => {
                                                 format='DD/MM/YYYY'
                                                 value={orderDate}
                                                 onChange={handleOrderDateChange}
-                                                defaultValue={today}
                                                 placeholder="Order Date"
+                                            />
+                                        </Col>
+
+                                        <Col span={6}><span className="item-span">Customer Order No</span></Col>
+                                        <Col span={18}>
+                                            <Input
+                                                placeholder="Customer Order No"
+                                                style={{ border: 'none', borderBottom: '1px solid #d9d9d9' }}
+                                                value={customerOrderNo}
+                                                onChange={handleCustomerOrderNoChange}
                                             />
                                         </Col>
 
@@ -612,16 +621,6 @@ const NewOrderPage = () => {
                             <Col span={12}>
                                 <Card bordered={false} style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
-                                        <Col span={6}><span className="item-span">Customer Order No</span></Col>
-                                        <Col span={18}>
-                                            <Input
-                                                placeholder="Customer Order No"
-                                                style={{ border: 'none', borderBottom: '1px solid #d9d9d9' }}
-                                                value={customerOrderNo}
-                                                onChange={handleCustomerOrderNoChange}
-                                            />
-                                        </Col>
-
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
                                             <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields();}} />
