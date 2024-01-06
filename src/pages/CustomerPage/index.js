@@ -273,7 +273,7 @@ const CustomerPage = () => {
 										placeholder="* Credit Term"
 										className="form-item"
 									>
-										<Option value="immidiately">
+										<Option value="immediately">
 											Immediately
 										</Option>
 										<Option value="30 days">30 days</Option>
