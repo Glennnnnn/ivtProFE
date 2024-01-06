@@ -152,14 +152,14 @@ const OrderPage = () => {
             dataIndex: "orderId",
             width: "20%",
             key: "orderDBId",
-            // render: (customerName, record) => {
-            //     const url = `/customerDetails?customerId=${record.customerId}`;
-            //     return (
-            //         <NavLink to={url}>
-            //             {customerName}
-            //         </NavLink>
-            //     );
-            // },
+            render: (orderId, record) => {
+                const url = `/orderDetails?orderDBId=${record.orderDBId}`;
+                return (
+                    <NavLink to={url}>
+                        {orderId}
+                    </NavLink>
+                );
+            },
         },
         {
             title: "Company Name",
@@ -202,16 +202,9 @@ const OrderPage = () => {
                 { text: "completed", value: "completed" },
             ],
             render: (status) => {
-                let color = "";
-                if (status === "processing") {
-                    color = "orange";
-                }
-                if (status === "reversed") {
-                    color = "black";
-                }
-                if (status === "completed") {
-                    color = "green";
-                }
+                const color = status === "processing" ? 'orange' :
+                (status === "reversed" ? 'red' : 'green');
+                
                 return (
                     <span>
                         <Tag color={color}>

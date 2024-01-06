@@ -28,6 +28,7 @@ import { getToken, removeToken } from '@/utils'
 //components
 import './App.css';
 import NewOrderPage from './pages/OrderPage/newOrder.js';
+import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
 
 
 const { Header, Sider, Content } = Layout;
@@ -121,6 +122,7 @@ const App = () => {
             <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />} />
             <Route path="/orders" element={isAuthenticated ? <OrderPage /> : <Navigate to="/login" />} />
             <Route path="/neworder" element={isAuthenticated ? <NewOrderPage /> : <Navigate to="/login" />} />
+            <Route path="/orderDetails" element={isAuthenticated ? <OrderDetailsPage /> : <Navigate to="/login" />} />
             <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />

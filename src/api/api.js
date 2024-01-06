@@ -109,10 +109,10 @@ export const searchProductList = async (searchName) => {
 export const orderList = async (searchingParams) => {
     var queryBody = {
         "searchParams": searchingParams.searchName ?? "",
-        "pageOffset": searchingParams.pagination.current ?? 1,
+        "pageIndex": searchingParams.pagination.current ?? 1,
         "pageSize": searchingParams.pagination.pageSize ?? 10,
         "orderStatus": searchingParams.filters?.orderStatus ?? [],
-        "order": searchingParams.order ?? "ascend"
+        "order": searchingParams.order ?? ""
     }
     const response = await http.post(`/queryOrderData`, queryBody);
     return response.data;
@@ -121,5 +121,10 @@ export const orderList = async (searchingParams) => {
 
 export const addOrder = async (queryBody) => {
     const response = await http.post(`/insertNewOrder`, queryBody);
+    return response.data;
+}
+
+export const getOrderDetailByDBId = async(orderDBId) => {
+    const response = await http.get(`/queryOrderDataById?orderDBId=${orderDBId}`);
     return response.data;
 }
