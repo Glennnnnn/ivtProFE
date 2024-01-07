@@ -19,6 +19,7 @@ import StatisticCard from "@/components/StatisticCard/StatisticCard";
 import { Link, NavLink } from 'react-router-dom';
 import { orderList } from "../../api/api.js";
 import moment from "moment";
+import dayjs from 'dayjs';
 
 
 const OrderPage = () => {
@@ -126,6 +127,11 @@ const OrderPage = () => {
             number: 9,
             style: { color: "green" },
         },
+        {
+            title: "Reversed",
+            number: 0,
+            style: { color: "red" },
+        }
     ];
     // TODO: fetch data from api
     const orderSummary = [
@@ -145,7 +151,21 @@ const OrderPage = () => {
             dataIndex: "orderDate",
             width: "15%",
             sorter: true,
-            render: (text) => moment(text).format('DD/MM/YYYY'),
+            render: (text, record) => {
+                // TODO: Overdue Tag
+                //record.customerInterPo.creditTerm
+                const originalDate = dayjs(text);
+                const creditTerm = 30;
+                const dueDate = originalDate.add(creditTerm, 'day');
+
+                const currentDate = dayjs();
+                
+                console.log(dueDate.toString() < currentDate.toString());
+                
+                return (
+                    moment(text).format('DD/MM/YYYY')
+                )
+            }
         },
         {
             title: "Order Id",
@@ -250,7 +270,7 @@ const OrderPage = () => {
 
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <StatisticCard title="Order Summary" data={orderNo} />
+                                <StatisticCard title="Order Summary" data={orderNo}  spanNumber={6}/>
                             </Col>
                             <Col span={12}>
                                 <StatisticCard title="Order Summary"

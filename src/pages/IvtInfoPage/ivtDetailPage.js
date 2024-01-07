@@ -14,6 +14,8 @@ import {
 } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import { http } from "@/utils";
+import moment from 'moment';
+
 function IvtDetailPage() {
 
   let location = useLocation()
@@ -31,7 +33,7 @@ function IvtDetailPage() {
   const [stockSearchParams, setStockSearchParams] = useState({
     ivtId: ivtId,
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 5
   })
 
   const [orderSource, setOrderSource] = useState([]);
@@ -39,7 +41,7 @@ function IvtDetailPage() {
   const [orderSearchParams, setOrderSearchParams] = useState({
     ivtId: ivtId,
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 5
   })
   useEffect(() => {
     const queryBasicDataAsync = async () => {
@@ -88,8 +90,13 @@ function IvtDetailPage() {
       // width: 220,
       key: 'orderId',
       render: (orderId, record) => {
-        return <NavLink>{orderId}</NavLink>
-      }
+        const url = `/orderDetails?orderDBId=${record.orderDBId}`;
+        return (
+          <NavLink to={url}>
+            {orderId}
+          </NavLink>
+        );
+      },
     },
     {
       title: 'OrderStatus',
@@ -100,7 +107,8 @@ function IvtDetailPage() {
       // ],
       render: (status) => (
         <span>
-          <Tag color={status === "reversed" ? 'volcano' : 'green'}> {status} </Tag>
+          <Tag color={status === "processing" ? 'orange' :
+            (status === "reversed" ? 'red' : 'green')}> {status} </Tag>
         </span>
       ),
       width: 300,
@@ -108,8 +116,11 @@ function IvtDetailPage() {
     {
       title: 'Inventory Price',
       dataIndex: 'orderIvtPrice',
-      width: 100
-
+      width: 100,
+      render: (_, record) => {
+        const formattedTotal = _.toFixed(2);
+        return ` ${formattedTotal}`;
+      },
       // width: 220,
     },
     {
@@ -120,12 +131,21 @@ function IvtDetailPage() {
     {
       title: 'Inventory Total',
       dataIndex: 'orderIvtTotal',
-      width: 100
+      width: 100,
+      render: (_, record) => {
+        const formattedTotal = _.toFixed(2);
+        return ` ${formattedTotal}`;
+      },
     },
     {
       title: 'Order Date',
       dataIndex: 'createDate',
       width: 300,
+      render: (text, record) => {
+        return (
+          moment(text).format('DD/MM/YYYY')
+        )
+      }
     },
     {
       title: 'Operator',
@@ -136,18 +156,20 @@ function IvtDetailPage() {
 
   const stockColumns = [
     {
-      title: 'Stock Id',
-      dataIndex: 'stockId',
-      width: 300,
-      key: 'orderId',
-      render: (orderId, record) => {
-        return <NavLink>{orderId}</NavLink>
-      }
-    },
-    {
       title: 'Order Id',
       dataIndex: 'orderId',
       width: 200,
+      render: (orderId, record) => {
+        if (record.orderDBId === null) {
+          return ({ orderId });
+        }
+        const url = `/orderDetails?orderDBId=${record.orderDBId}`;
+        return (
+          <NavLink to={url}>
+            {orderId}
+          </NavLink>
+        );
+      },
     },
     {
       title: 'Stock Amount',
@@ -176,6 +198,11 @@ function IvtDetailPage() {
       title: 'Stock Date',
       dataIndex: 'createTime',
       width: 300,
+      // render: (text, record) => {
+      //   return (
+      //     moment(text).format('DD/MM/YYYY')
+      //   )
+      // }
     },
     {
       title: 'Operator',
