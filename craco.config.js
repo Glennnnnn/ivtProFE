@@ -9,16 +9,16 @@ module.exports = {
       '@': path.resolve(__dirname, 'src')
     }
   },
-  // devServer: {
-  //   port: 3000,
-  //   proxy: {
-  //     '/api': {
-  //       target: 'http://3.25.98.192:8081',
-  //       changeOrigin: true,
-  //       pathRewrite: {
-  //         "^/api": ''
-  //       }
-  //     },
-  //   }
-  // }
+  devServer: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://3.25.98.192:8081',
+        changeOrigin: true,
+        pathRewrite: {
+          "^/api": ''
+        }
+      },
+    }
+  }
 }

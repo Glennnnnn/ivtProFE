@@ -9,9 +9,9 @@ import {
   Layout,
   Breadcrumb,
   Space,
-  Select, Button, Divider
+  Select, Button, Divider, Tag
 } from 'antd';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 // import { createBrowserHistory } from 'history'
 import { http } from "@/utils";
 //const { RangePicker } = DatePicker;
@@ -25,6 +25,7 @@ const normFile = (e) => {
 const IvtEditPage = () => {
   const [form] = Form.useForm();
   let location = useLocation()
+  let navigate = useNavigate()
   const recordData = JSON.parse(location.state.ivtData)
   const baseData = Object.assign({}, recordData)
   const prePage = location.state.prePage
@@ -42,66 +43,65 @@ const IvtEditPage = () => {
 
 
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const queryTagByIvtClassAsync = async () => {
-      let resJson = await http.post("/queryTag/queryTagResByIvtClass", { "ivtClassId": baseData.ivtClassId })
-      let res = JSON.parse(JSON.stringify(resJson.data.data))
-      // Object.keys(existTagList).map(tagName => {
-      //   setInputTagValues({
-      //     ...inputTagValues,
-      //     tagName: ""
-      //   })
-      // })
-      // console.log(res)
-      // form.setFieldsValue({
-      //   ivtClassName: baseData.ivtClassName,
-      //   ivtSubclassCode: baseData.ivtSubclassCode,
-      //   ivtCatName: baseData.ivtCatName,
-      //   ivtQty: baseData.ivtQty,
-      //   ivtValue: baseData.ivtValue,
-      //   ivtPrice: baseData.ivtPrice,
-      //   ivtNote: baseData.ivtNote,
-      // });
-      setExistTagList(res)
-    }
-    // console.log(baseData)
-    queryTagByIvtClassAsync()
+  //   const queryTagByIvtClassAsync = async () => {
+  //     let resJson = await http.post("/queryTag/queryTagResByIvtClass", { "ivtClassId": baseData.ivtClassId })
+  //     let res = JSON.parse(JSON.stringify(resJson.data.data))
+  //     // Object.keys(existTagList).map(tagName => {
+  //     //   setInputTagValues({
+  //     //     ...inputTagValues,
+  //     //     tagName: ""
+  //     //   })
+  //     // })
+  //     // console.log(res)
+  //     // form.setFieldsValue({
+  //     //   ivtClassName: baseData.ivtClassName,
+  //     //   ivtSubclassCode: baseData.ivtSubclassCode,
+  //     //   ivtCatName: baseData.ivtCatName,
+  //     //   ivtQty: baseData.ivtQty,
+  //     //   ivtValue: baseData.ivtValue,
+  //     //   ivtPrice: baseData.ivtPrice,
+  //     //   ivtNote: baseData.ivtNote,
+  //     // });
+  //     setExistTagList(res)
+  //   }
+  //   // console.log(baseData)
+  //   queryTagByIvtClassAsync()
 
-  }, [baseData.ivtClassId])
+  // }, [baseData.ivtClassId])
 
   const breadcrumbRender = (item, params, items, paths) => {
     const isPrevious = items.indexOf(item) !== items.length - 2;
-    return isPrevious ? <NavLink to={item.href}>{item.title}</NavLink> : <NavLink to='/ivtDetailPage' state={{ "ivtData": JSON.stringify(recordData), "prePage": "Inventory List" }}>{item.title + "aa"}</NavLink>;
+    return isPrevious ? <NavLink to={item.href}>{item.title}</NavLink> : <NavLink to='/ivtDetailPage' state={{ "ivtData": JSON.stringify(baseData), "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }}>{item.title}</NavLink>;
   }
 
   const onTagValueInputChange = (event) => {
-    // console.log(event.target.parentNode.parentNode.parentNode.parentNode)
     console.log(event.target.id)
     setInputTagValue(event.target.value);
   };
 
   const addItem = (e) => {
     e.preventDefault();
-    //setItems([...items, name || `New item ${index++}`]);
     console.log(inputTagValue)
     setInputTagValue("")
-
-    // });
-    // setTimeout(() => {
-    //   inputRef.current?.focus();
-    // }, 0);
   };
+
+  const navigateDetail = () => {
+    let data = { "ivtData": JSON.stringify(baseData), "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }
+    navigate("/ivtDetailPage", { state: data });
+  }
+
+
+
   const onFinish = async (values) => {
-
-
     if (values["ivtQty"] !== baseData.ivtQty) {
       values.isQtyModified = true
       let modifiedQty = values["ivtQty"] - baseData.ivtQty
       values.modifiedQty = modifiedQty
       if (modifiedQty > 0) {
         values.modifiedQtyType = "restock"
-      } else {
+      } else if (modifiedQty < 0) {
         values.modifiedQtyType = "reduce stock"
       }
     } else {
@@ -109,6 +109,8 @@ const IvtEditPage = () => {
     }
     console.log('Received values of form: ', values);
     await http.post("/ivt/updateIvt", { values })
+    navigateDetail()
+
   };
 
   const generateInitFormData = () => {
@@ -189,31 +191,6 @@ const IvtEditPage = () => {
     )
   }
 
-  // const tagForMap = (tag) => {
-  //   // console.log(tag)
-  //   const tagElem = (
-  //     <Tag
-  //       closable
-  //       onClick={handleTagEditOpen}
-  //       onClose={(e) => {
-  //         e.preventDefault();
-  //         handleTagClose(tag);
-  //       }}
-  //     >
-  //       {tag.tagName + ':' + tag.tagValue}
-  //     </Tag>
-  //   );
-  //   return (
-  //     <span
-  //       key={tag.tagId}
-  //       style={{
-  //         display: 'inline-block',
-  //       }}
-  //     >
-  //       {tagElem}
-  //     </span>
-  //   );
-  // };
 
   const processTagOptions = (tagValues) => {
     let tagValueOptions = []
@@ -245,20 +222,12 @@ const IvtEditPage = () => {
               title: 'Inventory List',
               href: '/inventory'
             },
-            // {
-            //   title: (function () {
-            //     return prePage.toLowerCase().replace(/\b([\w|']+)\b/g, function (word) {
-            //       //return word.slice(0, 1).toUpperCase() + word.slice(1);  
-            //       return word.replace(word.charAt(0), word.charAt(0).toUpperCase());
-            //     });
-            //   })(),
-            //   href: '/ivtDetailPage', recordData,
-            // },
             {
               title: prePage,
             },
             {
               title: 'Edit Inventory',
+              href: '/'
 
             },
           ]}
@@ -316,7 +285,20 @@ const IvtEditPage = () => {
               {/* {
                 modifiedTags.map(tagForMap)
               } */}
-              {renderTagForms()}
+              <span>
+                {baseData?.tags?.map((tag) => {
+                  let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
+                  if (tag.tagName === 'color') {
+                    color = tag.tagValue;
+                  }
+                  return (
+                    <Tag color={color} key={tag.tagName}>
+                      {tag.tagName + ':' + tag.tagValue}
+                      {/* {tag.toUpperCase()} */}
+                    </Tag>
+                  );
+                })}
+              </span>
               {/* {
                 selectExistTagOpen === false ? <></> : selectExistTag()
               }
@@ -379,7 +361,7 @@ const IvtEditPage = () => {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-              <Button htmlType="reset">reset</Button>
+              <Button htmlType="reset" onClick={navigateDetail}>reset</Button>
             </Space>
           </Form.Item>
 

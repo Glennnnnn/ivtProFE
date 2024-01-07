@@ -1,4 +1,4 @@
-import { useLocation, NavLink } from 'react-router-dom';
+import { useLocation, NavLink, useNavigate } from 'react-router-dom';
 import {
   Layout,
   Breadcrumb,
@@ -10,63 +10,77 @@ import {
   Table,
 } from 'antd';
 import {
-  EditOutlined, DeleteOutlined, CarOutlined, AccountBookOutlined, ShoppingCartOutlined
+  EditOutlined, CarOutlined, AccountBookOutlined, ShoppingCartOutlined
 } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
+import { http } from "@/utils";
 function IvtDetailPage() {
 
   let location = useLocation()
+  let navigate = useNavigate()
   const { Content } = Layout;
-  const recordData = JSON.parse(location.state.ivtData)
-  const baseData = Object.assign({}, recordData)
+  const ivtId = JSON.parse(location.state.ivtId)
+  // const ivtId = Object.assign(({}, JSON.parse(location.state.ivtId)))
+  //const baseData = Object.assign({}, recordData)
   const prePage = location.state.prePage
-  const [orderDataSource, setOrderDataSource] = useState([]);
-  const [restockSource, setRestockSource] = useState([]);
 
-  useEffect(() => {
-    console.log(baseData)
+  const [baseData, setBaseData] = useState({})
+
+  const [stockSource, setStockSource] = useState([]);
+  const [stockCount, setStockCount] = useState()
+  const [stockSearchParams, setStockSearchParams] = useState({
+    ivtId: ivtId,
+    pageIndex: 1,
+    pageSize: 10
   })
 
+  const [orderSource, setOrderSource] = useState([]);
+  const [orderCount, setOrderCount] = useState()
   const [orderSearchParams, setOrderSearchParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
-    },
+    ivtId: ivtId,
+    pageIndex: 1,
+    pageSize: 10
   })
-  const [restockSearchParams, setRestockSearchParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
-    },
-  })
+  useEffect(() => {
+    const queryBasicDataAsync = async () => {
+      let ivtJson = await http.get("/ivt/queryIvtResultById?ivtId=" + ivtId)
+      let ivt = JSON.parse(JSON.stringify(ivtJson.data.data))
+      setBaseData(ivt)
 
+      let stockJson = await http.post("/queryStockByIvtId", { stockSearchParams })
+      let stock = JSON.parse(JSON.stringify(stockJson.data.data))
+      setStockSource(stock.stockResponsePoList)
+      setStockCount(stock.totalCount)
 
-  const handleOrderPageChange = ((pagination, filters, sorter) => {
-    if (pagination.pageSize !== orderSearchParams.pagination?.pageSize) {
-      pagination.current = 1;
-      setOrderDataSource([]);
+      let orderJson = await http.post("/queryOrderByIvtId", { orderSearchParams })
+      let order = JSON.parse(JSON.stringify(orderJson.data.data))
+      setOrderSource(order.orderIvtResponsePoList)
+      setOrderCount(order.totalCount)
     }
 
+    queryBasicDataAsync()
+  }, [stockSearchParams, orderSearchParams])
+
+  const handleOrderPageChange = ((pageIndex, pageSize) => {
     setOrderSearchParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
+      ...orderSearchParams,
+      pageIndex,
+      pageSize
+    })
   });
-  const handleRestockPageChange = ((pagination, filters, sorter) => {
-    if (pagination.pageSize !== restockSearchParams.pagination?.pageSize) {
-      pagination.current = 1;
-      setRestockSource([]);
-    }
 
-    setRestockSearchParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
+  const handleStockPageChange = ((pageIndex, pageSize) => {
+    setStockSearchParams({
+      ...stockSearchParams,
+      pageIndex,
+      pageSize
+    })
   });
+
+  const navigateEdit = () => {
+    let data = { "ivtData": JSON.stringify(baseData), "prePage": baseData.ivtClassName + " " + baseData.ivtSubclassCode }
+    navigate("/ivtEditPage", { state: data });
+  }
   const orderColumns = [
     {
       title: 'orderId',
@@ -78,70 +92,96 @@ function IvtDetailPage() {
       }
     },
     {
-      title: 'Order Price',
-      dataIndex: 'orderPrice',
+      title: 'OrderStatus',
+      dataIndex: 'orderStatus',
+      // filters: [
+      //   { text: 'active', value: 'active' },
+      //   { text: 'inactive', value: 'inactive' },
+      // ],
+      render: (status) => (
+        <span>
+          <Tag color={status === "reversed" ? 'volcano' : 'green'}> {status} </Tag>
+        </span>
+      ),
+      width: 300,
+    },
+    {
+      title: 'Inventory Price',
+      dataIndex: 'orderIvtPrice',
+      width: 100
+
       // width: 220,
     },
     {
-      title: 'Order Quantity',
-      dataIndex: 'orderQty',
+      title: 'Inventory Quantity',
+      dataIndex: 'orderIvtQty',
+      width: 100
     },
     {
-      title: 'Order Discount',
-      dataIndex: 'orderDiscount',
+      title: 'Inventory Total',
+      dataIndex: 'orderIvtTotal',
+      width: 100
     },
     {
       title: 'Order Date',
-      dataIndex: 'date',
-      sorter: true,
+      dataIndex: 'createDate',
+      width: 300,
     },
     {
-      title: 'Status',
-      dataIndex: 'delFlag',
-      filters: [
-        { text: 'active', value: 'active' },
-        { text: 'inactive', value: 'inactive' },
-      ],
-      render: (status) => (
-        <span>
-          <Tag color={status === "active" ? 'green' : 'volcano'}> {status} </Tag>
-        </span>
-      ),
-    }
+      title: 'Operator',
+      dataIndex: 'createBy',
+      width: 300,
+    },
   ]
 
-  const restockColumns = [
+  const stockColumns = [
     {
-      title: 'Restock Id',
-      dataIndex: 'restockId',
-      width: 220,
+      title: 'Stock Id',
+      dataIndex: 'stockId',
+      width: 300,
       key: 'orderId',
       render: (orderId, record) => {
         return <NavLink>{orderId}</NavLink>
       }
     },
     {
-      title: 'Restock Date',
-      dataIndex: 'restockDate',
-      width: 220,
+      title: 'Order Id',
+      dataIndex: 'orderId',
+      width: 200,
     },
     {
-      title: 'Quantity',
-      dataIndex: 'restocQty',
+      title: 'Stock Amount',
+      dataIndex: 'stockOptAmount',
+      width: 200,
     },
     {
-      title: 'Restock Type',
-      dataIndex: 'restockType',
-      filters: [
-        { text: 'instock', value: 'instock' },
-        { text: 'offstock', value: 'instock' },
-      ],
+      title: 'Stock Type',
+      dataIndex: 'stockOptType',
+      // filters: [
+      //   { text: 'sale', value: 'sale' },
+      //   { text: 'reverse sale', value: 'reverse sale' },
+      //   { text: 'restock', value: 'restock' },
+      //   { text: 'reduce stock', value: 'reduce stock' },
+      // ],
+      // onFilter: (value) => {
+      //   console.log(value + 1)
+      // },
       render: (status) => (
         <span>
-          <Tag color={status === "instock" ? 'green' : 'volcano'}> {status} </Tag>
+          <Tag color={status === "reverse sale" || status === "reduce stock" ? 'green' : 'volcano'}> {status} </Tag>
         </span>
       ),
-    }
+    },
+    {
+      title: 'Stock Date',
+      dataIndex: 'createTime',
+      width: 300,
+    },
+    {
+      title: 'Operator',
+      dataIndex: 'createBy',
+      width: 300,
+    },
   ]
 
 
@@ -166,7 +206,7 @@ function IvtDetailPage() {
               href: '/' + prePage,
             },
             {
-              title: baseData.ivtClassName + " " + baseData.ivtSubclassCode
+              title: baseData?.ivtClassName + " " + baseData?.ivtSubclassCode
             }
           ]}
           style={
@@ -175,7 +215,7 @@ function IvtDetailPage() {
         />
         <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
           <div style={{ marginLeft: 'auto' }}>
-            <Button type="default" size="large" className="edit-customer-details-button" ><EditOutlined /><NavLink to='/ivtEditPage' state={{ "ivtData": JSON.stringify(recordData), "prePage": baseData.ivtClassName + " " + baseData.ivtSubclassCode }} >Edit</NavLink></Button>
+            <Button type="default" size="large" className="edit-customer-details-button" onClick={navigateEdit}><EditOutlined /><NavLink to='/ivtEditPage' state={{ "ivtData": JSON.stringify(baseData), "prePage": baseData.ivtClassName + " " + baseData.ivtSubclassCode }} width={"100%"} >Edit</NavLink></Button>
             {/* <Button danger icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"> Inactive</Button> */}
           </div>
         </div>
@@ -190,24 +230,9 @@ function IvtDetailPage() {
                       <ShoppingCartOutlined />
                     </Col>
                     <Col span={8}>
-                      {baseData.ivtClassName}
+                      {baseData?.ivtClassName}
                     </Col>
-                    <Col span={14}>
-                      <span>
-                        {baseData.tags.map((tag) => {
-                          let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
-                          if (tag.tagName === 'color') {
-                            color = tag.tagValue;
-                          }
-                          return (
-                            <Tag color={color} key={tag.tagName}>
-                              {tag.tagName + ':' + tag.tagValue}
-                              {/* {tag.toUpperCase()} */}
-                            </Tag>
-                          );
-                        })}
-                      </span>
-                    </Col>
+
                     {/* <Col span={6}>
                       <Tag color={recordData.delFlag === "active" ? 'green' : 'volcano'}> {recordData.delFlag}</Tag>
                     </Col> */}
@@ -215,7 +240,22 @@ function IvtDetailPage() {
                 bordered={false}
                 style={{ height: 'auto' }}>
                 <Row gutter={[16, 16]}>
-
+                  <Col span={14}>
+                    <span>
+                      {baseData?.tags?.map((tag) => {
+                        let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
+                        if (tag.tagName === 'color') {
+                          color = tag.tagValue;
+                        }
+                        return (
+                          <Tag color={color} key={tag.tagName}>
+                            {tag.tagName + ':' + tag.tagValue}
+                            {/* {tag.toUpperCase()} */}
+                          </Tag>
+                        );
+                      })}
+                    </span>
+                  </Col>
                 </Row>
               </Card>
             </Col>
@@ -278,23 +318,32 @@ function IvtDetailPage() {
         <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
           <Table
             title={() => 'Orders'}
-            rowKey={"orderId"}
+            rowKey={"orderIvtId"}
             columns={orderColumns}
-            dataSource={orderDataSource}
-            pagination={orderSearchParams.pagination}
-            // loading={loading}
-            onChange={handleOrderPageChange}
+            dataSource={orderSource}
+            pagination={{
+              position: ['bottomCenter'],
+              current: orderSearchParams.pageIndex,
+              pageSize: orderSearchParams.pageSize,
+              total: orderCount,
+              onChange: handleOrderPageChange
+            }}
           />
         </Card>
         <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
           <Table
-            title={() => 'Restock History'}
-            rowKey={"restockId"}
-            columns={restockColumns}
-            dataSource={restockSource}
-            pagination={restockSearchParams.pagination}
-            // loading={loading}
-            onChange={handleRestockPageChange}
+            title={() => 'Stock History'}
+            rowKey={"stockId"}
+            columns={stockColumns}
+            dataSource={stockSource}
+            pagination={{
+              position: ['bottomCenter'],
+              current: stockSearchParams.pageIndex,
+              pageSize: stockSearchParams.pageSize,
+              total: stockCount,
+              onChange: handleStockPageChange
+            }}
+
           />
         </Card>
       </Content>
