@@ -167,7 +167,7 @@ const IvtPage = () => {
                   style={{ height: '200px' }}>
                   {<div style={{ paddingLeft: '10px', position: 'absolute', top: '60%', left: '3%' }}>
                     <span style={{ fontSize: '20px' }}>All products</span><br />
-                    <span style={{ fontSize: '30px' }}>000</span>
+                    <span style={{ fontSize: '30px' }}>{ivtCount}</span>
                   </div>}
                   {<div style={{ paddingRight: '10px', position: 'absolute', top: '60%', right: '10%' }}>
                     <span style={{ fontSize: '20px' }}>Active</span><br />
