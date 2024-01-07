@@ -128,3 +128,16 @@ export const getOrderDetailByDBId = async(orderDBId) => {
     const response = await http.get(`/queryOrderDataById?orderDBId=${orderDBId}`);
     return response.data;
 }
+
+export const ordersDataByCustomerId = async(searchingParams, customerId) => {
+    var queryBody = {
+        "searchParams" : "",
+        "pageIndex": searchingParams.pagination.current ?? 1,
+        "pageSize": searchingParams.pagination.pageSize ?? 10,
+        "orderStatus": searchingParams.filters?.orderStatus ?? [],
+        "order": searchingParams.order ?? "",
+        "customerId": customerId
+    }
+    const response = await http.post(`/queryOrderData`, queryBody);
+    return response.data;
+}

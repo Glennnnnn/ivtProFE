@@ -19,10 +19,14 @@ import {
     EditOutlined, DeleteOutlined, UserOutlined, CarOutlined, AccountBookOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { editCustomer, deleteCustomer, getCustomerDetailById } from '../../api/api.js'
+import { editCustomer, deleteCustomer, getCustomerDetailById, ordersDataByCustomerId } from '../../api/api.js'
+import moment from "moment";
 
 
 const CustomerDetailsPage = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const customerId = urlParams.get('customerId');
+
     const { Content } = Layout;
     const { Option } = Select;
     const [messageApi, contextHolder] = message.useMessage();
@@ -33,12 +37,8 @@ const CustomerDetailsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const customerId = urlParams.get('customerId');
-
                 const posts = await getCustomerDetailById(customerId);
                 if (posts.code === 200) {
-                    console.log(posts.data);
                     setRecordData(posts.data);
                 }
                 else {
@@ -64,10 +64,45 @@ const CustomerDetailsPage = () => {
     const [searchParams, setSearchParams] = useState({
         pagination: {
             current: 1,
-            pageSize: 10,
+            pageSize: 5,
             total: 0,
         },
     })
+
+    const fetchDataAndUpdateState = async () => {
+        try {
+            setDataSource([]);
+            setLoading(true);
+            const posts = await ordersDataByCustomerId(searchParams, customerId);
+            if (posts.code === 200) {
+                setDataSource(posts.data.responsePoList);
+                setSearchParams({
+                    ...searchParams,
+                    pagination: {
+                        ...searchParams.pagination,
+                        total: posts.data.count,
+                    },
+                });
+            } else {
+                messageApi.open({
+                    type: "error",
+                    content: "Loading Orders Error!",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Loading Orders Error!",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDataAndUpdateState();
+    }, [JSON.stringify(searchParams)]);
 
     const [editVisible, setEditVisible] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
@@ -179,40 +214,70 @@ const CustomerDetailsPage = () => {
 
     const columns = [
         {
-            title: 'Order Number',
-            dataIndex: 'orderNumber',
-            width: 220,
-            key: 'orderId',
-            render: (orderNumber, record) => {
-                return <NavLink>{orderNumber}</NavLink>
+            title: 'Order Date',
+            dataIndex: 'orderDate',
+            width: "10%",
+            render: (text, record) => {
+                return (
+                    moment(text).format('DD/MM/YYYY')
+                )
             }
         },
         {
-            title: 'Customer Order Number',
-            dataIndex: 'customerOrderNumber',
-            width: 220,
+            title: 'Order ID',
+            dataIndex: 'orderId',
+            width: "20%",
+            key: 'orderId',
+            render: (orderId, record) => {
+                const url = `/orderDetails?orderDBId=${record.orderDBId}`;
+                return (
+                    <NavLink to={url}>
+                        {orderId}
+                    </NavLink>
+                );
+            },
         },
         {
-            title: 'Order Date',
-            dataIndex: 'orderDate',
-            sorter: true,
+            title: 'Customer Order No',
+            dataIndex: 'customerOrderNo',
+            width: "20%",
         },
         {
-            title: 'Order Total',
-            dataIndex: 'orderTotal',
+            title: 'Order Note',
+            dataIndex: 'orderNote',
+            width: "20%",
+            
+        },
+        {
+            title: 'Total(AUD)',
+            dataIndex: 'totalPrice',
+            width: "10%",
+            render: (_, record) => {
+                const formattedTotal = _.toFixed(2);
+                return ` ${formattedTotal}`;
+            },
         },
         {
             title: 'Status',
-            dataIndex: 'delFlag',
+            dataIndex: 'orderStatus',
+            width: "10%",
             filters: [
-                { text: 'active', value: 'active' },
-                { text: 'inactive', value: 'inactive' },
+                { text: "processing", value: "processing" },
+                { text: "reversed", value: "reversed" },
+                { text: "completed", value: "completed" },
             ],
-            render: (status) => (
-                <span>
-                    <Tag color={status === "active" ? 'green' : 'volcano'}> {status} </Tag>
-                </span>
-            ),
+            render: (status) => {
+                const color = status === "processing" ? 'orange' :
+                    (status === "reversed" ? 'red' : 'green');
+
+                return (
+                    <span>
+                        <Tag color={color}>
+                            {status}
+                        </Tag>
+                    </span>
+                );
+            }
         }
     ]
 
@@ -443,7 +508,7 @@ const CustomerDetailsPage = () => {
                                                     <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Inactive Reason</span><br />
                                                     <span style={{ fontSize: '12px' }}>{recordData.customerDelNote ?? ""}</span>
                                                 </Col>
-                                            ): (<></>)
+                                            ) : (<></>)
                                         }
                                     </Row>
                                 </Card>
@@ -453,7 +518,7 @@ const CustomerDetailsPage = () => {
 
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
                         <Table
-                            rowKey={"customerId"}
+                            rowKey={"orderDBId"}
                             columns={columns}
                             dataSource={dataSource}
                             pagination={searchParams.pagination}
