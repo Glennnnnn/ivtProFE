@@ -22,6 +22,7 @@ import {
     PlusOutlined, EditOutlined, DeleteOutlined, RedoOutlined
 } from '@ant-design/icons'
 import moment from "moment";
+import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
 import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder } from "@/api/api.js";
 
@@ -119,10 +120,9 @@ const NewOrderPage = () => {
     const { Content } = Layout;
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
-    const today = moment();
 
     const [orderId, setOrderId] = useState('');
-    const [orderDate, setOrderDate] = useState(null);
+    const [orderDate, setOrderDate] = useState(dayjs());
     const [customerOrderNo, setCustomerOrderNo] = useState('');
     const [orderNote, setOrderNote] = useState('');
 
@@ -430,10 +430,10 @@ const NewOrderPage = () => {
         const { isValid, reason } = validateSave();
         if (isValid) {
             try {
-                const newCustomerDetails = newCustomerForm.getFieldValue()
+                const newCustomerDetails = newCustomerForm.getFieldValue();
                 const queryBody = {
                     "orderId": orderId,
-                    "orderDate": moment(orderDate).format("DD/MM/YYYY"),
+                    "orderDate": moment(orderDate.toString()).format("YYYY/MM/DD"),
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
                     "isNewCustomer": showCustomer,
@@ -451,16 +451,22 @@ const NewOrderPage = () => {
                     },
                     "productList": data,
                 };
-                // const posts = await addOrder(queryBody);
-                // if (posts.code === 200) {
-                //     if (e.key === "2") {
-                //         navigate(-1);
-                //     }
-                //     else {
-                //         window.location.reload();
-                //     }
-                // }
-                console.log(queryBody);
+                
+                const posts = await addOrder(queryBody);
+                if (posts.code === 200) {
+                    if (e.key === "2") {
+                        navigate(-1);
+                    }
+                    else {
+                        window.location.reload();
+                    }
+                }
+                else{
+                    messageApi.open({
+                        type: "error",
+                        content: "Save Order Error!",
+                    });
+                }
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -586,8 +592,17 @@ const NewOrderPage = () => {
                                                 format='DD/MM/YYYY'
                                                 value={orderDate}
                                                 onChange={handleOrderDateChange}
-                                                defaultValue={today}
                                                 placeholder="Order Date"
+                                            />
+                                        </Col>
+
+                                        <Col span={6}><span className="item-span">Customer Order No</span></Col>
+                                        <Col span={18}>
+                                            <Input
+                                                placeholder="Customer Order No"
+                                                style={{ border: 'none', borderBottom: '1px solid #d9d9d9' }}
+                                                value={customerOrderNo}
+                                                onChange={handleCustomerOrderNoChange}
                                             />
                                         </Col>
 
@@ -606,16 +621,6 @@ const NewOrderPage = () => {
                             <Col span={12}>
                                 <Card bordered={false} style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
-                                        <Col span={6}><span className="item-span">Customer Order No</span></Col>
-                                        <Col span={18}>
-                                            <Input
-                                                placeholder="Customer Order No"
-                                                style={{ border: 'none', borderBottom: '1px solid #d9d9d9' }}
-                                                value={customerOrderNo}
-                                                onChange={handleCustomerOrderNoChange}
-                                            />
-                                        </Col>
-
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
                                             <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields();}} />
@@ -660,7 +665,7 @@ const NewOrderPage = () => {
                                                                 label="* Credit Term"
                                                                 name="creditTerm">
                                                                 <Select placeholder="* Credit Term" className="form-item">
-                                                                    <Option value="immidiately">Immediately</Option>
+                                                                    <Option value="immediately">Immediately</Option>
                                                                     <Option value="30 days">30 days</Option>
                                                                     <Option value="60 days">60 days</Option>
                                                                 </Select>

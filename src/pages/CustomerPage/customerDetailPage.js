@@ -307,7 +307,7 @@ const CustomerDetailsPage = () => {
                                 ]}
                                 initialValue={recordData.creditTerm}>
                                 <Select placeholder="* Credit Term" className="form-item">
-                                    <Option value="immidiately">Immediately</Option>
+                                    <Option value="immediately">Immediately</Option>
                                     <Option value="30 days">30 days</Option>
                                     <Option value="60 days">60 days</Option>
                                 </Select>
