@@ -70,7 +70,7 @@ const IvtPage = () => {
       key: 'ivtClassName',
       render: (ivtClassName, record) => {
         // console.log(JSON.stringify(ivtClassName) + JSON.stringify(record))
-        return <NavLink to='/ivtDetailPage' state={{ "ivtData": JSON.stringify(record), "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtClassName}</NavLink>
+        return <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtClassName}</NavLink>
       }
     },
     {

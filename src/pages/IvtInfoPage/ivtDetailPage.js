@@ -237,10 +237,12 @@ function IvtDetailPage() {
             },
             {
               title: (function () {
-                return prePage.toLowerCase().replace(/\b([\w|']+)\b/g, function (word) {
-                  //return word.slice(0, 1).toUpperCase() + word.slice(1);  
-                  return word.replace(word.charAt(0), word.charAt(0).toUpperCase()) + ' List';
-                });
+                if (prePage === 'inventory') {
+                  return prePage.toLowerCase().replace(/\b([\w|']+)\b/g, function (word) {
+                    //return word.slice(0, 1).toUpperCase() + word.slice(1);  
+                    return word.replace(word.charAt(0), word.charAt(0).toUpperCase()) + ' List';
+                  });
+                }
               })(),
               href: '/' + prePage,
             },

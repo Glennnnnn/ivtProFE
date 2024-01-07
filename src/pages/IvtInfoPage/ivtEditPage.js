@@ -73,7 +73,7 @@ const IvtEditPage = () => {
 
   const breadcrumbRender = (item, params, items, paths) => {
     const isPrevious = items.indexOf(item) !== items.length - 2;
-    return isPrevious ? <NavLink to={item.href}>{item.title}</NavLink> : <NavLink to='/ivtDetailPage' state={{ "ivtData": JSON.stringify(baseData), "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }}>{item.title}</NavLink>;
+    return isPrevious ? <NavLink to={item.href}>{item.title}</NavLink> : <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }}>{item.title}</NavLink>;
   }
 
   const onTagValueInputChange = (event) => {
@@ -88,7 +88,7 @@ const IvtEditPage = () => {
   };
 
   const navigateDetail = () => {
-    let data = { "ivtData": JSON.stringify(baseData), "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }
+    let data = { "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }
     navigate("/ivtDetailPage", { state: data });
   }
 
@@ -361,7 +361,7 @@ const IvtEditPage = () => {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-              <Button htmlType="reset" onClick={navigateDetail}>reset</Button>
+              <Button htmlType="cancel" onClick={navigateDetail}>cancel</Button>
             </Space>
           </Form.Item>
 
