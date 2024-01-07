@@ -46,22 +46,36 @@ function IvtDetailPage() {
   useEffect(() => {
     const queryBasicDataAsync = async () => {
       let ivtJson = await http.get("/ivt/queryIvtResultById?ivtId=" + ivtId)
+      let _ivtCount = await http.get("/ivt/countTotalIvt")
       let ivt = JSON.parse(JSON.stringify(ivtJson.data.data))
+      setIvtCount(_ivtCount)
       setBaseData(ivt)
+    }
 
+    queryBasicDataAsync()
+  }, [ivtId])
+
+  useEffect(() => {
+    const queryStockDataAsync = async () => {
       let stockJson = await http.post("/queryStockByIvtId", { stockSearchParams })
       let stock = JSON.parse(JSON.stringify(stockJson.data.data))
       setStockSource(stock.stockResponsePoList)
       setStockCount(stock.totalCount)
+    }
 
+    queryStockDataAsync()
+  }, [stockSearchParams])
+
+  useEffect(() => {
+    const queryOrderDataAsync = async () => {
       let orderJson = await http.post("/queryOrderByIvtId", { orderSearchParams })
       let order = JSON.parse(JSON.stringify(orderJson.data.data))
       setOrderSource(order.orderIvtResponsePoList)
       setOrderCount(order.totalCount)
     }
 
-    queryBasicDataAsync()
-  }, [stockSearchParams, orderSearchParams])
+    queryOrderDataAsync()
+  }, [orderSearchParams])
 
   const handleOrderPageChange = ((pageIndex, pageSize) => {
     setOrderSearchParams({
