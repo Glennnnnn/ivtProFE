@@ -13,10 +13,9 @@ import {
     message,
     Modal,
     Input,
-    Select,
 } from 'antd';
 import {
-    CheckOutlined, DeleteOutlined, UserOutlined, AccountBookOutlined, CarryOutOutlined
+    CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { getOrderDetailByDBId } from '../../api/api.js'
@@ -74,7 +73,7 @@ const OrderDetailsPage = () => {
     }, []);
 
     const [dataSource, setDataSource] = useState([]);
-    const [searchParams, setSearchParams] = useState({
+    const searchParams = useState({
         pagination: {
             current: 1,
             pageSize: 10,
