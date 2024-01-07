@@ -46,9 +46,7 @@ function IvtDetailPage() {
   useEffect(() => {
     const queryBasicDataAsync = async () => {
       let ivtJson = await http.get("/ivt/queryIvtResultById?ivtId=" + ivtId)
-      let _ivtCount = await http.get("/ivt/countTotalIvt")
       let ivt = JSON.parse(JSON.stringify(ivtJson.data.data))
-      setIvtCount(_ivtCount)
       setBaseData(ivt)
     }
 
