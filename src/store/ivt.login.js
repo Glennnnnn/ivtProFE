@@ -1,7 +1,7 @@
 // 登录模块
 import { makeAutoObservable } from "mobx"
 //import axios from "axios"
-import { getToken, setToken } from '@/utils'
+import { getToken, setToken, removeToken } from '@/utils'
 import { history } from "@/utils/historyPlugin"
 import { http } from "@/utils"
 
@@ -35,14 +35,13 @@ class LoginIvt {
   }
 
   logout = async () => {
-    const res = await http.post('/user/logout', {
-      token: this.token
-    })
-    this.result = res.data.code
-    // this.result = 200
-    this.token = ''
-    //removeToken()？
-    setToken(this.token)
+    const res = await http.get('/user/logout')
+    if (res.data.code === 200) {
+      this.result = res.data.code
+      console.log(getToken())
+      removeToken()
+    }
+
   }
 }
 export default LoginIvt

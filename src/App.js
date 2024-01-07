@@ -23,7 +23,8 @@ import HomePage from './pages/HomePage/index.js';
 import IvtCreatePage from './pages/IvtInfoPage/ivtCreatePage.js';
 import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
 import IvtEditPage from './pages/IvtInfoPage/ivtEditPage.js';
-import { getToken, removeToken } from '@/utils'
+import { getToken } from '@/utils'
+import { useIvt } from '@/store'
 
 //components
 import './App.css';
@@ -34,6 +35,7 @@ import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
 const { Header, Sider, Content } = Layout;
 
 const App = () => {
+  const { loginIvt } = useIvt();
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('dashboard');
   const { token: { colorBgContainer }, } = theme.useToken();
@@ -42,10 +44,14 @@ const App = () => {
     setSelectedMenu(window.location.pathname.split('/')[1])
   }, [])
 
-  const handleLogout = () => {
-    removeToken();
+  const handleLogout = async () => {
+    try {
+      await loginIvt.logout()
+      window.location.href = '/login';
+    } catch (e) {
+      console.log(e.response?.data?.message || '登出失败')
+    }
     // You can use window.location.href or any other navigation method
-    window.location.href = '/login';
   };
 
   const setMenu = (menuName) => {
