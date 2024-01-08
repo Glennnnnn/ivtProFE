@@ -1,24 +1,17 @@
-import { React, useState, useEffect } from 'react';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { React, useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   EditableProTable,
-  ProCard,
-  ProFormField,
   ProForm,
   ProFormText,
-  stringify
 } from '@ant-design/pro-components';
 
 import {
-  message,
-  Form,
-  Input,
-  Breadcrumb,
-  Space,
-  Select, Button, Divider, Layout, Row, Col, Card, Tag
+
+  Select, Layout, Row, Col, Card
 } from 'antd';
-import { http } from "@/utils";
-import TextArea from 'antd/es/input/TextArea';
+// import { http } from "@/utils";
+// import TextArea from 'antd/es/input/TextArea';
 //const { RangePicker } = DatePicker;
 const waitTime = (time) => {
   return new Promise((resolve) => {
@@ -28,7 +21,7 @@ const waitTime = (time) => {
   });
 };
 
-const options = [];
+// const options = [];
 
 
 const columns = [

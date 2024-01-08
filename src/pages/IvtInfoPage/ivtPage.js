@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
 import "./index.scss"
 
-import { Card, Breadcrumb, Form, Button, Table, Tag, Input, Layout, Row, Col, Flex } from "antd";
+import { Card, Breadcrumb, Table, Tag, Input, Layout, Row, Col } from "antd";
 import {
-  FolderOutlined, PlusOutlined
+  FolderOutlined
 } from '@ant-design/icons'
 //import img404 from '@/assets/error.png'
 import { http } from "@/utils";
@@ -165,7 +165,7 @@ const IvtPage = () => {
                   </div>}
                   {<div style={{ paddingRight: '10px', position: 'absolute', top: '60%', right: '10%' }}>
                     <span style={{ fontSize: '20px' }}>Active</span><br />
-                    <span style={{ fontSize: '30px' }}>000</span>
+                    <span style={{ fontSize: '30px' }}>{ivtCount}</span>
                   </div>}
                 </Card>
               </Col>
@@ -178,11 +178,11 @@ const IvtPage = () => {
                   style={{ height: '200px' }}>
                   {<div style={{ paddingLeft: '10px', position: 'absolute', top: '60%', left: '3%' }}>
                     <span style={{ fontSize: '20px' }}>All products</span><br />
-                    <span style={{ fontSize: '30px' }}>000</span>
+                    <span style={{ fontSize: '30px' }}>{ivtCount}</span>
                   </div>}
                   {<div style={{ paddingRight: '10px', position: 'absolute', top: '60%', right: '10%' }}>
                     <span style={{ fontSize: '20px' }}>Active</span><br />
-                    <span style={{ fontSize: '30px' }}>000</span>
+                    <span style={{ fontSize: '30px' }}>{ivtCount}</span>
                   </div>}
                 </Card>
               </Col>

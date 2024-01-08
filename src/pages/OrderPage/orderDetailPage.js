@@ -132,7 +132,7 @@ const OrderDetailsPage = () => {
     const columns = [
         {
             title: 'Product',
-            dataIndex: 'ivtId',
+            dataIndex: 'ivtClassName',
             width: "45%",
             render: (ivtId, record) => {
                 return (
@@ -254,10 +254,10 @@ const OrderDetailsPage = () => {
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Company Name</span><br />
                                             <span style={{ fontSize: '12px' }}>
                                                 {
-                                                    recordData.customerInterPo === null  || 
-                                                    recordData.customerInterPo === undefined || 
-                                                    recordData.customerInterPo.customerId === undefined || 
-                                                    recordData.customerInterPo.customerId === null ?
+                                                    recordData.customerInterPo === null ||
+                                                        recordData.customerInterPo === undefined ||
+                                                        recordData.customerInterPo.customerId === undefined ||
+                                                        recordData.customerInterPo.customerId === null ?
                                                         (<>{recordData.orderCompanyName}</>) : (
                                                             <>
                                                                 <NavLink to={`/customerDetails?customerId=${recordData.customerInterPo.customerId.toString()}`}>

@@ -177,7 +177,7 @@ const OrderPage = () => {
             render: (text, record) => {
                 // TODO: Overdue Tag
                 //record.customerInterPo.creditTerm
-                console.log(text)
+                // console.log(text)
                 const originalDate = dayjs(text);
                 const currentDate = dayjs();
 
