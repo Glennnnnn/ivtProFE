@@ -133,10 +133,10 @@ const App = () => {
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
-            <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/ivtCreatePage" />} />
+            <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/login" />} />
             <Route path='/ivtEditPage' element={isAuthenticated ? <IvtEditPage /> : <Navigate to="/login" />} />
             <Route path="/ivtDetailPage" element={isAuthenticated ? <IvtDetailPage /> : <Navigate to="/login" />} />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />} />
             <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
           </Routes>
         </Content>
