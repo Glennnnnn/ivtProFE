@@ -98,10 +98,6 @@ const IvtPage = () => {
       dataIndex: 'ivtSubclassCode',
     },
     {
-      title: 'Category',
-      dataIndex: 'ivtCatName',
-    },
-    {
       title: 'Note',
       dataIndex: 'ivtNote',
     },
@@ -111,14 +107,12 @@ const IvtPage = () => {
 
     },
     {
-      title: 'Value',
-      dataIndex: 'ivtValue',
-
-    },
-    {
       title: 'Price',
       dataIndex: 'ivtPrice',
-
+      render: (_, record) => {
+        const formattedTotal = _.toFixed(2);
+        return ` ${formattedTotal}`;
+      },
     },
   ]
 

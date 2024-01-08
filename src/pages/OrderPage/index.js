@@ -116,7 +116,6 @@ const OrderPage = () => {
 		const fetchData = async () => {
 			try {
 				const res = await getOrderSummary();
-                console.log(res);
 				if (res.code === 200) {
 					setOrderNo([
 						{
