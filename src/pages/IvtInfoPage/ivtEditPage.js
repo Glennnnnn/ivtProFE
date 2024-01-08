@@ -336,7 +336,7 @@ const IvtEditPage = () => {
           <Form.Item label="Switch" valuePropName="checked">
             <Switch />
           </Form.Item> */}
-          <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+          {/* <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
             <Upload action="/upload.do" listType="picture-card">
               <div>
                 <PlusOutlined />
@@ -349,7 +349,7 @@ const IvtEditPage = () => {
                 </div>
               </div>
             </Upload>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             wrapperCol={{

@@ -33,7 +33,6 @@ http.interceptors.response.use((response) => {
   // 对响应数据做点什么
   return response
 }, (error) => {
-  console.log(error)
   if (error.response.status === 401) {
 
     setToken('')

@@ -28,97 +28,97 @@ const OrderPage = () => {
     const [orderNo, setOrderNo] = useState([]);
 
     const [loading, setLoading] = useState(false);
-	const [dataSource, setDataSource] = useState([]);
-	const [searchParams, setSearchParams] = useState({
-		pagination: {
-			current: 1,
-			pageSize: 10,
-			total: 0,
-		},
-	});
-	const [searchName, setSearchName] = useState("");
+    const [dataSource, setDataSource] = useState([]);
+    const [searchParams, setSearchParams] = useState({
+        pagination: {
+            current: 1,
+            pageSize: 10,
+            total: 0,
+        },
+    });
+    const [searchName, setSearchName] = useState("");
 
     const fetchDataAndUpdateState = async () => {
-		try {
-			setDataSource([]);
-			setLoading(true);
-			const posts = await orderList(searchParams);
-			if (posts.code === 200) {
-				setDataSource(posts.data.responsePoList);
-				setSearchParams({
-					...searchParams,
-					pagination: {
-						...searchParams.pagination,
-						total: posts.data.count,
-					},
-				});
-			} else {
-				messageApi.open({
-					type: "error",
-					content: "Loading Orders Error!",
-				});
-			}
-		} catch (error) {
-			console.log(error);
-			messageApi.open({
-				type: "error",
-				content: "Loading Orders Error!",
-			});
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchDataAndUpdateState();
-	}, [JSON.stringify(searchParams)]);
-
-	const handlePageChange = (pagination, filters, sorter) => {
-		if (pagination.pageSize !== searchParams.pagination?.pageSize) {
-			console.log("page size changed");
-			pagination.current = 1;
-			setDataSource([]);
-		}
-
-		setSearchParams({
-			pagination,
-			filters,
-			...sorter,
-		});
-	};
-
-	const onSearch = (value, _e) => {
-		setSearchParams({
-			...searchParams,
-			pagination: {
-				...searchParams.pagination,
-				current: 1,
-			},
-			searchName: value,
-		});
-	};
-
-	const onChange = (e) => {
-		if (e.target.value !== searchName && loading === false) {
-			setSearchParams({
-				...searchParams,
-				pagination: {
-					...searchParams.pagination,
-					current: 1,
-				},
-				searchName: e.target.value,
-			});
-			setSearchName(e.target.value);
-		}
-	};
+        try {
+            setDataSource([]);
+            setLoading(true);
+            const posts = await orderList(searchParams);
+            if (posts.code === 200) {
+                setDataSource(posts.data.responsePoList);
+                setSearchParams({
+                    ...searchParams,
+                    pagination: {
+                        ...searchParams.pagination,
+                        total: posts.data.count,
+                    },
+                });
+            } else {
+                messageApi.open({
+                    type: "error",
+                    content: "Loading Orders Error!",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Loading Orders Error!",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const res = await getOrderSummary();
-				if (res.code === 200) {
-					setOrderNo([
-						{
+        fetchDataAndUpdateState();
+    }, [JSON.stringify(searchParams)]);
+
+    const handlePageChange = (pagination, filters, sorter) => {
+        if (pagination.pageSize !== searchParams.pagination?.pageSize) {
+            console.log("page size changed");
+            pagination.current = 1;
+            setDataSource([]);
+        }
+
+        setSearchParams({
+            pagination,
+            filters,
+            ...sorter,
+        });
+    };
+
+    const onSearch = (value, _e) => {
+        setSearchParams({
+            ...searchParams,
+            pagination: {
+                ...searchParams.pagination,
+                current: 1,
+            },
+            searchName: value,
+        });
+    };
+
+    const onChange = (e) => {
+        if (e.target.value !== searchName && loading === false) {
+            setSearchParams({
+                ...searchParams,
+                pagination: {
+                    ...searchParams.pagination,
+                    current: 1,
+                },
+                searchName: e.target.value,
+            });
+            setSearchName(e.target.value);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getOrderSummary();
+                if (res.code === 200) {
+                    setOrderNo([
+                        {
                             title: "All Order",
                             number: res.data.totalOrderCount,
                         },
@@ -137,24 +137,24 @@ const OrderPage = () => {
                             number: res.data.reversedOrderCount,
                             style: { color: "red" },
                         }
-					]);
-				} else {
-					messageApi.open({
-						type: "error",
-						content: "Loading Order Summary Error!",
-					});
-				}
-			} catch (error) {
-				console.log(error);
-				messageApi.open({
-					type: "error",
-					content: "Loading Order Summary Error!",
-				});
-			}
-		};
+                    ]);
+                } else {
+                    messageApi.open({
+                        type: "error",
+                        content: "Loading Order Summary Error!",
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: "error",
+                    content: "Loading Order Summary Error!",
+                });
+            }
+        };
 
-		fetchData();
-	}, [messageApi]);
+        fetchData();
+    }, [messageApi]);
 
     // TODO: fetch data from api
     const orderSummary = [
@@ -177,16 +177,18 @@ const OrderPage = () => {
             render: (text, record) => {
                 // TODO: Overdue Tag
                 //record.customerInterPo.creditTerm
+                console.log(text)
                 const originalDate = dayjs(text);
-                const creditTerm = 30;
-                const dueDate = originalDate.add(creditTerm, 'day');
-
                 const currentDate = dayjs();
-                
-                //console.log(dueDate.toString() < currentDate.toString());
-                
+
+                let isOverDue = true
+                null === record.customerInterPo || "immediately" === record.customerInterPo?.creditTerm ? isOverDue = currentDate.isAfter(originalDate) : isOverDue = currentDate.isAfter(originalDate.add(30, 'day'))
+
                 return (
-                    moment(text).format('DD/MM/YYYY')
+                    <>
+                        <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                        <Tag color={isOverDue ? "red" : "green"}>{isOverDue ? "overDue" : "available"}</Tag>
+                    </>
                 )
             }
         },
@@ -245,8 +247,8 @@ const OrderPage = () => {
             ],
             render: (status) => {
                 const color = status === "processing" ? 'orange' :
-                (status === "reversed" ? 'red' : 'green');
-                
+                    (status === "reversed" ? 'red' : 'green');
+
                 return (
                     <span>
                         <Tag color={color}>
@@ -292,7 +294,7 @@ const OrderPage = () => {
 
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <StatisticCard title="Order Summary" data={orderNo}  spanNumber={6}/>
+                                <StatisticCard title="Order Summary" data={orderNo} spanNumber={6} />
                             </Col>
                             <Col span={12}>
                                 <StatisticCard title="Order Summary"
