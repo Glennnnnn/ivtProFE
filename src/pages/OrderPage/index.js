@@ -17,7 +17,7 @@ import {
 import { PlusOutlined } from '@ant-design/icons'
 import StatisticCard from "@/components/StatisticCard/StatisticCard";
 import { Link, NavLink } from 'react-router-dom';
-import { orderList } from "../../api/api.js";
+import { orderList, getOrderSummary } from "../../api/api.js";
 import moment from "moment";
 import dayjs from 'dayjs';
 
@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 const OrderPage = () => {
     const { Content } = Layout;
     const [messageApi, contextHolder] = message.useMessage();
+    const [orderNo, setOrderNo] = useState([]);
 
     const [loading, setLoading] = useState(false);
 	const [dataSource, setDataSource] = useState([]);
@@ -111,28 +112,51 @@ const OrderPage = () => {
 		}
 	};
 
-    // TODO: fetch data from api
-    const orderNo = [
-        {
-            title: "All Order",
-            number: 10,
-        },
-        {
-            title: "Processing",
-            number: 1,
-            style: { color: "orange" },
-        },
-        {
-            title: "Completed",
-            number: 9,
-            style: { color: "green" },
-        },
-        {
-            title: "Reversed",
-            number: 0,
-            style: { color: "red" },
-        }
-    ];
+    useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const res = await getOrderSummary();
+                console.log(res);
+				if (res.code === 200) {
+					setOrderNo([
+						{
+                            title: "All Order",
+                            number: res.data.totalOrderCount,
+                        },
+                        {
+                            title: "Processing",
+                            number: res.data.processingOrderCount,
+                            style: { color: "orange" },
+                        },
+                        {
+                            title: "Completed",
+                            number: res.data.completedOrderCount,
+                            style: { color: "green" },
+                        },
+                        {
+                            title: "Reversed",
+                            number: res.data.reversedOrderCount,
+                            style: { color: "red" },
+                        }
+					]);
+				} else {
+					messageApi.open({
+						type: "error",
+						content: "Loading Order Summary Error!",
+					});
+				}
+			} catch (error) {
+				console.log(error);
+				messageApi.open({
+					type: "error",
+					content: "Loading Order Summary Error!",
+				});
+			}
+		};
+
+		fetchData();
+	}, [messageApi]);
+
     // TODO: fetch data from api
     const orderSummary = [
         {
@@ -160,7 +184,7 @@ const OrderPage = () => {
 
                 const currentDate = dayjs();
                 
-                console.log(dueDate.toString() < currentDate.toString());
+                //console.log(dueDate.toString() < currentDate.toString());
                 
                 return (
                     moment(text).format('DD/MM/YYYY')

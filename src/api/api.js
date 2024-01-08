@@ -141,3 +141,8 @@ export const ordersDataByCustomerId = async(searchingParams, customerId) => {
     const response = await http.post(`/queryOrderData`, queryBody);
     return response.data;
 }
+
+export const getOrderSummary = async() => {
+    const response = await http.get(`/queryOrderCountData`);
+    return response.data;
+}
