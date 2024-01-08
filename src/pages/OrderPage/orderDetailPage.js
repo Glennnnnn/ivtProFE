@@ -134,9 +134,28 @@ const OrderDetailsPage = () => {
             title: 'Product',
             dataIndex: 'ivtId',
             width: "45%",
-            // render: (ivtId, record) => {
-            //     return <NavLink>{ivtId}</NavLink>
-            // }
+            render: (ivtId, record) => {
+                return (
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtId.toString()}</NavLink>
+                        </Col>
+                        <Col span={12}>
+                            <span style={{ whiteSpace: 'pre-wrap' }}>
+                                {record.tags.map((tag) => {
+                                    if (tag !== null) {
+                                        return (
+                                            <Tag color="green" key={tag.tagName}>
+                                                {tag.tagName + ': ' + tag.tagValue}
+                                            </Tag>
+                                        );
+                                    }
+                                })}
+                            </span>
+                        </Col>
+                    </Row>
+                )
+            }
         },
         {
             title: 'Description',
@@ -233,7 +252,21 @@ const OrderDetailsPage = () => {
                                         </Col>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Company Name</span><br />
-                                            <span style={{ fontSize: '12px' }}>{recordData.orderCompanyName}</span>
+                                            <span style={{ fontSize: '12px' }}>
+                                                {
+                                                    recordData.customerInterPo === null  || 
+                                                    recordData.customerInterPo === undefined || 
+                                                    recordData.customerInterPo.customerId === undefined || 
+                                                    recordData.customerInterPo.customerId === null ?
+                                                        (<>{recordData.orderCompanyName}</>) : (
+                                                            <>
+                                                                <NavLink to={`/customerDetails?customerId=${recordData.customerInterPo.customerId.toString()}`}>
+                                                                    {recordData.orderCompanyName}
+                                                                </NavLink>
+                                                            </>
+                                                        )
+                                                }
+                                            </span>
                                         </Col>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Customer Name</span><br />
@@ -290,7 +323,7 @@ const OrderDetailsPage = () => {
                         maskClosable={false}
                         width={600}
                         centered>
-                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  You cannot move this order to processing</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  You cannot move this order to processing after complete</span>
                     </Modal>
 
                     <Modal
@@ -309,6 +342,7 @@ const OrderDetailsPage = () => {
                                 Reverse
                             </Button>,
                         ]}>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  You cannot change this order status after reverse</span>
 
                         <Form form={reverseForm} name="reverseForm" style={{ maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', marginBottom: '60px' }}
                             layout="vertical">

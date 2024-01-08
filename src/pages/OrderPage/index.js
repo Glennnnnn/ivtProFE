@@ -209,7 +209,6 @@ const OrderPage = () => {
             dataIndex: "orderCompanyName",
             width: "20%",
             render: (customerName, record) => {
-                //console.log(record);
                 if (record.customerInterPo === null || record.customerInterPo.customerId === null) {
                     return (<>{customerName}</>)
                 }
