@@ -1,7 +1,7 @@
 //封装axios
 import axios from 'axios'
 import { getToken, setToken } from '@/utils/token'
-import { history } from './historyPlugin'
+import { history } from '@/utils/historyPlugin'
 import JSONbig from 'json-bigint'
 
 //const JSONbig = require('json-bigint')({ 'storeAsString': true });
@@ -36,7 +36,9 @@ http.interceptors.response.use((response) => {
   if (error.response.status === 401) {
 
     setToken('')
-    history.push('/login')
+    //window.alert("Token expired please login")
+    window.location = "/login"
+    //history.push('/login')
   }
   return Promise.reject(error)
 })
