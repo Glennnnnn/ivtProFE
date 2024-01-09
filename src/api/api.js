@@ -146,3 +146,13 @@ export const getOrderSummary = async() => {
     const response = await http.get(`/queryOrderCountData`);
     return response.data;
 }
+
+export const updateOrderStatus = async(orderDBId, orderStatus, reverseReason) => {
+    var queryBody = {
+        "orderDBId" : orderDBId,
+        "orderStatus": orderStatus,
+        "reverseReason": reverseReason,
+    }
+    const response = await http.post(`/updateOrderStatus`, queryBody);
+    return response.data;
+}

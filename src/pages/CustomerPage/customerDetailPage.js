@@ -21,6 +21,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { editCustomer, deleteCustomer, getCustomerDetailById, ordersDataByCustomerId } from '../../api/api.js'
 import moment from "moment";
+import dayjs from "dayjs";
 
 
 const CustomerDetailsPage = () => {
@@ -216,17 +217,50 @@ const CustomerDetailsPage = () => {
         {
             title: 'Order Date',
             dataIndex: 'orderDate',
-            width: "10%",
+            width: "20%",
             render: (text, record) => {
-                return (
-                    moment(text).format('DD/MM/YYYY')
-                )
+                if(record.orderStatus !== "processing"){
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                        </>
+                    )
+                }
+                const originalDate = dayjs(text);
+                const currentDate = dayjs();
+
+                let isOverDue = true;
+                if(record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm){
+                    isOverDue = currentDate.isAfter(originalDate)
+                }
+                else if(record.customerInterPo.creditTerm.include("30")){
+                    isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
+                }
+                else if(record.customerInterPo.creditTerm.include("60")){
+                    isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+                }
+
+                if(isOverDue){
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                            <Tag color={"red"}> overdue </Tag>
+                        </>
+                    )
+                }
+                else{
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                        </>
+                    )
+                }
             }
         },
         {
             title: 'Order ID',
             dataIndex: 'orderId',
-            width: "20%",
+            width: "15%",
             key: 'orderId',
             render: (orderId, record) => {
                 const url = `/orderDetails?orderDBId=${record.orderDBId}`;
@@ -240,7 +274,7 @@ const CustomerDetailsPage = () => {
         {
             title: 'Customer Order No',
             dataIndex: 'customerOrderNo',
-            width: "20%",
+            width: "15%",
         },
         {
             title: 'Order Note',

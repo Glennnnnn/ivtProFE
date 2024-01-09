@@ -18,7 +18,7 @@ import {
     CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { getOrderDetailByDBId } from '../../api/api.js'
+import { getOrderDetailByDBId, updateOrderStatus } from '../../api/api.js'
 import moment from "moment";
 
 
@@ -82,8 +82,26 @@ const OrderDetailsPage = () => {
     })
 
     const handleCompleteOk = async () => {
-        setCompleteVisible(false);
-        window.location.reload();
+        try {
+            const posts = await updateOrderStatus(recordData.orderDBId, "completed", "");
+            if (posts.code === 200) {
+                setCompleteVisible(false);
+                window.location.reload();
+            }
+            else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'Complete Order Error!'
+                })
+            }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: 'error',
+                content: 'Complete Order Error!'
+            })
+        }
     }
 
     const handleCompleteCancel = () => {
@@ -93,20 +111,17 @@ const OrderDetailsPage = () => {
     const handleReverseOk = async () => {
         reverseForm.validateFields().then(async (values) => {
             try {
-                // const posts = await deleteCustomer(values, recordData.customerId);
-                // if (posts.code === 200) {
-                //     setEditVisible(false);
-                //     deleteForm.resetFields();
-                //     window.location.reload();
-                setReverseVisible(false);
-                window.location.reload();
-                // }
-                // else {
-                //     messageApi.open({
-                //         type: 'error',
-                //         content: 'Reverse Order Error!'
-                //     })
-                // }
+                const posts = await updateOrderStatus(recordData.orderDBId, "reversed", values.reason);
+                if (posts.code === 200) {
+                    setReverseVisible(false);
+                    window.location.reload();
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Reverse Order Error!'
+                    })
+                }
             }
             catch (error) {
                 console.log(error);

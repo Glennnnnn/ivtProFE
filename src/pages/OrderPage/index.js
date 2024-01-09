@@ -172,24 +172,45 @@ const OrderPage = () => {
         {
             title: "Order Date",
             dataIndex: "orderDate",
-            width: "15%",
+            width: "20%",
             sorter: true,
             render: (text, record) => {
-                // TODO: Overdue Tag
-                //record.customerInterPo.creditTerm
-                // console.log(text)
+                if(record.orderStatus !== "processing"){
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                        </>
+                    )
+                }
                 const originalDate = dayjs(text);
                 const currentDate = dayjs();
 
-                let isOverDue = true
-                null === record.customerInterPo || "immediately" === record.customerInterPo?.creditTerm ? isOverDue = currentDate.isAfter(originalDate) : isOverDue = currentDate.isAfter(originalDate.add(30, 'day'))
+                let isOverDue = true;
+                if(record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm){
+                    isOverDue = currentDate.isAfter(originalDate)
+                }
+                else if(record.customerInterPo.creditTerm.include("30")){
+                    isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
+                }
+                else if(record.customerInterPo.creditTerm.include("60")){
+                    isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+                }
 
-                return (
-                    <>
-                        <span>{moment(text).format('DD/MM/YYYY')}  </span>
-                        <Tag color={isOverDue ? "red" : "green"}>{isOverDue ? "overDue" : "available"}</Tag>
-                    </>
-                )
+                if(isOverDue){
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                            <Tag color={"red"}> overdue </Tag>
+                        </>
+                    )
+                }
+                else{
+                    return (
+                        <>
+                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                        </>
+                    )
+                }
             }
         },
         {
@@ -225,7 +246,7 @@ const OrderPage = () => {
         {
             title: "Customer Order No",
             dataIndex: "customerOrderNo",
-            width: "20%",
+            width: "15%",
         },
         {
             title: "Total(AUD)",
