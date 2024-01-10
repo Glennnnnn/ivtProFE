@@ -11,6 +11,8 @@ module.exports = {
   },
 
   devServer: {
+    host: '0.0.0.0',
+    port: 3000,
     client: {
       webSocketURL: 'ws://0.0.0.0:3000/ws',
       //当出现编译错误或警告时，在浏览器中是否显示全屏覆盖。  示例为只显示错误信息
@@ -19,6 +21,9 @@ module.exports = {
         warnings: false
       },
     },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    }
   },
 }
 
