@@ -320,10 +320,23 @@ const OrderDetailsPage = () => {
                                     bordered={false}
                                     style={{ height: 'auto', minHeight: '350px' }}>
                                     <Row gutter={[16, 16]}>
-                                        <Col span={24}>
-                                            <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Order Note</span><br />
-                                            <span style={{ fontSize: '12px' }}>{recordData.orderNote}</span>
-                                        </Col>
+                                        {null === recordData.reverseReason ?
+                                            <Col span={24}>
+                                                <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Order Note</span><br />
+                                                <span style={{ fontSize: '12px' }}>{recordData.orderNote}</span>
+                                            </Col> :
+                                            <>
+                                                <Col span={24}>
+                                                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Order Note</span><br />
+                                                    <span style={{ fontSize: '12px' }}>{recordData.orderNote}</span>
+                                                </Col>
+                                                <Col span={24}>
+                                                    <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Reverse Reason</span><br />
+                                                    <span style={{ fontSize: '12px' }}>{recordData.reverseReason}</span>
+                                                </Col>
+                                            </>
+                                        }
+
                                     </Row>
                                 </Card>
                             </Col>

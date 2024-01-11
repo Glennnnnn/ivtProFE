@@ -175,7 +175,7 @@ const OrderPage = () => {
             width: "20%",
             sorter: true,
             render: (text, record) => {
-                if(record.orderStatus !== "processing"){
+                if (record.orderStatus !== "processing") {
                     return (
                         <>
                             <span>{moment(text).format('DD/MM/YYYY')}  </span>
@@ -186,17 +186,17 @@ const OrderPage = () => {
                 const currentDate = dayjs();
 
                 let isOverDue = true;
-                if(record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm){
+                if (record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm) {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
-                else if(record.customerInterPo.creditTerm.include("30")){
+                else if (record.customerInterPo.creditTerm.includes("30")) {
                     isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
                 }
-                else if(record.customerInterPo.creditTerm.include("60")){
+                else if (record.customerInterPo.creditTerm.includes("60")) {
                     isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
                 }
 
-                if(isOverDue){
+                if (isOverDue) {
                     return (
                         <>
                             <span>{moment(text).format('DD/MM/YYYY')}  </span>
@@ -204,7 +204,7 @@ const OrderPage = () => {
                         </>
                     )
                 }
-                else{
+                else {
                     return (
                         <>
                             <span>{moment(text).format('DD/MM/YYYY')}  </span>
