@@ -231,8 +231,8 @@ const OrderDetailsPage = () => {
         const originalDate = moment(text);
         const currentDate = moment();
         let isOverDue = true;
-
-        if (recordData.customerInterPo === null || "immediately" === recordData.customerInterPo?.creditTerm) {
+        
+        if (recordData.customerInterPo === null || "immediately" === recordData.customerInterPo?.creditTerm || recordData.customerInterPo === undefined) {
             isOverDue = currentDate.isAfter(originalDate);
         } else if (recordData.customerInterPo.creditTerm.includes("30")) {
             isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
