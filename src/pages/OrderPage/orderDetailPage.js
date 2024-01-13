@@ -110,7 +110,7 @@ const OrderDetailsPage = () => {
         try {
             // const posts = await updateOrderStatus(recordData.orderDBId, "completed", "");
             // if (posts.code === 200) {
-                setDeleteVisible(false);
+            setDeleteVisible(false);
             //     window.location.reload();
             // }
             // else {
@@ -225,8 +225,28 @@ const OrderDetailsPage = () => {
                 return ` ${formattedTotal}`;
             },
         }
-    ]
+    ];
 
+    const renderDateAndTag = (text) => {
+        const originalDate = moment(text);
+        const currentDate = moment();
+        let isOverDue = true;
+
+        if (recordData.customerInterPo === null || "immediately" === recordData.customerInterPo?.creditTerm) {
+            isOverDue = currentDate.isAfter(originalDate);
+        } else if (recordData.customerInterPo.creditTerm.includes("30")) {
+            isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
+        } else if (recordData.customerInterPo.creditTerm.includes("60")) {
+            isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+        }
+
+        return (
+            <span style={{ fontSize: '12px' }}>
+                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                {(recordData.orderStatus === "processing" && isOverDue) ? <Tag color="red"> overdue</Tag> : null}
+            </span>
+        );
+    };
 
     return (
         <div className="ivt-layout">
@@ -302,7 +322,7 @@ const OrderDetailsPage = () => {
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Order Date</span><br />
-                                            <span style={{ fontSize: '12px' }}>{moment(recordData.orderDate).format('DD/MM/YYYY')}</span>
+                                            <span style={{ fontSize: '12px' }}>{renderDateAndTag(recordData.orderDate)}</span>
                                         </Col>
                                         <Col span={12}>
                                             <span style={{ fontSize: '15px', fontWeight: 'bold' }}>Customer Order No</span><br />
