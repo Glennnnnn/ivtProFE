@@ -15,7 +15,7 @@ import {
     Input,
 } from 'antd';
 import {
-    CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined
+    CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined, EditOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { getOrderDetailByDBId, updateOrderStatus } from '../../api/api.js'
@@ -73,13 +73,6 @@ const OrderDetailsPage = () => {
     }, []);
 
     const [dataSource, setDataSource] = useState([]);
-    const searchParams = useState({
-        pagination: {
-            current: 1,
-            pageSize: 10,
-            total: 0,
-        },
-    })
 
     const handleCompleteOk = async () => {
         try {
@@ -230,10 +223,28 @@ const OrderDetailsPage = () => {
 
                     <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
-                            <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"} onClick={showCompleteModel}
-                                style={{ backgroundColor: recordData.orderStatus !== "processing" ? "" : "green", color: "white" }}> Complete</Button>
-                            <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus === "reversed"} onClick={showReverseModel}
-                                style={{ backgroundColor: recordData.orderStatus === "reversed" ? "" : "red", color: "white" }}> Reverse</Button>
+                            {
+                                recordData.orderStatus === "processing" ? (
+                                    <>
+                                        <NavLink to={`/editOrder?orderDBId=${recordData.orderDBId}`}>
+                                            <Button icon={<EditOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"}
+                                                style={{ backgroundColor: "orange", color: "white" }}>
+                                                Edit
+                                            </Button>
+                                        </NavLink>
+                                        <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"} onClick={showCompleteModel}
+                                            style={{ backgroundColor: "green", color: "white" }}> Complete</Button>
+                                        <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"
+                                            style={{ backgroundColor: "red", color: "white", }}> Delete</Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus === "reversed"} onClick={showReverseModel}
+                                            style={{ backgroundColor: "red", color: "white", }}> Reverse</Button>
+                                    </>
+                                )
+                            }
+
                         </div>
                     </div>
 
@@ -385,7 +396,7 @@ const OrderDetailsPage = () => {
                             rowKey={"ivtId"}
                             columns={columns}
                             dataSource={dataSource}
-                            pagination={searchParams.pagination}
+                            pagination={false}
                             loading={loading}
                         />
                     </Card>

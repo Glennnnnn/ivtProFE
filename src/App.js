@@ -17,6 +17,9 @@ import LoginPage from './pages/LoginPage/index.js'
 import IvtPage from "./pages/IvtInfoPage/ivtPage.js";
 import DashboardPage from './pages/DashboardPage/index.js';
 import OrderPage from './pages/OrderPage/index.js';
+import NewOrderPage from './pages/OrderPage/newOrder.js';
+import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
+import EditOrderPage from './pages/OrderPage/editOrder.js';
 import CustomerPage from './pages/CustomerPage/index.js';
 import CustomerDetailsPage from './pages/CustomerPage/customerDetailPage.js';
 import HomePage from './pages/HomePage/index.js';
@@ -28,8 +31,6 @@ import { useIvt } from '@/store'
 
 //components
 import './App.css';
-import NewOrderPage from './pages/OrderPage/newOrder.js';
-import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
 
 
 const { Header, Sider, Content } = Layout;
@@ -129,6 +130,7 @@ const App = () => {
             <Route path="/orders" element={isAuthenticated ? <OrderPage /> : <Navigate to="/login" />} />
             <Route path="/neworder" element={isAuthenticated ? <NewOrderPage /> : <Navigate to="/login" />} />
             <Route path="/orderDetails" element={isAuthenticated ? <OrderDetailsPage /> : <Navigate to="/login" />} />
+            <Route path="/editorder" element={isAuthenticated ? <EditOrderPage /> : <Navigate to="/login" />} />
             <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />

@@ -5,26 +5,24 @@ import {
     Breadcrumb,
     Button,
     message,
-    Dropdown,
     Card,
     Row,
     Col,
     Input,
     DatePicker,
     Select,
-    Switch,
     Table,
     InputNumber,
     Form,
     Tag,
 } from 'antd';
 import {
-    PlusOutlined, EditOutlined, DeleteOutlined, RedoOutlined
+    PlusOutlined, LeftOutlined, DeleteOutlined, SaveOutlined
 } from '@ant-design/icons'
 import moment from "moment";
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
-import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder } from "@/api/api.js";
+import { searchProductList, getOrderDetailByDBId } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -116,41 +114,23 @@ const EditableCell = ({
 };
 
 
-const NewOrderPage = () => {
+const EditOrderPage = () => {
     const { Content } = Layout;
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
 
+    const [orderDetail, setOrderDetail] = useState({});
     const [orderId, setOrderId] = useState('');
     const [orderDate, setOrderDate] = useState(dayjs());
     const [customerOrderNo, setCustomerOrderNo] = useState('');
     const [orderNote, setOrderNote] = useState('');
-
-    const [showCustomer, setShowCustomer] = useState(false);
-    const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
-    const [customerList, setCustomerList] = useState([]);
-    const [selectedCustomer, setSelectedCustomer] = useState('');
-    const [customerDetails, setCustomerDetails] = useState({});
-
     const [productList, setProductList] = useState([]);
 
     const [form] = Form.useForm();
-    const [newCustomerForm] = Form.useForm();
+    const [customerForm] = Form.useForm();
 
-    const [data, setData] = useState(
-        [
-            {
-                rowNo: 1,
-                product: '',
-                description: '',
-                qty: 0,
-                price: 0,
-                total: 0,
-                key: 1,
-            }
-        ]
-    );
+    const [data, setData] = useState([]);
 
     const columns = [
         {
@@ -256,6 +236,67 @@ const NewOrderPage = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderDBId = urlParams.get('orderDBId');
+
+                const posts = await getOrderDetailByDBId(orderDBId);
+                if (posts.code === 200) {
+                    setOrderId(posts.data.orderId);
+                    setOrderDate(dayjs(posts.data.orderDate));
+                    setCustomerOrderNo(posts.data.customerOrderNo);
+                    setOrderNote(posts.data.orderNote);
+
+                    let dataList = [];
+                    posts.data.orderIvtPoList.forEach((item, index) => {
+                        let newData = {
+                            rowNo: index + 1,
+                            product: item.ivtId,
+                            description: item.orderIvtDesc,
+                            qty: item.orderIvtQty,
+                            price: item.orderIvtPrice,
+                            total: item.orderIvtTotal,
+                            key: item.ivtId.toString(),
+                            label: item.ivtClassName.toString() + " " + item.tags.map((tag) => {
+                                return (
+                                    tag.tagName + ':' + tag.tagValue
+                                );
+                            })
+                        };
+                        dataList.push(newData);
+                    });
+
+                    setData(dataList);
+                    setOrderDetail(posts.data);
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Loading Order Detail Error!'
+                    })
+                }
+            }
+            catch (error) {
+                messageApi.open({
+                    type: 'error',
+                    content: 'Loading Order Detail Error!'
+                })
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        updateFormData();
+        updateCustomerFormData();
+    }, [orderDetail])
+
     const handleInputChange = (rowNo, dataIndex, value) => {
         const newData = data.map((item) => {
             if (item.rowNo === rowNo) {
@@ -285,6 +326,26 @@ const NewOrderPage = () => {
                 content: "Loading Product Error!",
             });
         }
+    }
+
+    const updateFormData = () => {
+        data.forEach((item) => {
+            form.setFieldsValue({ [`product_${item.key}`]: item.label ?? "" });
+            form.setFieldsValue({ [`description_${item.key}`]: item.description ?? "" });
+            form.setFieldsValue({ [`price_${item.key}`]: item.price ?? "" });
+            form.setFieldsValue({ [`qty_${item.key}`]: item.qty ?? "" });
+        })
+    }
+
+    const updateCustomerFormData = () => {
+        customerForm.setFieldsValue({
+            companyName: orderDetail.orderCompanyName,
+            customerName: orderDetail.orderCustomerName,
+            customerPhone: orderDetail.orderCustomerPhone,
+            customerEmail: orderDetail.orderCustomerEmail,
+            deliveryAddress: orderDetail.orderDeliveryAddress,
+            billingAddress: orderDetail.orderBillingAddress,
+        })
     }
 
     const handleSelectChange = (rowNo, selectedProduct) => {
@@ -342,31 +403,6 @@ const NewOrderPage = () => {
         setOrderNote(e.target.value);
     }
 
-    const handleSelectedCustomer = (e) => {
-        setSearchValue('');
-        setSelectedCustomer(e);
-        fetchCustomerDetail(e);
-    }
-
-    const handleEditCustomer = () => {
-        window.open(`/customerDetails?customerId=${selectedCustomer}`);
-    }
-
-    const fetchCustomerDetail = async (customerId) => {
-        try {
-            const posts = await getCustomerDetailById(customerId);
-            if (posts.code === 200) {
-                setCustomerDetails(posts.data);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    const handleRefreshCustomer = () => {
-        fetchCustomerDetail(selectedCustomer);
-    }
-
     const onCancelClick = () => {
         navigate(-1);
     }
@@ -387,28 +423,6 @@ const NewOrderPage = () => {
             return { isValid, reason };
         }
 
-        if (showCustomer) {
-            const customerFormData = newCustomerForm.getFieldValue();
-            if (!customerFormData.hasOwnProperty('companyName') || (customerFormData.companyName?.trim() === '')) {
-                isValid = false;
-                reason = "Company name cannot be empty!";
-                return { isValid, reason };
-            }
-            if (!customerFormData.hasOwnProperty('creditTerm')) {
-                isValid = false;
-                reason = "Credit Term cannot be empty!";
-                return { isValid, reason };
-            }
-
-        }
-        else {
-            if (selectedCustomer.trim() === '') {
-                isValid = false;
-                reason = "Customer cannot be empty!";
-                return { isValid, reason };
-            }
-        }
-
         data.forEach(item => {
             if (item.product === '') {
                 isValid = false;
@@ -426,47 +440,40 @@ const NewOrderPage = () => {
         return { isValid, reason };
     }
 
-    const onMenuClick = async (e) => {
+    const onSaveClick = async () => {
         const { isValid, reason } = validateSave();
         if (isValid) {
             try {
-                const newCustomerDetails = newCustomerForm.getFieldValue();
+                const newCustomerDetails = customerForm.getFieldValue();
                 const queryBody = {
+                    //Order
+                    "orderDBId": orderDetail.orderDBId.toString(),
                     "orderId": orderId,
                     "orderDate": moment(orderDate.toString()).format("YYYY/MM/DD"),
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
-                    "isNewCustomer": showCustomer,
-                    "customerId": selectedCustomer,
-                    "newCustomerDetails": {
-                        "companyName": newCustomerDetails.companyName ?? "",
-                        "customerName": newCustomerDetails.customerName ?? "",
-                        "deliveryAddress": newCustomerDetails.customerDeliveryAddress ?? "",
-                        "billingAddress": newCustomerDetails.customerBillingAddress ?? "",
-                        "customerPhone": newCustomerDetails.customerPhone ?? "",
-                        "customerEmail": newCustomerDetails.customerEmail ?? "",
-                        "customerNote": newCustomerDetails.note ?? "",
-                        "creditTerm": newCustomerDetails.creditTerm ?? "",
-                        "isSaveCustomer": newCustomerDetails.isSaveCustomer ?? false,
-                    },
+                    //Customer
+                    "orderCompanyName": newCustomerDetails.companyName ?? "",
+                    "orderCustomerName": newCustomerDetails.customerName ?? "",
+                    "orderDeliveryAddress": newCustomerDetails.customerDeliveryAddress ?? "",
+                    "orderBillingAddress": newCustomerDetails.customerBillingAddress ?? "",
+                    "orderCustomerPhone": newCustomerDetails.customerPhone ?? "",
+                    "orderCustomerEmail": newCustomerDetails.customerEmail ?? "",
+                    //Product
                     "productList": data,
                 };
-                
-                const posts = await addOrder(queryBody);
-                if (posts.code === 200) {
-                    if (e.key === "2") {
-                        navigate(-1);
-                    }
-                    else {
-                        window.location.reload();
-                    }
-                }
-                else{
-                    messageApi.open({
-                        type: "error",
-                        content: "Save Order Error!",
-                    });
-                }
+
+                console.log(queryBody);
+                // const posts = await addOrder(queryBody);
+                // if (posts.code === 200) {
+                //     navigate(-1);
+                // }
+                // else {
+                //     messageApi.open({
+                //         type: "error",
+                //         content: "Save Order Error!",
+                //     });
+                // }
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -483,8 +490,7 @@ const NewOrderPage = () => {
                 content: reason,
             });
         }
-
-    };
+    }
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -504,41 +510,6 @@ const NewOrderPage = () => {
         fetchProductData();
     }, []);
 
-    useEffect(() => {
-        const fetchCustomerData = async () => {
-            try {
-                setLoading(true);
-                const posts = await searchCustomerList(searchValue);
-                if (posts.code === 200) {
-                    setCustomerList(posts.data.customerInterPos);
-                } else {
-                    messageApi.open({
-                        type: "error",
-                        content: "Loading Customers Error!",
-                    });
-                }
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCustomerData();
-    }, [searchValue]);
-
-    const buttonItems = [
-        {
-            key: '1',
-            label: 'Save and New',
-        },
-        {
-            key: '2',
-            label: 'Save and Close',
-        },
-    ];
-
     return (
         <div className="ivt-layout">
             <Layout>
@@ -556,7 +527,7 @@ const NewOrderPage = () => {
                                 href: '/orders',
                             },
                             {
-                                title: "New Order"
+                                title: "Edit Order"
                             },
                         ]}
                         style={
@@ -564,10 +535,8 @@ const NewOrderPage = () => {
                         } />
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-                        <Button danger icon={<DeleteOutlined />} size="large" onClick={onCancelClick} className="edit-customer-details-button" > Cancel </Button>
-                        <Dropdown.Button type="default" icon={<EditOutlined />} size="large" className="edit-customer-details-button" onClick={onMenuClick}
-                            menu={{ items: buttonItems, onClick: onMenuClick }} > Save and New
-                        </Dropdown.Button>
+                        <Button danger icon={<LeftOutlined />} size="large" onClick={onCancelClick} className="edit-customer-details-button" > Back </Button>
+                        <Button icon={<SaveOutlined />} size="large" onClick={onSaveClick} className="edit-customer-details-button" > Save </Button>
                     </div>
 
 
@@ -621,132 +590,41 @@ const NewOrderPage = () => {
                             <Col span={12}>
                                 <Card bordered={false} style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
-                                        <Col span={6}><span className="item-span">New Customer</span></Col>
-                                        <Col span={18}>
-                                            <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields();}} />
+                                        <Col span={24}>
+                                            <Form form={customerForm} name="customerForm" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}
+                                                style={{ maxWidth: "100%", marginLeft: 'auto', marginRight: 'auto', marginTop: '20px' }}>
+                                                <Form.Item
+                                                    label="* Company Name"
+                                                    name="companyName">
+                                                    <Input placeholder="* Company Name" className="form-item" disabled />
+                                                </Form.Item>
+
+                                                <Form.Item name="customerName" label="Customer Name">
+                                                    <Input placeholder="Customer Name" className="form-item" />
+                                                </Form.Item>
+
+                                                <Form.Item
+                                                    label="Customer Email"
+                                                    name="customerEmail"
+                                                    rules={[
+                                                        { type: "email", message: "Invalid email format" },
+                                                    ]}>
+                                                    <Input placeholder="Email" className="form-item" />
+                                                </Form.Item>
+
+                                                <Form.Item label="Phone Number" name="customerPhone">
+                                                    <Input placeholder="Phone Number" className="form-item" />
+                                                </Form.Item>
+
+                                                <Form.Item label="Delivery Address" name="customerDeliveryAddress">
+                                                    <Input placeholder="Delivery Address" className="form-item" />
+                                                </Form.Item>
+
+                                                <Form.Item label="Billing Address" name="customerBillingAddress">
+                                                    <Input placeholder="Billing Address" className="form-item" />
+                                                </Form.Item>
+                                            </Form>
                                         </Col>
-
-                                        {
-                                            showCustomer ? (
-                                                <>
-                                                    <Col span={24}>
-                                                        <Form form={newCustomerForm} name="customerForm" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}
-                                                            style={{ maxWidth: "100%", marginLeft: 'auto', marginRight: 'auto', marginTop: '20px' }}>
-                                                            <Form.Item
-                                                                label="Save Customer"
-                                                                name="isSaveCustomer"
-                                                                valuePropName="checked">
-                                                                <Switch />
-                                                            </Form.Item>
-                                                            <Form.Item
-                                                                label="* Company Name"
-                                                                name="companyName">
-                                                                <Input placeholder="* Company Name" className="form-item" />
-                                                            </Form.Item>
-
-                                                            <Form.Item name="customerName" label="Customer Name">
-                                                                <Input placeholder="Customer Name" className="form-item" />
-                                                            </Form.Item>
-
-                                                            <Form.Item
-                                                                label="Customer Email"
-                                                                name="customerEmail"
-                                                                rules={[
-                                                                    { type: "email", message: "Invalid email format" },
-                                                                ]}>
-                                                                <Input placeholder="Email" className="form-item" />
-                                                            </Form.Item>
-
-                                                            <Form.Item label="Phone Number" name="customerPhone">
-                                                                <Input placeholder="Phone Number" className="form-item" />
-                                                            </Form.Item>
-
-                                                            <Form.Item
-                                                                label="* Credit Term"
-                                                                name="creditTerm">
-                                                                <Select placeholder="* Credit Term" className="form-item">
-                                                                    <Option value="immediately">Immediately</Option>
-                                                                    <Option value="30 days">30 days</Option>
-                                                                    <Option value="60 days">60 days</Option>
-                                                                </Select>
-                                                            </Form.Item>
-
-                                                            <Form.Item label="Note" name="note">
-                                                                <Input.TextArea placeholder="Note" style={{ height: '50px' }} />
-                                                            </Form.Item>
-
-                                                            <Form.Item label="Delivery Address" name="customerDeliveryAddress">
-                                                                <Input placeholder="Delivery Address" className="form-item" />
-                                                            </Form.Item>
-
-                                                            <Form.Item label="Billing Address" name="customerBillingAddress">
-                                                                <Input placeholder="Billing Address" className="form-item" />
-                                                            </Form.Item>
-                                                        </Form>
-                                                    </Col>
-                                                </>) : (<>
-                                                    <Col span={6}><span className="item-span">Existing Customer</span></Col>
-                                                    <Col span={18}>
-                                                        <Select
-                                                            showSearch
-                                                            value={selectedCustomer}
-                                                            placeholder="Search for customer"
-                                                            onSearch={(value) => setSearchValue(value)}
-                                                            onChange={handleSelectedCustomer}
-                                                            optionLabelProp="label"
-                                                            loading={loading}
-                                                            defaultActiveFirstOption={false}
-                                                            filterOption={false}
-                                                            style={{ width: '100%' }}>
-                                                            {customerList.map((customer) => (
-                                                                <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
-                                                                    <div>{`${customer.companyName}`}</div>
-                                                                    {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
-                                                                    {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
-                                                                    {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
-                                                                </Option>
-                                                            ))}
-                                                        </Select>
-                                                    </Col>
-
-                                                    <Col span={12} style={{ display: 'flex', justifyContent: 'center' }}>
-                                                        <Button type="default" icon={<EditOutlined />} size="large"
-                                                            onClick={handleEditCustomer}
-                                                            disabled={selectedCustomer === ''}
-                                                            className="edit-customer-details-button" > Edit </Button>
-                                                    </Col>
-                                                    <Col span={12} style={{ display: 'flex', justifyContent: 'center' }}>
-                                                        <Button type="default" icon={<RedoOutlined />} size="large"
-                                                            onClick={handleRefreshCustomer}
-                                                            disabled={selectedCustomer === ''}
-                                                            className="edit-customer-details-button" > Refresh </Button>
-                                                    </Col>
-                                                    {
-                                                        selectedCustomer === '' ? (<></>) : (
-                                                            <>
-                                                                <Col span={6}><span className="item-span">Company Name</span></Col>
-                                                                <Col span={18}>{customerDetails.companyName}</Col>
-
-                                                                <Col span={6}><span className="item-span">Customer Name</span></Col>
-                                                                <Col span={18}>{customerDetails.customerName}</Col>
-
-                                                                <Col span={6}><span className="item-span">Phone</span></Col>
-                                                                <Col span={18}>{customerDetails.customerPhone}</Col>
-
-                                                                <Col span={6}><span className="item-span">Email</span></Col>
-                                                                <Col span={18}>{customerDetails.customerEmail}</Col>
-
-                                                                <Col span={6}><span className="item-span">Delivery Address</span></Col>
-                                                                <Col span={18}>{customerDetails.deliveryAddress}</Col>
-
-                                                                <Col span={6}><span className="item-span">Billing Address</span></Col>
-                                                                <Col span={18}>{customerDetails.billingAddress}</Col>
-                                                            </>
-                                                        )
-                                                    }
-                                                </>
-                                            )
-                                        }
 
                                     </Row>
                                 </Card>
@@ -755,7 +633,7 @@ const NewOrderPage = () => {
                     </div>
 
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>
-                        <Form form={form} component={false}>
+                        <Form form={form} component={false} loading={loading}>
                             <Table
                                 components={{
                                     body: {
@@ -778,4 +656,4 @@ const NewOrderPage = () => {
     );
 };
 
-export default NewOrderPage;
+export default EditOrderPage;
