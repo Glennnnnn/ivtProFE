@@ -39,6 +39,11 @@ const OrderDetailsPage = () => {
         setReverseVisible(true);
     }
 
+    const [deleteVisible, setDeleteVisible] = useState(false);
+    const showDeleteModel = () => {
+        setDeleteVisible(true);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -99,6 +104,33 @@ const OrderDetailsPage = () => {
 
     const handleCompleteCancel = () => {
         setCompleteVisible(false);
+    }
+
+    const handleDeleteOk = async () => {
+        try {
+            // const posts = await updateOrderStatus(recordData.orderDBId, "completed", "");
+            // if (posts.code === 200) {
+                setDeleteVisible(false);
+            //     window.location.reload();
+            // }
+            // else {
+            //     messageApi.open({
+            //         type: 'error',
+            //         content: 'Delete Order Error!'
+            //     })
+            // }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: 'error',
+                content: 'Delete Order Error!'
+            })
+        }
+    }
+
+    const handleDeleteCancel = () => {
+        setDeleteVisible(false);
     }
 
     const handleReverseOk = async () => {
@@ -227,14 +259,14 @@ const OrderDetailsPage = () => {
                                 recordData.orderStatus === "processing" ? (
                                     <>
                                         <NavLink to={`/editOrder?orderDBId=${recordData.orderDBId}`}>
-                                            <Button icon={<EditOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"}
+                                            <Button icon={<EditOutlined />} size="large" className="edit-customer-details-button"
                                                 style={{ backgroundColor: "orange", color: "white" }}>
                                                 Edit
                                             </Button>
                                         </NavLink>
-                                        <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus !== "processing"} onClick={showCompleteModel}
+                                        <Button icon={<CheckOutlined />} size="large" className="edit-customer-details-button" onClick={showCompleteModel}
                                             style={{ backgroundColor: "green", color: "white" }}> Complete</Button>
-                                        <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button"
+                                        <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" onClick={showDeleteModel}
                                             style={{ backgroundColor: "red", color: "white", }}> Delete</Button>
                                     </>
                                 ) : (
@@ -363,6 +395,17 @@ const OrderDetailsPage = () => {
                         width={600}
                         centered>
                         <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  You cannot move this order to processing after complete</span>
+                    </Modal>
+
+                    <Modal
+                        title="Do you want to delete this order?"
+                        open={deleteVisible}
+                        onOk={handleDeleteOk}
+                        onCancel={handleDeleteCancel}
+                        maskClosable={false}
+                        width={600}
+                        centered>
+                        <span style={{ fontSize: '14px', fontWeight: 'normal' }}>* Note:  Delete Order will remove this order from database</span>
                     </Modal>
 
                     <Modal
