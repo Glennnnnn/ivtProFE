@@ -22,7 +22,7 @@ import {
 import moment from "moment";
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
-import { searchProductList, getOrderDetailByDBId } from "@/api/api.js";
+import { searchProductList, getOrderDetailByDBId, editOrderById } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -245,6 +245,7 @@ const EditOrderPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
+                    console.log(posts.data);
                     setOrderId(posts.data.orderId);
                     setOrderDate(dayjs(posts.data.orderDate));
                     setCustomerOrderNo(posts.data.customerOrderNo);
@@ -261,6 +262,10 @@ const EditOrderPage = () => {
                             total: item.orderIvtTotal,
                             key: item.ivtId.toString(),
                             label: item.ivtClassName.toString() + " " + item.tags.map((tag) => {
+                                if (tag === null) {
+                                    return ''
+                                }
+
                                 return (
                                     tag.tagName + ':' + tag.tagValue
                                 );
@@ -280,6 +285,7 @@ const EditOrderPage = () => {
                 }
             }
             catch (error) {
+                console.log(error);
                 messageApi.open({
                     type: 'error',
                     content: 'Loading Order Detail Error!'
@@ -455,25 +461,24 @@ const EditOrderPage = () => {
                     //Customer
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
                     "orderCustomerName": newCustomerDetails.customerName ?? "",
-                    "orderDeliveryAddress": newCustomerDetails.customerDeliveryAddress ?? "",
-                    "orderBillingAddress": newCustomerDetails.customerBillingAddress ?? "",
+                    "orderDeliveryAddress": newCustomerDetails.deliveryAddress ?? "",
+                    "orderBillingAddress": newCustomerDetails.billingAddress ?? "",
                     "orderCustomerPhone": newCustomerDetails.customerPhone ?? "",
                     "orderCustomerEmail": newCustomerDetails.customerEmail ?? "",
                     //Product
                     "productList": data,
                 };
 
-                console.log(queryBody);
-                // const posts = await addOrder(queryBody);
-                // if (posts.code === 200) {
-                //     navigate(-1);
-                // }
-                // else {
-                //     messageApi.open({
-                //         type: "error",
-                //         content: "Save Order Error!",
-                //     });
-                // }
+                const posts = await editOrderById(queryBody);
+                if (posts.code === 200) {
+                    navigate(-1);
+                }
+                else {
+                    messageApi.open({
+                        type: "error",
+                        content: "Save Order Error!",
+                    });
+                }
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -616,11 +621,11 @@ const EditOrderPage = () => {
                                                     <Input placeholder="Phone Number" className="form-item" />
                                                 </Form.Item>
 
-                                                <Form.Item label="Delivery Address" name="customerDeliveryAddress">
+                                                <Form.Item label="Delivery Address" name="deliveryAddress">
                                                     <Input placeholder="Delivery Address" className="form-item" />
                                                 </Form.Item>
 
-                                                <Form.Item label="Billing Address" name="customerBillingAddress">
+                                                <Form.Item label="Billing Address" name="billingAddress">
                                                     <Input placeholder="Billing Address" className="form-item" />
                                                 </Form.Item>
                                             </Form>

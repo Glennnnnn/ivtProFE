@@ -28,12 +28,12 @@ export const searchCustomerList = async (searchName) => {
 export const addCustomer = async (formData) => {
     var deliveryAddress = "";
     var billingAddress = ""
-    if (formData.enableAddress === true){
+    if (formData.enableAddress === true) {
         deliveryAddress = formData.customerDeliveryAddress
-        if(formData.enableBilling === true){
+        if (formData.enableBilling === true) {
             billingAddress = formData.customerDeliveryAddress
         }
-        else{
+        else {
             billingAddress = formData.customerBillingAddress
         }
     }
@@ -56,7 +56,7 @@ export const addCustomer = async (formData) => {
     return response.data;
 }
 
-export const getCustomerDetailById = async(customerId) => {
+export const getCustomerDetailById = async (customerId) => {
     const response = await http.get(`/queryCustomerDataById?customerId=${customerId}`);
     return response.data;
 }
@@ -80,14 +80,14 @@ export const editCustomer = async (formData, customerId) => {
     return response.data;
 }
 
-export const deleteCustomer = async(formData, customerId) => {
+export const deleteCustomer = async (formData, customerId) => {
     var queryBody = {
         "customerId": customerId,
         "delNote": formData.reason ?? ""
     }
     const response = await http.delete(`/deleteCustomer`, { data: queryBody });
     return response.data;
-} 
+}
 
 export const customersSummary = async () => {
     const response = await http.get(`/countCustomerByLabel`);
@@ -124,14 +124,14 @@ export const addOrder = async (queryBody) => {
     return response.data;
 }
 
-export const getOrderDetailByDBId = async(orderDBId) => {
+export const getOrderDetailByDBId = async (orderDBId) => {
     const response = await http.get(`/queryOrderDataById?orderDBId=${orderDBId}`);
     return response.data;
 }
 
-export const ordersDataByCustomerId = async(searchingParams, customerId) => {
+export const ordersDataByCustomerId = async (searchingParams, customerId) => {
     var queryBody = {
-        "searchParams" : "",
+        "searchParams": "",
         "pageIndex": searchingParams.pagination.current ?? 1,
         "pageSize": searchingParams.pagination.pageSize ?? 10,
         "orderStatus": searchingParams.filters?.orderStatus ?? [],
@@ -142,17 +142,27 @@ export const ordersDataByCustomerId = async(searchingParams, customerId) => {
     return response.data;
 }
 
-export const getOrderSummary = async() => {
+export const getOrderSummary = async () => {
     const response = await http.get(`/queryOrderCountData`);
     return response.data;
 }
 
-export const updateOrderStatus = async(orderDBId, orderStatus, reverseReason) => {
+export const updateOrderStatus = async (orderDBId, orderStatus, reverseReason) => {
     var queryBody = {
-        "orderDBId" : orderDBId,
+        "orderDBId": orderDBId,
         "orderStatus": orderStatus,
         "reverseReason": reverseReason,
     }
     const response = await http.post(`/updateOrderStatus`, queryBody);
+    return response.data;
+}
+
+export const editOrderById = async (queryBody) => {
+    const response = await http.post(`/updateOrderById`, queryBody);
+    return response.data;
+}
+
+export const deleteOrderById = async (orderDBId) => {
+    const response = await http.delete(`/deleteOrderById?orderDBId=${orderDBId}`);
     return response.data;
 }

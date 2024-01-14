@@ -18,7 +18,7 @@ import {
     CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined, EditOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { getOrderDetailByDBId, updateOrderStatus } from '../../api/api.js'
+import { getOrderDetailByDBId, updateOrderStatus, deleteOrderById } from '../../api/api.js'
 import moment from "moment";
 
 
@@ -108,17 +108,16 @@ const OrderDetailsPage = () => {
 
     const handleDeleteOk = async () => {
         try {
-            // const posts = await updateOrderStatus(recordData.orderDBId, "completed", "");
-            // if (posts.code === 200) {
-            setDeleteVisible(false);
-            //     window.location.reload();
-            // }
-            // else {
-            //     messageApi.open({
-            //         type: 'error',
-            //         content: 'Delete Order Error!'
-            //     })
-            // }
+            const posts = await deleteOrderById(recordData.orderDBId);
+            if (posts.code === 200) {
+                window.open(`/orders`, '_self');
+            }
+            else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'Delete Order Error!'
+                })
+            }
         }
         catch (error) {
             console.log(error);
@@ -231,7 +230,7 @@ const OrderDetailsPage = () => {
         const originalDate = moment(text);
         const currentDate = moment();
         let isOverDue = true;
-        
+
         if (recordData.customerInterPo === null || "immediately" === recordData.customerInterPo?.creditTerm || recordData.customerInterPo === undefined) {
             isOverDue = currentDate.isAfter(originalDate);
         } else if (recordData.customerInterPo.creditTerm.includes("30")) {
