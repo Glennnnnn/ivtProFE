@@ -127,6 +127,10 @@ const EditOrderPage = () => {
     const [loading, setLoading] = useState(false);
     const [productList, setProductList] = useState([]);
 
+    const [productTotal, setProductTotal] = useState(0.00);
+    const [shippingFee, setShippingFee] = useState(0.00);
+    const [allTotal, setAllTotal] = useState(0.00);
+
     const [form] = Form.useForm();
     const [customerForm] = Form.useForm();
 
@@ -245,11 +249,14 @@ const EditOrderPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
-                    console.log(posts.data);
                     setOrderId(posts.data.orderId);
                     setOrderDate(dayjs(posts.data.orderDate));
                     setCustomerOrderNo(posts.data.customerOrderNo);
                     setOrderNote(posts.data.orderNote);
+
+                    setProductTotal(parseFloat(posts.data.totalPrice));
+                    setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
+                    setAllTotal(parseFloat(posts.data.totalPrice) + parseFloat(posts.data.orderShippingFee ?? 0));
 
                     let dataList = [];
                     posts.data.orderIvtPoList.forEach((item, index) => {
@@ -318,6 +325,7 @@ const EditOrderPage = () => {
         });
 
         setData(newData);
+        updateSubTotal(newData);
     };
 
     const handleSearchChange = async (value) => {
@@ -413,6 +421,22 @@ const EditOrderPage = () => {
         navigate(-1);
     }
 
+    const updateSubTotal = (newData) => {
+        let subTotal = 0.00;
+        newData.forEach((eachData) => {
+            subTotal += parseFloat(eachData.total);
+        })
+
+        setProductTotal(subTotal);
+
+        if(shippingFee === ""){
+            setAllTotal(parseFloat(subTotal));
+        }
+        else{
+            setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
+        }
+    }
+
     const validateSave = () => {
         let isValid = true;
         let reason = "";
@@ -458,6 +482,7 @@ const EditOrderPage = () => {
                     "orderDate": moment(orderDate.toString()).format("YYYY/MM/DD"),
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
+                    "orderShippingFee": shippingFee,
                     //Customer
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
                     "orderCustomerName": newCustomerDetails.customerName ?? "",
@@ -514,6 +539,15 @@ const EditOrderPage = () => {
 
         fetchProductData();
     }, []);
+
+    useEffect(() => {
+        if(shippingFee === ""){
+            setAllTotal(parseFloat(productTotal));
+        }
+        else{
+            setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
+        }
+    }, [shippingFee])
 
     return (
         <div className="ivt-layout">
@@ -652,9 +686,25 @@ const EditOrderPage = () => {
                                 rowClassName="editable-row"
                                 pagination={false} />
                         </Form>
+
+                        <Row gutter={[16, 16]} style={{ margin: '20px' }}>
+                            <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right' }}
+                                    value={shippingFee}
+                                    onChange={(e) => { setShippingFee(e.target.value); }}
+                                />
+                            </Col>
+
+                            <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
+                        </Row>
                     </Card>
-
-
                 </Content>
             </Layout >
         </div>

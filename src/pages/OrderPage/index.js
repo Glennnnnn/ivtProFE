@@ -253,7 +253,8 @@ const OrderPage = () => {
             dataIndex: "totalPrice",
             width: "10%",
             render: (_, record) => {
-                const formattedTotal = _.toFixed(2);
+                const total = parseFloat(record.totalPrice) + parseFloat(record.orderShippingFee ?? 0)
+                const formattedTotal = total.toFixed(2);
                 return ` ${formattedTotal}`;
             },
         },

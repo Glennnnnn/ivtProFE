@@ -28,6 +28,10 @@ const OrderDetailsPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState(false);
 
+    const [productTotal, setProductTotal] = useState(0.00);
+    const [shippingFee, setShippingFee] = useState(0.00);
+    const [allTotal, setAllTotal] = useState(0.00);
+
     const [recordData, setRecordData] = useState({});
     const [completeVisible, setCompleteVisible] = useState(false);
     const showCompleteModel = () => {
@@ -53,8 +57,12 @@ const OrderDetailsPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
+                    console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
+                    setProductTotal(parseFloat(posts.data.totalPrice));
+                    setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
+                    setAllTotal(parseFloat(posts.data.totalPrice) + parseFloat(posts.data.orderShippingFee ?? 0));
                 }
                 else {
                     messageApi.open({
@@ -461,6 +469,16 @@ const OrderDetailsPage = () => {
                             pagination={false}
                             loading={loading}
                         />
+                        <Row gutter={[16, 16]} style={{ margin: '20px' }}>
+                            <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{shippingFee.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
+                        </Row>
                     </Card>
                 </Content>
             </Layout >

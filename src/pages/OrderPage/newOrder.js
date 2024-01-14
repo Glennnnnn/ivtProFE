@@ -126,6 +126,10 @@ const NewOrderPage = () => {
     const [customerOrderNo, setCustomerOrderNo] = useState('');
     const [orderNote, setOrderNote] = useState('');
 
+    const [productTotal, setProductTotal] = useState(0.00);
+    const [shippingFee, setShippingFee] = useState(0.00);
+    const [allTotal, setAllTotal] = useState(0.00);
+
     const [showCustomer, setShowCustomer] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
@@ -271,6 +275,7 @@ const NewOrderPage = () => {
         });
 
         setData(newData);
+        updateSubTotal(newData);
     };
 
     const handleSearchChange = async (value) => {
@@ -371,6 +376,22 @@ const NewOrderPage = () => {
         navigate(-1);
     }
 
+    const updateSubTotal = (newData) => {
+        let subTotal = 0.00;
+        newData.forEach((eachData) => {
+            subTotal += parseFloat(eachData.total);
+        })
+
+        setProductTotal(subTotal);
+
+        if(shippingFee === ""){
+            setAllTotal(parseFloat(subTotal));
+        }
+        else{
+            setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
+        }
+    }
+
     const validateSave = () => {
         let isValid = true;
         let reason = "";
@@ -438,6 +459,7 @@ const NewOrderPage = () => {
                     "customerOrderNo": customerOrderNo,
                     "isNewCustomer": showCustomer,
                     "customerId": selectedCustomer,
+                    "orderShippingFee": shippingFee,
                     "newCustomerDetails": {
                         "companyName": newCustomerDetails.companyName ?? "",
                         "customerName": newCustomerDetails.customerName ?? "",
@@ -451,7 +473,7 @@ const NewOrderPage = () => {
                     },
                     "productList": data,
                 };
-                
+
                 const posts = await addOrder(queryBody);
                 if (posts.code === 200) {
                     if (e.key === "2") {
@@ -461,7 +483,7 @@ const NewOrderPage = () => {
                         window.location.reload();
                     }
                 }
-                else{
+                else {
                     messageApi.open({
                         type: "error",
                         content: "Save Order Error!",
@@ -527,6 +549,15 @@ const NewOrderPage = () => {
 
         fetchCustomerData();
     }, [searchValue]);
+
+    useEffect(() => {
+        if(shippingFee === ""){
+            setAllTotal(parseFloat(productTotal));
+        }
+        else{
+            setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
+        }
+    }, [shippingFee])
 
     const buttonItems = [
         {
@@ -623,7 +654,7 @@ const NewOrderPage = () => {
                                     <Row gutter={[16, 16]}>
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
-                                            <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields();}} />
+                                            <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields(); }} />
                                         </Col>
 
                                         {
@@ -769,9 +800,25 @@ const NewOrderPage = () => {
                                 rowClassName="editable-row"
                                 pagination={false} />
                         </Form>
+
+                        <Row gutter={[16, 16]} style={{ margin: '20px' }}>
+                            <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{paddingRight: "8px"}}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right'}}
+                                    value={shippingFee}
+                                    onChange={(e) => {setShippingFee(e.target.value);}}
+                                />
+                            </Col>
+
+                            <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{paddingRight: "8px"}}>{allTotal.toFixed(2)}</span></Col>
+                        </Row>
                     </Card>
-
-
                 </Content>
             </Layout >
         </div>
