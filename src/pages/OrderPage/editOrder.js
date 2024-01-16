@@ -429,10 +429,10 @@ const EditOrderPage = () => {
 
         setProductTotal(subTotal);
 
-        if(shippingFee === ""){
+        if (shippingFee === "") {
             setAllTotal(parseFloat(subTotal));
         }
-        else{
+        else {
             setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
         }
     }
@@ -496,7 +496,13 @@ const EditOrderPage = () => {
 
                 const posts = await editOrderById(queryBody);
                 if (posts.code === 200) {
-                    navigate(-1);
+                    messageApi.open({
+                        type: 'success',
+                        content: 'Save Order Success!',
+                    })
+                    setTimeout(() => {
+                        navigate(-1);
+                    }, 1000)
                 }
                 else {
                     messageApi.open({
@@ -541,10 +547,10 @@ const EditOrderPage = () => {
     }, []);
 
     useEffect(() => {
-        if(shippingFee === ""){
+        if (shippingFee === "") {
             setAllTotal(parseFloat(productTotal));
         }
-        else{
+        else {
             setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
         }
     }, [shippingFee])

@@ -9,7 +9,7 @@ import {
   Layout,
   Breadcrumb,
   Space,
-  Select, Button, Divider, Tag
+  Select, Button, Divider, Tag, message
 } from 'antd';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 // import { createBrowserHistory } from 'history'
@@ -24,6 +24,7 @@ const normFile = (e) => {
 };
 const IvtEditPage = () => {
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
   let location = useLocation()
   let navigate = useNavigate()
   const recordData = JSON.parse(location.state.ivtData)
@@ -37,6 +38,7 @@ const IvtEditPage = () => {
 
   // const [editableTags, setEditableTags] = useState(modifiedData.tags)
   // const [tagEditOpen, setTagEditOpen] = useState(false)
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [existTagList, setExistTagList] = useState([])
   const [inputTagValue, setInputTagValue] = useState();
 
@@ -108,8 +110,25 @@ const IvtEditPage = () => {
       values.isQtyModified = false
     }
     console.log('Received values of form: ', values);
-    await http.post("/ivt/updateIvt", { values })
-    navigateDetail()
+    setSubmitLoading(true)
+    let res = await http.post("/ivt/updateIvt", { values })
+    if (res.data.code === 200) {
+      messageApi.open({
+        type: 'success',
+        content: 'Success!',
+      });
+      setSubmitLoading(false)
+
+    } else {
+      messageApi.open({
+        type: 'error',
+        content: 'error!',
+      });
+      setSubmitLoading(false)
+    }
+    setTimeout(() => {
+      navigateDetail()
+    }, 1000)
 
   };
 
@@ -209,6 +228,7 @@ const IvtEditPage = () => {
 
   return (
     <Layout>
+      {contextHolder}
       <Content>
         <Breadcrumb
           itemRender={breadcrumbRender}
@@ -358,7 +378,7 @@ const IvtEditPage = () => {
             }}
           >
             <Space>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={submitLoading}>
                 Submit
               </Button>
               <Button htmlType="cancel" onClick={navigateDetail}>cancel</Button>
