@@ -809,7 +809,7 @@ const NewOrderPage = () => {
                             <Col span={6}>
                                 <Input
                                     placeholder="0"
-                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right' }}
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
                                     value={shippingFee}
                                     onChange={(e) => { setShippingFee(e.target.value); }}
                                 />
