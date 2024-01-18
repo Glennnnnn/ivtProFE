@@ -580,8 +580,8 @@ const EditOrderPage = () => {
                         } />
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-                        <Button danger icon={<LeftOutlined />} size="large" onClick={onCancelClick} className="edit-customer-details-button" > Back </Button>
-                        <Button icon={<SaveOutlined />} size="large" onClick={onSaveClick} className="edit-customer-details-button" > Save </Button>
+                        <Button danger icon={<LeftOutlined />} size="large" onClick={onCancelClick} style={{ backgroundColor: "red", color: "white" }} className="edit-customer-details-button" > Back </Button>
+                        <Button icon={<SaveOutlined />} size="large" onClick={onSaveClick} style={{ backgroundColor: "green", color: "white" }} className="edit-customer-details-button" > Save </Button>
                     </div>
 
 

@@ -378,10 +378,10 @@ const IvtEditPage = () => {
             }}
           >
             <Space>
-              <Button type="primary" htmlType="submit" loading={submitLoading}>
+              <Button type="primary" htmlType="submit" loading={submitLoading} style={{ backgroundColor: "green", color: "white" }}>
                 Submit
               </Button>
-              <Button htmlType="cancel" onClick={navigateDetail}>cancel</Button>
+              <Button htmlType="cancel" onClick={navigateDetail} style={{ backgroundColor: "red", color: "white" }}>cancel</Button>
             </Space>
           </Form.Item>
 

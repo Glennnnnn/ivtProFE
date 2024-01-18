@@ -384,10 +384,10 @@ const NewOrderPage = () => {
 
         setProductTotal(subTotal);
 
-        if(shippingFee === ""){
+        if (shippingFee === "") {
             setAllTotal(parseFloat(subTotal));
         }
-        else{
+        else {
             setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
         }
     }
@@ -551,10 +551,10 @@ const NewOrderPage = () => {
     }, [searchValue]);
 
     useEffect(() => {
-        if(shippingFee === ""){
+        if (shippingFee === "") {
             setAllTotal(parseFloat(productTotal));
         }
-        else{
+        else {
             setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
         }
     }, [shippingFee])
@@ -595,9 +595,9 @@ const NewOrderPage = () => {
                         } />
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-                        <Button danger icon={<DeleteOutlined />} size="large" onClick={onCancelClick} className="edit-customer-details-button" > Cancel </Button>
+                        <Button icon={<DeleteOutlined />} size="large" onClick={onCancelClick} style={{ backgroundColor: "red", color: "white" }} className="edit-customer-details-button" > Cancel </Button>
                         <Dropdown.Button type="default" icon={<EditOutlined />} size="large" className="edit-customer-details-button" onClick={onMenuClick}
-                            menu={{ items: buttonItems, onClick: onMenuClick }} > Save and New
+                            menu={{ items: buttonItems, style: { backgroundColor: "green" }, onClick: onMenuClick }} > Save and New
                         </Dropdown.Button>
                     </div>
 
@@ -803,20 +803,20 @@ const NewOrderPage = () => {
 
                         <Row gutter={[16, 16]} style={{ margin: '20px' }}>
                             <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
-                            <Col span={6}><span className="item-span" style={{paddingRight: "8px"}}>{productTotal.toFixed(2)}</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
 
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}>
                                 <Input
                                     placeholder="0"
-                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right'}}
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right' }}
                                     value={shippingFee}
-                                    onChange={(e) => {setShippingFee(e.target.value);}}
+                                    onChange={(e) => { setShippingFee(e.target.value); }}
                                 />
                             </Col>
 
                             <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
-                            <Col span={6}><span className="item-span" style={{paddingRight: "8px"}}>{allTotal.toFixed(2)}</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
                         </Row>
                     </Card>
                 </Content>

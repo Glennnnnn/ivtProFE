@@ -351,8 +351,8 @@ const CustomerDetailsPage = () => {
 
                     <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
-                            <Button type="default" icon={<EditOutlined />} size="large" onClick={showEditModel} className="edit-customer-details-button" > Edit</Button>
-                            <Button danger icon={<DeleteOutlined />} size="large" onClick={showDeleteModel} className="edit-customer-details-button" disabled={recordData.delFlag !== "active"}> Inactive</Button>
+                            <Button type="default" icon={<EditOutlined />} size="large" onClick={showEditModel} className="edit-customer-details-button" style={{ backgroundColor: "orange", color: "white" }}> Edit</Button>
+                            <Button danger icon={<DeleteOutlined />} size="large" onClick={showDeleteModel} className="edit-customer-details-button" disabled={recordData.delFlag !== "active"} style={{ backgroundColor: "red", color: "white" }}> Inactive</Button>
                         </div>
                     </div>
 

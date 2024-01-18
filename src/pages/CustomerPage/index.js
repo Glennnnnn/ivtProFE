@@ -173,6 +173,8 @@ const CustomerPage = () => {
 									style={{
 										display: "inline-block",
 										width: "calc(50% - 12px)",
+										backgroundColor: "red",
+										color: "white",
 									}}
 									size="large"
 								>
@@ -187,6 +189,8 @@ const CustomerPage = () => {
 										display: "inline-block",
 										width: "calc(50% - 12px)",
 										margin: "0 12px",
+										backgroundColor: "green",
+										color: "white",
 									}}
 									size="large"
 								>
