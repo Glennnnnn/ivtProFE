@@ -95,7 +95,7 @@ const EditableCell = ({
                 ))}
             </Select>
         ) : isNumberInput ? (
-            <InputNumber onChange={handleInputChange} placeholder="0" />
+            <InputNumber onChange={handleInputChange} placeholder="0" controls={false} />
         ) : (
             <Input onChange={(e) => handleInputChange(e.target.value)} />
         );
