@@ -175,7 +175,16 @@ const OrderPage = () => {
             width: "20%",
             sorter: true,
             render: (text, record) => {
+                let isCashSale = record.isCashSale;
                 if (record.orderStatus !== "processing") {
+                    if (isCashSale === true) {
+                        return (
+                            <>
+                                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                                <Tag color={"green"}> cash sale </Tag>
+                            </>
+                        )
+                    }
                     return (
                         <>
                             <span>{moment(text).format('DD/MM/YYYY')}  </span>
@@ -186,7 +195,7 @@ const OrderPage = () => {
                 const currentDate = dayjs();
 
                 let isOverDue = true;
-                let isCashSale = record.isCashSale;
+
                 if (record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm) {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
