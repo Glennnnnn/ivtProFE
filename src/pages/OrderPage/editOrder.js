@@ -15,6 +15,7 @@ import {
     InputNumber,
     Form,
     Tag,
+    Switch
 } from 'antd';
 import {
     PlusOutlined, LeftOutlined, DeleteOutlined, SaveOutlined
@@ -124,6 +125,7 @@ const EditOrderPage = () => {
     const [orderDate, setOrderDate] = useState(dayjs());
     const [customerOrderNo, setCustomerOrderNo] = useState('');
     const [orderNote, setOrderNote] = useState('');
+    const [isCashSale, setIsCashSale] = useState();
     const [loading, setLoading] = useState(false);
     const [productList, setProductList] = useState([]);
 
@@ -253,6 +255,7 @@ const EditOrderPage = () => {
                     setOrderDate(dayjs(posts.data.orderDate));
                     setCustomerOrderNo(posts.data.customerOrderNo);
                     setOrderNote(posts.data.orderNote);
+                    setIsCashSale(posts.data.isCashSale);
 
                     setProductTotal(parseFloat(posts.data.totalPrice));
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
@@ -483,6 +486,7 @@ const EditOrderPage = () => {
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
                     "orderShippingFee": shippingFee,
+                    "isCashSale": isCashSale,
                     //Customer
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
                     "orderCustomerName": newCustomerDetails.customerName ?? "",
@@ -618,6 +622,11 @@ const EditOrderPage = () => {
                                                 value={customerOrderNo}
                                                 onChange={handleCustomerOrderNoChange}
                                             />
+                                        </Col>
+
+                                        <Col span={6}><span className="item-span">Cash Sale</span></Col>
+                                        <Col span={18}>
+                                            <Switch value={isCashSale} onChange={(value) => { setIsCashSale(value) }} />
                                         </Col>
 
                                         <Col span={6}><span className="item-span">Order Note</span></Col>

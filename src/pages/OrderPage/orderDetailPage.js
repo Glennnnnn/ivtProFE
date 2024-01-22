@@ -57,7 +57,7 @@ const OrderDetailsPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
-                    console.log(posts.data);
+                    //console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
                     setProductTotal(parseFloat(posts.data.totalPrice));
@@ -316,13 +316,29 @@ const OrderDetailsPage = () => {
                                             <Col span={2}>
                                                 <CarryOutOutlined />
                                             </Col>
-                                            <Col span={16}>
-                                                Order ID: {recordData.orderId}
-                                            </Col>
-                                            <Col span={6}>
-                                                <Tag color={recordData.orderStatus === "processing" ? 'orange' :
-                                                    (recordData.orderStatus === "reversed" ? 'red' : 'green')}> {recordData.orderStatus}</Tag>
-                                            </Col>
+                                            {recordData.isCashSale === true ?
+                                                <>
+                                                    <Col span={14}>
+                                                        Order ID: {recordData.orderId}
+                                                    </Col>
+                                                    <Col span={4}>
+                                                        <Tag color={"green"}> cash sale </Tag>
+                                                    </Col>
+                                                    <Col span={4}>
+                                                        <Tag color={recordData.orderStatus === "processing" ? 'orange' :
+                                                            (recordData.orderStatus === "reversed" ? 'red' : 'green')}> {recordData.orderStatus}</Tag>
+                                                    </Col>
+                                                </> :
+                                                <>
+                                                    <Col span={18}>
+                                                        Order ID: {recordData.orderId}
+                                                    </Col>
+                                                    <Col span={4}>
+                                                        <Tag color={recordData.orderStatus === "processing" ? 'orange' :
+                                                            (recordData.orderStatus === "reversed" ? 'red' : 'green')}> {recordData.orderStatus}</Tag>
+                                                    </Col>
+                                                </>
+                                            }
                                         </Row>}
                                     bordered={false}
                                     style={{ height: 'auto', minHeight: '350px' }}>

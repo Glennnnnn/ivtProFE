@@ -103,6 +103,17 @@ function IvtDetailPage() {
       key: 'orderId',
       render: (orderId, record) => {
         const url = `/orderDetails?orderDBId=${record.orderDBId}`;
+        console.log(record)
+        if (record.isCashSale === true) {
+          return (
+            <>
+              <NavLink to={url}>
+                {orderId}
+              </NavLink>
+              <Tag color={"green"} style={{ marginLeft: "10px" }}> cash sale </Tag>
+            </>
+          );
+        }
         return (
           <NavLink to={url}>
             {orderId}

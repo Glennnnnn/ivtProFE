@@ -130,6 +130,7 @@ const NewOrderPage = () => {
     const [shippingFee, setShippingFee] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
 
+    const [isCashSale, setIsCashSale] = useState(false);
     const [showCustomer, setShowCustomer] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
@@ -458,6 +459,7 @@ const NewOrderPage = () => {
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
                     "isNewCustomer": showCustomer,
+                    "isCashSale": isCashSale,
                     "customerId": selectedCustomer,
                     "orderShippingFee": shippingFee,
                     "newCustomerDetails": {
@@ -476,12 +478,19 @@ const NewOrderPage = () => {
 
                 const posts = await addOrder(queryBody);
                 if (posts.code === 200) {
-                    if (e.key === "2") {
-                        navigate(-1);
-                    }
-                    else {
-                        window.location.reload();
-                    }
+                    messageApi.open({
+                        type: "success",
+                        content: "Save Order Success!",
+                    });
+                    setTimeout(() => {
+                        if (e.key === "2") {
+                            navigate(-1);
+                        }
+                        else {
+                            window.location.reload();
+                        }
+                    }, 1000)
+
                 }
                 else {
                     messageApi.open({
@@ -597,7 +606,7 @@ const NewOrderPage = () => {
                     <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
                         <Button icon={<DeleteOutlined />} size="large" onClick={onCancelClick} style={{ backgroundColor: "red", color: "white" }} className="edit-customer-details-button" > Cancel </Button>
                         <Dropdown.Button type="default" icon={<EditOutlined />} size="large" className="edit-customer-details-button" onClick={onMenuClick}
-                            menu={{ items: buttonItems, style: { backgroundColor: "green" }, onClick: onMenuClick }} > Save and New
+                            menu={{ items: buttonItems, onClick: onMenuClick }} > Save and New
                         </Dropdown.Button>
                     </div>
 
@@ -652,6 +661,10 @@ const NewOrderPage = () => {
                             <Col span={12}>
                                 <Card bordered={false} style={{ height: 'auto', minHeight: '220px' }}>
                                     <Row gutter={[16, 16]}>
+                                        <Col span={6}><span className="item-span">Cash Sale</span></Col>
+                                        <Col span={18}>
+                                            <Switch value={isCashSale} onChange={(value) => { setIsCashSale(value) }} />
+                                        </Col>
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
                                             <Switch value={showCustomer} onChange={(value) => { setShowCustomer(value); setSelectedCustomer(''); newCustomerForm.resetFields(); }} />

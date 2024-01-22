@@ -186,6 +186,7 @@ const OrderPage = () => {
                 const currentDate = dayjs();
 
                 let isOverDue = true;
+                let isCashSale = record.isCashSale;
                 if (record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm) {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
@@ -197,19 +198,39 @@ const OrderPage = () => {
                 }
 
                 if (isOverDue) {
-                    return (
-                        <>
-                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
-                            <Tag color={"red"}> overdue </Tag>
-                        </>
-                    )
+                    if (isCashSale === true) {
+                        return (
+                            <>
+                                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                                <Tag color={"green"}> cash sale </Tag>
+                                <Tag color={"red"}> overdue </Tag>
+                            </>
+                        )
+                    } else {
+                        return (
+                            <>
+                                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                                <Tag color={"red"}> overdue </Tag>
+                            </>
+                        )
+                    }
                 }
                 else {
-                    return (
-                        <>
-                            <span>{moment(text).format('DD/MM/YYYY')}  </span>
-                        </>
-                    )
+                    if (isCashSale === true) {
+                        return (
+                            <>
+                                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                                <Tag color={"green"}> cash sale </Tag>
+                            </>
+                        )
+                    } else {
+                        return (
+                            <>
+                                <span>{moment(text).format('DD/MM/YYYY')}  </span>
+                            </>
+                        )
+                    }
+
                 }
             }
         },
