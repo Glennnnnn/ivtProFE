@@ -166,3 +166,20 @@ export const deleteOrderById = async (orderDBId) => {
     const response = await http.delete(`/deleteOrderById?orderDBId=${orderDBId}`);
     return response.data;
 }
+
+export const editOrderStatusByIds = async (orderDBIdList, orderStatus) => {
+    var queryBody = {
+        "orderDBIds": orderDBIdList,
+        "orderStatus": orderStatus
+    }
+    const response = await http.post(`/batchUpdateOrderStatus`, queryBody);
+    return response.data;
+}
+
+export const deleteOrderByIds = async (orderDBIdList) => {
+    var queryBody = {
+        "orderDBIds": orderDBIdList,
+    }
+    const response = await http.post(`/batchDeleteOrder`, queryBody);
+    return response.data;
+}
