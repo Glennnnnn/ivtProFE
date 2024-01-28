@@ -103,7 +103,7 @@ function IvtDetailPage() {
       key: 'orderId',
       render: (orderId, record) => {
         const url = `/orderDetails?orderDBId=${record.orderDBId}`;
-        console.log(record)
+        // console.log(record)
         if (record.isCashSale === true) {
           return (
             <>
