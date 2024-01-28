@@ -12,12 +12,13 @@ import {
     Tag,
     Table,
     Card,
-    Input
+    Input,
+    Popconfirm
 } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons'
 import StatisticCard from "@/components/StatisticCard/StatisticCard";
 import { Link, NavLink } from 'react-router-dom';
-import { orderList, getOrderSummary } from "../../api/api.js";
+import { orderList, getOrderSummary, editOrderStatusByIds, deleteOrderByIds } from "../../api/api.js";
 import moment from "moment";
 import dayjs from 'dayjs';
 
@@ -26,8 +27,10 @@ const OrderPage = () => {
     const { Content } = Layout;
     const [messageApi, contextHolder] = message.useMessage();
     const [orderNo, setOrderNo] = useState([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [loading, setLoading] = useState(false);
+    const [bulkLoading, setBulkLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
     const [searchParams, setSearchParams] = useState({
         pagination: {
@@ -37,6 +40,16 @@ const OrderPage = () => {
         },
     });
     const [searchName, setSearchName] = useState("");
+    const hasSelected = selectedRowKeys.length > 0;
+
+    const onSelectRowsChange = (newSelectedRowKeys) => {
+        setSelectedRowKeys(newSelectedRowKeys);
+    };
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectRowsChange,
+    };
 
     const fetchDataAndUpdateState = async () => {
         try {
@@ -69,6 +82,103 @@ const OrderPage = () => {
         }
     };
 
+    const handleComplete = async () => {
+        try {
+            setBulkLoading(true);
+            const filteredList = [];
+            for (const item of dataSource) {
+                const checkId = selectedRowKeys.some(bigNumber => bigNumber.toString() === item.orderDBId.toString());
+
+                if (checkId) {
+                    if (item.orderStatus !== "processing") {
+                        messageApi.open({
+                            type: "error",
+                            content: "Selected order status should be processing!",
+                        });
+                        return; // Stop the execution of the function
+                    } else {
+                        filteredList.push(item.orderDBId.toString());
+                    }
+                }
+            }
+
+            const posts = await editOrderStatusByIds(filteredList, 'completed');
+            if (posts.code === 200) {
+                messageApi.open({
+                    type: 'success',
+                    content: 'Complete Selected Orders Success!',
+                })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000)
+            }
+            else {
+                messageApi.open({
+                    type: "error",
+                    content: "Complete Selected Orders Error!",
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Complete Selected Orders Error!",
+            });
+        } finally {
+            setBulkLoading(false);
+        }
+    }
+
+    const handleDelete = async () => {
+        try {
+            setBulkLoading(true);
+            const filteredList = [];
+            for (const item of dataSource) {
+                const checkId = selectedRowKeys.some(bigNumber => bigNumber.toString() === item.orderDBId.toString());
+
+                if (checkId) {
+                    if (item.orderStatus !== "processing") {
+                        messageApi.open({
+                            type: "error",
+                            content: "Selected order status should be processing!",
+                        });
+                        return; // Stop the execution of the function
+                    } else {
+                        filteredList.push(item.orderDBId.toString());
+                    }
+                }
+            }
+
+            const posts = await deleteOrderByIds(filteredList);
+            if (posts.code === 200) {
+                messageApi.open({
+                    type: 'success',
+                    content: 'Delete Selected Orders Success!',
+                })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000)
+            }
+            else {
+                messageApi.open({
+                    type: "error",
+                    content: "Delete Selected Orders Error!",
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Delete Selected Orders Error!",
+            });
+        } finally {
+            setBulkLoading(false);
+        }
+    }
+
+
     useEffect(() => {
         fetchDataAndUpdateState();
     }, [JSON.stringify(searchParams)]);
@@ -80,6 +190,7 @@ const OrderPage = () => {
             setDataSource([]);
         }
 
+        setSelectedRowKeys([]);
         setSearchParams({
             pagination,
             filters,
@@ -361,7 +472,30 @@ const OrderPage = () => {
                             bodyStyle={{ height: "85%", width: "100%" }}
                         >
                             <Row justify={"end"}>
-                                <Col>
+                                <Col span={8}>
+                                    <Popconfirm title="Are you sure you want to complete selected order?"
+                                        onConfirm={handleComplete}
+                                        okText="Yes"
+                                        cancelText="No">
+                                        <Button type="primary" className="new-customer-button" icon={<CheckOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                                            style={{ backgroundColor: hasSelected ? "green" : "", color: hasSelected ? "white" : "" }}>
+                                            Complete Selected
+                                        </Button>
+                                    </Popconfirm>
+                                    <Popconfirm title="Are you sure you want to delete selected order?"
+                                        onConfirm={handleDelete}
+                                        okText="Yes"
+                                        cancelText="No">
+                                        <Button type="primary" className="new-customer-button" icon={<DeleteOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                                            style={{ backgroundColor: hasSelected ? "red" : "", color: hasSelected ? "white" : "" }}>
+                                            Delete Selected
+                                        </Button>
+                                    </Popconfirm>
+                                </Col>
+                                <Col span={9}>
+
+                                </Col>
+                                <Col span={7}>
                                     <Input.Search
                                         placeholder="Search Order Id"
                                         onSearch={onSearch}
@@ -373,6 +507,7 @@ const OrderPage = () => {
                                 </Col>
                             </Row>
                             <Table
+                                rowSelection={rowSelection}
                                 rowKey={"orderDBId"}
                                 columns={columns}
                                 dataSource={dataSource}
