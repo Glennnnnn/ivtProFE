@@ -492,10 +492,10 @@ const OrderPage = () => {
                                         </Button>
                                     </Popconfirm>
                                 </Col>
-                                <Col span={9}>
+                                <Col span={11}>
 
                                 </Col>
-                                <Col span={7}>
+                                <Col span={5}>
                                     <Input.Search
                                         placeholder="Search Order Id"
                                         onSearch={onSearch}

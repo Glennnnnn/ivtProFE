@@ -183,3 +183,27 @@ export const deleteOrderByIds = async (orderDBIdList) => {
     const response = await http.post(`/batchDeleteOrder`, queryBody);
     return response.data;
 }
+
+export const addRestock = async (queryBody) => {
+    const response = await http.post(`/insertStockBatchData`, queryBody);
+    return response.data;
+}
+
+export const queryRestockById = async (restockDBId) => {
+    var queryBody = {
+        "stockBatchDBId": restockDBId,
+    }
+    const response = await http.post(`/queryStockBatchById`, queryBody);
+    return response.data;
+}
+
+export const restockList = async (searchingParams) => {
+    var queryBody = {
+        "stockBatchId": searchingParams.searchName ?? "",
+        "pageIndex": searchingParams.pagination.current ?? 1,
+        "pageSize": searchingParams.pagination.pageSize ?? 10,
+        "order": searchingParams.order ?? ""
+    }
+    const response = await http.post(`/queryStockBatchData`, queryBody);
+    return response.data;
+}

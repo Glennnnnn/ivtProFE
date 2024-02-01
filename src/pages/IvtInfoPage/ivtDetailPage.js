@@ -179,10 +179,18 @@ function IvtDetailPage() {
 
   const stockColumns = [
     {
-      title: 'Order Id',
+      title: 'Order Id/Restock Id',
       dataIndex: 'orderId',
       width: 200,
       render: (orderId, record) => {
+        if (record.stockBatchDBId !== null) {
+          const url = `/restockDetails?stockBatchDBId=${record.stockBatchDBId}`;
+          return (
+            <NavLink to={url}>
+              {record.stockBatchId}
+            </NavLink>
+          )
+        }
         if (record.orderDBId === null) {
           return ({ orderId });
         }

@@ -9,6 +9,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
   TeamOutlined,
+  CopyOutlined,
   AppstoreTwoTone
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
@@ -20,6 +21,9 @@ import OrderPage from './pages/OrderPage/index.js';
 import NewOrderPage from './pages/OrderPage/newOrder.js';
 import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
 import EditOrderPage from './pages/OrderPage/editOrder.js';
+import RestockPage from './pages/RestockPage/index.js';
+import NewRestockPage from './pages/RestockPage/newRestock.js';
+import RestockDetailsPage from './pages/RestockPage/restockDetailPage.js';
 import CustomerPage from './pages/CustomerPage/index.js';
 import CustomerDetailsPage from './pages/CustomerPage/customerDetailPage.js';
 import HomePage from './pages/HomePage/index.js';
@@ -80,6 +84,9 @@ const App = () => {
           <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setMenu('orders')}>
             <Link to="/orders">Orders</Link>
           </Menu.Item>
+          <Menu.Item key="restock" icon={<CopyOutlined />} onClick={() => setMenu('restock')}>
+            <Link to="/restock">Restock</Link>
+          </Menu.Item>
           <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setMenu('customers')}>
             <Link to="/customers">Customers</Link>
           </Menu.Item>
@@ -131,6 +138,9 @@ const App = () => {
             <Route path="/neworder" element={isAuthenticated ? <NewOrderPage /> : <Navigate to="/login" />} />
             <Route path="/orderDetails" element={isAuthenticated ? <OrderDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/editorder" element={isAuthenticated ? <EditOrderPage /> : <Navigate to="/login" />} />
+            <Route path="/restock" element={isAuthenticated ? <RestockPage /> : <Navigate to="/login" />} />
+            <Route path="/newrestock" element={isAuthenticated ? <NewRestockPage /> : <Navigate to="/login" />} />
+            <Route path="/restockDetails" element={isAuthenticated ? <RestockDetailsPage /> : <Navigate to="/login" />} />
             <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
