@@ -185,7 +185,7 @@ const OrderDetailsPage = () => {
                 return (
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
-                            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtId.toString()}</NavLink>
+                            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtId === null ? "" : ivtId.toString()}</NavLink>
                         </Col>
                         <Col span={12}>
                             <span style={{ whiteSpace: 'pre-wrap' }}>
