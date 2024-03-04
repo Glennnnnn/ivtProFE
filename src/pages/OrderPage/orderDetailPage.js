@@ -57,7 +57,7 @@ const OrderDetailsPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
-                    //console.log(posts.data);
+                    console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
                     setProductTotal(parseFloat(posts.data.totalPrice));
@@ -219,6 +219,9 @@ const OrderDetailsPage = () => {
             dataIndex: 'orderIvtPrice',
             width: "10%",
             render: (_, record) => {
+                if(_ === null){
+                    return 0.00.toFixed(2);
+                }
                 const formattedTotal = _.toFixed(2);
                 return ` ${formattedTotal}`;
             },
