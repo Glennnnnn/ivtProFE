@@ -15,11 +15,13 @@ import {
     Input,
 } from 'antd';
 import {
-    CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined, EditOutlined
+    CheckOutlined, DeleteOutlined, AccountBookOutlined, CarryOutOutlined, EditOutlined, DownloadOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
 import { getOrderDetailByDBId, updateOrderStatus, deleteOrderById } from '../../api/api.js'
 import moment from "moment";
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import MyDocument from './document'
 
 
 const OrderDetailsPage = () => {
@@ -219,7 +221,7 @@ const OrderDetailsPage = () => {
             dataIndex: 'orderIvtPrice',
             width: "10%",
             render: (_, record) => {
-                if(_ === null){
+                if (_ === null) {
                     return 0.00.toFixed(2);
                 }
                 const formattedTotal = _.toFixed(2);
@@ -288,6 +290,19 @@ const OrderDetailsPage = () => {
                             {
                                 recordData.orderStatus === "processing" ? (
                                     <>
+                                        <PDFDownloadLink
+                                            document={<MyDocument data={recordData} />}
+                                            fileName={recordData.orderId + ".pdf"}>
+                                            {({ blob, url, loading, error }) => (
+                                                <Button
+                                                    icon={<DownloadOutlined />}
+                                                    size="large"
+                                                    className="edit-customer-details-button"
+                                                    style={{ backgroundColor: "deepskyblue", color: "white" }}>
+                                                    {loading ? 'Loading...' : 'Print'}
+                                                </Button>
+                                            )}
+                                        </PDFDownloadLink>
                                         <NavLink to={`/editOrder?orderDBId=${recordData.orderDBId}`}>
                                             <Button icon={<EditOutlined />} size="large" className="edit-customer-details-button"
                                                 style={{ backgroundColor: "orange", color: "white" }}>
@@ -301,12 +316,24 @@ const OrderDetailsPage = () => {
                                     </>
                                 ) : (
                                     <>
+                                        <PDFDownloadLink
+                                            document={<MyDocument data={recordData} />}
+                                            fileName={recordData.orderId + ".pdf"}>
+                                            {({ blob, url, loading, error }) => (
+                                                <Button
+                                                    icon={<DownloadOutlined />}
+                                                    size="large"
+                                                    className="edit-customer-details-button"
+                                                    style={{ backgroundColor: "deepskyblue", color: "white" }}>
+                                                    {loading ? 'Loading...' : 'Print'}
+                                                </Button>
+                                            )}
+                                        </PDFDownloadLink>
                                         <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus === "reversed"} onClick={showReverseModel}
                                             style={{ backgroundColor: "red", color: "white", }}> Reverse</Button>
                                     </>
                                 )
                             }
-
                         </div>
                     </div>
 
