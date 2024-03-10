@@ -279,7 +279,7 @@ const MyDocument = ({ data }) => (
                     <Text>70 North View Drive</Text>
                     <Text>Sunshine West VIC  3020</Text>
                     <Text>info@pioneertrading.com.au</Text>
-                    <Text>ABN 69870739006</Text>
+                    <Text>{data.isCashSale ? "" : "ABN 69870739006"}</Text>
                 </View>
                 <View style={styles.rightHeader}>
                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>Order Id {data.orderId}</Text>
