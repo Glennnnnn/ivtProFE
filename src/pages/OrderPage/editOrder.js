@@ -131,6 +131,7 @@ const EditOrderPage = () => {
 
     const [productTotal, setProductTotal] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
+    const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
 
     const [form] = Form.useForm();
@@ -257,9 +258,10 @@ const EditOrderPage = () => {
                     setOrderNote(posts.data.orderNote);
                     setIsCashSale(posts.data.isCashSale);
 
-                    setProductTotal(parseFloat(posts.data.totalPrice));
+                    setProductTotal(parseFloat(posts.data.totalPrice) - parseFloat(posts.data.orderShippingFee ?? 0) - parseFloat(posts.data.orderPreBalance ?? 0));
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
-                    setAllTotal(parseFloat(posts.data.totalPrice) + parseFloat(posts.data.orderShippingFee ?? 0));
+                    setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
+                    setAllTotal(parseFloat(posts.data.totalPrice));
 
                     let dataList = [];
                     posts.data.orderIvtPoList.forEach((item, index) => {
@@ -431,13 +433,14 @@ const EditOrderPage = () => {
         })
 
         setProductTotal(subTotal);
+        updateTotal(subTotal);
+    }
 
-        if (shippingFee === "") {
-            setAllTotal(parseFloat(subTotal));
-        }
-        else {
-            setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
-        }
+    const updateTotal = (subTotal) => {
+        let thisShipping = shippingFee === "" ? 0 : shippingFee;
+        let thisPrevBalance = prevBalance === "" ? 0 : prevBalance;
+
+        setAllTotal(parseFloat(subTotal) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
     }
 
     const validateSave = () => {
@@ -486,6 +489,7 @@ const EditOrderPage = () => {
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
                     "orderShippingFee": shippingFee,
+                    "orderPreBalance": prevBalance,
                     "isCashSale": isCashSale,
                     //Customer
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
@@ -551,13 +555,12 @@ const EditOrderPage = () => {
     }, []);
 
     useEffect(() => {
-        if (shippingFee === "") {
-            setAllTotal(parseFloat(productTotal));
-        }
-        else {
-            setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
-        }
+        updateTotal(productTotal);
     }, [shippingFee])
+
+    useEffect(() => {
+        updateTotal(productTotal);
+    }, [prevBalance])
 
     return (
         <div className="ivt-layout">
@@ -713,6 +716,16 @@ const EditOrderPage = () => {
                                     style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right' }}
                                     value={shippingFee}
                                     onChange={(e) => { setShippingFee(e.target.value); }}
+                                />
+                            </Col>
+
+                            <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
+                                    value={prevBalance}
+                                    onChange={(e) => { setPrevBalance(e.target.value); }}
                                 />
                             </Col>
 

@@ -44,7 +44,7 @@ const RestockPage = () => {
                     ...searchParams,
                     pagination: {
                         ...searchParams.pagination,
-                        total: posts.data.count,
+                        total: posts.data.totalCount,
                     },
                 });
             } else {

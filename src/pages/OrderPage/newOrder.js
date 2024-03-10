@@ -128,6 +128,7 @@ const NewOrderPage = () => {
 
     const [productTotal, setProductTotal] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
+    const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
 
     const [isCashSale, setIsCashSale] = useState(false);
@@ -384,13 +385,14 @@ const NewOrderPage = () => {
         })
 
         setProductTotal(subTotal);
+        updateTotal(subTotal);
+    }
 
-        if (shippingFee === "") {
-            setAllTotal(parseFloat(subTotal));
-        }
-        else {
-            setAllTotal(parseFloat(subTotal) + parseFloat(shippingFee));
-        }
+    const updateTotal = (subTotal) => {
+        let thisShipping = shippingFee === "" ? 0 : shippingFee;
+        let thisPrevBalance = prevBalance === "" ? 0 : prevBalance;
+
+        setAllTotal(parseFloat(subTotal) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
     }
 
     const validateSave = () => {
@@ -462,6 +464,7 @@ const NewOrderPage = () => {
                     "isCashSale": isCashSale,
                     "customerId": selectedCustomer,
                     "orderShippingFee": shippingFee,
+                    "orderPreBalance": prevBalance,
                     "newCustomerDetails": {
                         "companyName": newCustomerDetails.companyName ?? "",
                         "customerName": newCustomerDetails.customerName ?? "",
@@ -560,13 +563,12 @@ const NewOrderPage = () => {
     }, [searchValue]);
 
     useEffect(() => {
-        if (shippingFee === "") {
-            setAllTotal(parseFloat(productTotal));
-        }
-        else {
-            setAllTotal(parseFloat(productTotal) + parseFloat(shippingFee));
-        }
+        updateTotal(productTotal);
     }, [shippingFee])
+
+    useEffect(() => {
+        updateTotal(productTotal);
+    }, [prevBalance])
 
     const buttonItems = [
         {
@@ -825,6 +827,16 @@ const NewOrderPage = () => {
                                     style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
                                     value={shippingFee}
                                     onChange={(e) => { setShippingFee(e.target.value); }}
+                                />
+                            </Col>
+
+                            <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
+                                    value={prevBalance}
+                                    onChange={(e) => { setPrevBalance(e.target.value); }}
                                 />
                             </Col>
 

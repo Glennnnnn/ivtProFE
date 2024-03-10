@@ -357,7 +357,7 @@ const MyDocument = ({ data }) => (
                         <View style={styles.itemCodeCell}></View>
                         <View style={styles.descriptionItemCell}></View>
                         <Text style={styles.subscriptName}>SUBTOTAL</Text>
-                        <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
+                        <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
                     </View>
 
                     <View style={styles.tableRow}>
@@ -370,8 +370,15 @@ const MyDocument = ({ data }) => (
                     <View style={styles.tableRow}>
                         <View style={styles.itemCodeCell}></View>
                         <View style={styles.descriptionItemCell}></View>
+                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
+                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                    </View>
+
+                    <View style={styles.tableRow}>
+                        <View style={styles.itemCodeCell}></View>
+                        <View style={styles.descriptionItemCell}></View>
                         <Text style={styles.subscriptName}>TOTAL</Text>
-                        <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) + parseFloat(data.orderShippingFee)).toFixed(2)}</Text>
+                        <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
                     </View>
 
                     {/* Total Due */}
@@ -379,7 +386,7 @@ const MyDocument = ({ data }) => (
                         <View style={styles.itemCodeCell}></View>
                         <View style={styles.descriptionItemCell}></View>
                         <Text style={styles.totalDue}>TOTAL DUE</Text>
-                        <Text style={styles.totalDueNumber}>AUD {(parseFloat(data.totalPrice) + parseFloat(data.orderShippingFee)).toFixed(2)}</Text>
+                        <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
                     </View>
 
                     <View style={styles.tableRow}>

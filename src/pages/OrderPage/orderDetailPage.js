@@ -32,6 +32,7 @@ const OrderDetailsPage = () => {
 
     const [productTotal, setProductTotal] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
+    const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
 
     const [recordData, setRecordData] = useState({});
@@ -62,9 +63,10 @@ const OrderDetailsPage = () => {
                     console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
-                    setProductTotal(parseFloat(posts.data.totalPrice));
+                    setProductTotal(parseFloat(posts.data.totalPrice) - parseFloat(posts.data.orderShippingFee ?? 0) - parseFloat(posts.data.orderPreBalance ?? 0));
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
-                    setAllTotal(parseFloat(posts.data.totalPrice) + parseFloat(posts.data.orderShippingFee ?? 0));
+                    setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
+                    setAllTotal(parseFloat(posts.data.totalPrice));
                 }
                 else {
                     messageApi.open({
@@ -521,6 +523,9 @@ const OrderDetailsPage = () => {
 
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{shippingFee.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{prevBalance.toFixed(2)}</span></Col>
 
                             <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
