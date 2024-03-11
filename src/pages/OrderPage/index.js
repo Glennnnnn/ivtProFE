@@ -407,6 +407,7 @@ const OrderPage = () => {
                 { text: "processing", value: "processing" },
                 { text: "reversed", value: "reversed" },
                 { text: "completed", value: "completed" },
+                { text: "cash sale", value: "cash sale"},
             ],
             render: (status) => {
                 const color = status === "processing" ? 'orange' :
