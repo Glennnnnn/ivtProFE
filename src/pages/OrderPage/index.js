@@ -394,7 +394,7 @@ const OrderPage = () => {
             dataIndex: "totalPrice",
             width: "10%",
             render: (_, record) => {
-                const total = parseFloat(record.totalPrice) + parseFloat(record.orderShippingFee ?? 0)
+                const total = parseFloat(record.totalPrice)
                 const formattedTotal = total.toFixed(2);
                 return ` ${formattedTotal}`;
             },
@@ -407,7 +407,7 @@ const OrderPage = () => {
                 { text: "processing", value: "processing" },
                 { text: "reversed", value: "reversed" },
                 { text: "completed", value: "completed" },
-                { text: "cash sale", value: "cash sale"},
+                { text: "cash sale", value: "cash sale" },
             ],
             render: (status) => {
                 const color = status === "processing" ? 'orange' :
