@@ -112,7 +112,7 @@ export const orderList = async (searchingParams) => {
         "pageIndex": searchingParams.pagination.current ?? 1,
         "pageSize": searchingParams.pagination.pageSize ?? 10,
         "orderStatus": searchingParams.filters?.orderStatus ?? [],
-        "order": searchingParams.order ?? ""
+        "order": searchingParams.order ?? "descend"
     }
     const response = await http.post(`/queryOrderData`, queryBody);
     return response.data;
