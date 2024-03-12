@@ -274,13 +274,17 @@ const MyDocument = ({ data }) => (
         <Page size="A4" style={styles.page}>
             {/* Header Section */}
             <View style={styles.header}>
-                <View style={styles.leftHeader}>
-                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>Pioneer Aluminium Pty Ltd</Text>
-                    <Text>70 North View Drive</Text>
-                    <Text>Sunshine West VIC  3020</Text>
-                    <Text>info@pioneertrading.com.au</Text>
-                    <Text>{data.isCashSale ? "" : "ABN 69870739006"}</Text>
-                </View>
+                {data.isCashSale ?
+                    <View style={styles.leftHeader}></View> :
+                    <View style={styles.leftHeader}>
+                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>Pioneer Aluminium Pty Ltd</Text>
+                        <Text>70 North View Drive</Text>
+                        <Text>Sunshine West VIC  3020</Text>
+                        <Text>info@pioneertrading.com.au</Text>
+                        <Text>ABN 69870739006</Text>
+                    </View>
+                }
+
                 <View style={styles.rightHeader}>
                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>Order Id {data.orderId}</Text>
                 </View>
@@ -398,11 +402,15 @@ const MyDocument = ({ data }) => (
                 </View>
             </View>
             {/* Footer Section */}
-            <View style={styles.footer}>
-                <Text>Thanks for your payment via EFT to: </Text>
-                <Text>Pioneer Aluminium Pty Ltd </Text>
-                <Text>BSB: 063 779   Account No: 1032 0767 </Text>
-            </View>
+            {data.isCashSale ?
+                <View style={styles.footer}></View> :
+                <View style={styles.footer}>
+                    <Text>Thanks for your payment via EFT to: </Text>
+                    <Text>Pioneer Aluminium Pty Ltd </Text>
+                    <Text>BSB: 063 779   Account No: 1032 0767 </Text>
+                </View>
+            }
+
         </Page>
     </Document>
 );
