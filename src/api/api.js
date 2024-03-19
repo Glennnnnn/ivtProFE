@@ -207,3 +207,8 @@ export const restockList = async (searchingParams) => {
     const response = await http.post(`/queryStockBatchData`, queryBody);
     return response.data;
 }
+
+export const queryCashSaleOrderId = async () => {
+    const response = await http.get(`/queryCashSaleOrderId`);
+    return response.data;
+}

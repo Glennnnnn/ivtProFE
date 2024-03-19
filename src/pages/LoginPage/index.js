@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Form, Input, Button, Checkbox } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import logo from '@/assets/logo.png'
+import logo from '@/assets/newLogo.png'
 import './index.scss'
 import { useIvt } from '@/store'
 
@@ -29,6 +29,9 @@ const LoginPage = () => {
 
   return (
     <div className="login">
+      <video autoPlay loop muted>
+        <source src="https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/jXRBRK_VAwoAAAAAAAAAAAAAK4eUAQBr" />
+      </video>
       <Card className="login-container">
         <div className='login-div'>
           <img className="login-logo" src={logo} alt="" />
@@ -70,7 +73,7 @@ const LoginPage = () => {
                     !clientReady ||
                     !form.isFieldsTouched(true) ||
                     !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                  }> Log in</Button> )}
+                  }> Log in</Button>)}
             </Form.Item>
           </div>
         </Form>

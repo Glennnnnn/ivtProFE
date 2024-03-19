@@ -24,7 +24,7 @@ import {
 import moment from "moment";
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
-import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder } from "@/api/api.js";
+import { searchCustomerList, searchProductList, getCustomerDetailById, addOrder, queryCashSaleOrderId } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -140,6 +140,7 @@ const NewOrderPage = () => {
     const [customerDetails, setCustomerDetails] = useState({});
 
     const [productList, setProductList] = useState([]);
+    const [cashSaleOrderId, setCashSaleOrderId] = useState("");
 
     const [form] = Form.useForm();
     const [newCustomerForm] = Form.useForm();
@@ -535,7 +536,19 @@ const NewOrderPage = () => {
             }
         }
 
+        const fetchCashSaleOrderId = async () => {
+            try {
+                const gets = await queryCashSaleOrderId();
+                //Todo: get response data set to cashSaleOrderId
+                setCashSaleOrderId(gets.cashSaleOrderId);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
         fetchProductData();
+        fetchCashSaleOrderId();
     }, []);
 
     useEffect(() => {
@@ -665,7 +678,12 @@ const NewOrderPage = () => {
                                     <Row gutter={[16, 16]}>
                                         <Col span={6}><span className="item-span">Cash Sale</span></Col>
                                         <Col span={18}>
-                                            <Switch value={isCashSale} onChange={(value) => { setIsCashSale(value) }} />
+                                            <Switch value={isCashSale} onChange={(value) => {
+                                                if(value === true){
+                                                    setOrderId(cashSaleOrderId);
+                                                }
+                                                setIsCashSale(value);
+                                            }} />
                                         </Col>
                                         <Col span={6}><span className="item-span">New Customer</span></Col>
                                         <Col span={18}>
