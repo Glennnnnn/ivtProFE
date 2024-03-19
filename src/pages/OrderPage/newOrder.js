@@ -540,7 +540,7 @@ const NewOrderPage = () => {
             try {
                 const gets = await queryCashSaleOrderId();
                 //Todo: get response data set to cashSaleOrderId
-                setCashSaleOrderId(gets.cashSaleOrderId);
+                setCashSaleOrderId(gets.data);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -679,7 +679,7 @@ const NewOrderPage = () => {
                                         <Col span={6}><span className="item-span">Cash Sale</span></Col>
                                         <Col span={18}>
                                             <Switch value={isCashSale} onChange={(value) => {
-                                                if(value === true){
+                                                if (value === true) {
                                                     setOrderId(cashSaleOrderId);
                                                 }
                                                 setIsCashSale(value);
