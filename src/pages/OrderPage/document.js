@@ -268,6 +268,18 @@ const renderTags = (tags) => {
     }).join(", ");
 }
 
+const renderCompanyandCustomerName = (data) => {
+    const shouldRenderCompany = data.orderCompanyName !== "";
+    const shouldRenderCustomer = data.orderCustomerName !== "";
+
+    return (
+        <>
+            {shouldRenderCompany && <Text>{data.orderCompanyName}</Text>}
+            {shouldRenderCustomer && <Text>{data.orderCustomerName}</Text>}
+        </>
+    );
+};
+
 // Create Document Component
 const MyDocument = ({ data }) => (
     <Document>
@@ -299,10 +311,12 @@ const MyDocument = ({ data }) => (
                 <View style={styles.topSection}>
                     <View style={styles.topLeft}>
                         <Text style={{ fontFamily: 'Helvetica-Bold' }}>Invoice to</Text>
+                        {renderCompanyandCustomerName(data)}
                         <Text>{data.orderBillingAddress}</Text>
                     </View>
                     <View style={styles.topCenter}>
                         <Text style={{ fontFamily: 'Helvetica-Bold' }}>Ship to</Text>
+                        {renderCompanyandCustomerName(data)}
                         <Text>{data.orderDeliveryAddress}</Text>
                     </View>
                     <View style={styles.topRight}>

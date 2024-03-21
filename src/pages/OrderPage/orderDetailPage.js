@@ -60,7 +60,7 @@ const OrderDetailsPage = () => {
 
                 const posts = await getOrderDetailByDBId(orderDBId);
                 if (posts.code === 200) {
-                    console.log(posts.data);
+                    //console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
                     setProductTotal(parseFloat(posts.data.totalPrice) - parseFloat(posts.data.orderShippingFee ?? 0) - parseFloat(posts.data.orderPreBalance ?? 0));
