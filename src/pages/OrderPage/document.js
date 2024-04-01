@@ -73,6 +73,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    lightBackgroundNoPrice: {
+        width: '50%',
+        backgroundColor: '#ADD8E6',
+        color: '#5F9EA0',
+        fontSize: 11,
+        lineHeight: 1.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    darkBackgroundNoPrice: {
+        width: '50%',
+        backgroundColor: '#5F9EA0',
+        color: 'white',
+        fontSize: 11,
+        lineHeight: 1.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     subscriptName: {
         flex: 0.3,
         color: '#5F9EA0',
@@ -281,7 +299,7 @@ const renderCompanyandCustomerName = (data) => {
 };
 
 // Create Document Component
-const MyDocument = ({ data }) => (
+const MyDocument = ({ data, showPrice = true }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             {/* Header Section */}
@@ -319,20 +337,33 @@ const MyDocument = ({ data }) => (
                         {renderCompanyandCustomerName(data)}
                         <Text>{data.orderDeliveryAddress}</Text>
                     </View>
-                    <View style={styles.topRight}>
-                        <View style={styles.lightBackground}>
-                            <Text>DATE</Text>
-                            <Text>{renderDate(data.orderDate)}</Text>
-                        </View>
-                        <View style={styles.darkBackground}>
-                            <Text style={{ fontFamily: 'Helvetica-Bold' }}>PLEASE PAY</Text>
-                            <Text>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
-                        </View>
-                        <View style={styles.lightBackground}>
-                            <Text>DUE DATE</Text>
-                            <Text>{renderDueDate(data)}</Text>
-                        </View>
-                    </View>
+                    {
+                        showPrice ?
+                            <View style={styles.topRight}>
+                                <View style={styles.lightBackground}>
+                                    <Text>DATE</Text>
+                                    <Text>{renderDate(data.orderDate)}</Text>
+                                </View>
+                                <View style={styles.darkBackground}>
+                                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>PLEASE PAY</Text>
+                                    <Text>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                </View>
+                                <View style={styles.lightBackground}>
+                                    <Text>DUE DATE</Text>
+                                    <Text>{renderDueDate(data)}</Text>
+                                </View>
+                            </View> :
+                            <View style={styles.topRight}>
+                                <View style={styles.lightBackgroundNoPrice}>
+                                    <Text>DATE</Text>
+                                    <Text>{renderDate(data.orderDate)}</Text>
+                                </View>
+                                <View style={styles.darkBackgroundNoPrice}>
+                                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>DUE DATE</Text>
+                                    <Text>{renderDueDate(data)}</Text>
+                                </View>
+                            </View>
+                    }
                 </View>
 
                 {/* Middle Section */}
@@ -349,63 +380,85 @@ const MyDocument = ({ data }) => (
 
                 {/* Bottom Section */}
                 <View style={styles.bottomSection}>
-                    <View style={styles.tableHeader}>
-                        <Text style={styles.itemCodeCell}>ITEM CODE</Text>
-                        <Text style={styles.descriptionCell}>DESCRIPTION</Text>
-                        <Text style={styles.qtyCell}>QTY</Text>
-                        <Text style={styles.rateCell}>RATE</Text>
-                        <Text style={styles.amountCell}>AMOUNT</Text>
-                    </View>
+                    {showPrice ?
+                        <View style={styles.tableHeader}>
+                            <Text style={styles.itemCodeCell}>ITEM CODE</Text>
+                            <Text style={styles.descriptionCell}>DESCRIPTION</Text>
+                            <Text style={styles.qtyCell}>QTY</Text>
+                            <Text style={styles.rateCell}>RATE</Text>
+                            <Text style={styles.amountCell}>AMOUNT</Text>
+                        </View> :
+                        <View style={styles.tableHeader}>
+                            <Text style={{ ...styles.itemCodeCell, flex: 0.25 }}>ITEM CODE</Text>
+                            <Text style={{ ...styles.descriptionCell, flex: 0.5 }}>DESCRIPTION</Text>
+                            <Text style={{ ...styles.qtyCell, flex: 0.25 }}>QTY</Text>
+                        </View>
+                    }
+
 
                     {/* Table Body */}
                     {data.orderIvtPoList && data.orderIvtPoList.map((item, index) => (
-                        <View key={index} style={styles.tableRowCell}>
-                            <Text style={styles.itemCodeCell}>{item.ivtSubClassCode ?? ""}</Text>
-                            <View style={styles.descriptionItemCell}>
-                                <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
+                        showPrice ?
+                            <View key={index} style={styles.tableRowCell}>
+                                <Text style={styles.itemCodeCell}>{item.ivtSubClassCode ?? ""}</Text>
+                                <View style={styles.descriptionItemCell}>
+                                    <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
+                                </View>
+                                <Text style={styles.qtyItemCell}>{item.orderIvtQty}</Text>
+                                <Text style={styles.rateItemCell}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
+                                <Text style={styles.amountItemCell}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
+                            </View> :
+                            <View key={index} style={styles.tableRowCell}>
+                                <Text style={{ ...styles.itemCodeCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
+                                <View style={{ ...styles.descriptionItemCell, flex: 0.5 }}>
+                                    <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
+                                </View>
+                                <Text style={{ ...styles.qtyItemCell, flex: 0.25 }}>{item.orderIvtQty}</Text>
                             </View>
-                            <Text style={styles.qtyItemCell}>{item.orderIvtQty}</Text>
-                            <Text style={styles.rateItemCell}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
-                            <Text style={styles.amountItemCell}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
-                        </View>
                     ))}
 
-                    {/* Subscript */}
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.subscriptName}>SUBTOTAL</Text>
-                        <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
-                    </View>
+                    {
+                        showPrice ?
+                            <>
+                                {/* Subscript */}
+                                <View style={styles.tableRow}>
+                                    <View style={styles.itemCodeCell}></View>
+                                    <View style={styles.descriptionItemCell}></View>
+                                    <Text style={styles.subscriptName}>SUBTOTAL</Text>
+                                    <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
+                                </View>
 
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.subscriptName}>SHIPPING</Text>
-                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
-                    </View>
+                                <View style={styles.tableRow}>
+                                    <View style={styles.itemCodeCell}></View>
+                                    <View style={styles.descriptionItemCell}></View>
+                                    <Text style={styles.subscriptName}>SHIPPING</Text>
+                                    <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
+                                </View>
 
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
-                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
-                    </View>
+                                <View style={styles.tableRow}>
+                                    <View style={styles.itemCodeCell}></View>
+                                    <View style={styles.descriptionItemCell}></View>
+                                    <Text style={styles.subscriptName}>PREV BALANCE</Text>
+                                    <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                                </View>
 
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.subscriptName}>TOTAL</Text>
-                        <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
-                    </View>
+                                <View style={styles.tableRow}>
+                                    <View style={styles.itemCodeCell}></View>
+                                    <View style={styles.descriptionItemCell}></View>
+                                    <Text style={styles.subscriptName}>TOTAL</Text>
+                                    <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                </View>
 
-                    {/* Total Due */}
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.totalDue}>TOTAL DUE</Text>
-                        <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
-                    </View>
+                                {/* Total Due */}
+                                <View style={styles.tableRow}>
+                                    <View style={styles.itemCodeCell}></View>
+                                    <View style={styles.descriptionItemCell}></View>
+                                    <Text style={styles.totalDue}>TOTAL DUE</Text>
+                                    <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                </View>
+                            </> : <></>
+                    }
+
 
                     <View style={styles.tableRow}>
                         <View style={styles.itemCodeCell}></View>

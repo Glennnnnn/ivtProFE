@@ -57,14 +57,20 @@ const OrderPage = () => {
             setLoading(true);
             const posts = await orderList(searchParams);
             if (posts.code === 200) {
-                setDataSource(posts.data.responsePoList);
-                setSearchParams({
-                    ...searchParams,
-                    pagination: {
-                        ...searchParams.pagination,
-                        total: posts.data.count,
-                    },
-                });
+                if(posts.data.responsePoList.length === 1){
+                    const orderDBId = posts.data.responsePoList[0].orderDBId.toString();
+                    window.location.href = `/orderDetails?orderDBId=${orderDBId}`;
+                }
+                else{
+                    setDataSource(posts.data.responsePoList);
+                    setSearchParams({
+                        ...searchParams,
+                        pagination: {
+                            ...searchParams.pagination,
+                            total: posts.data.count,
+                        },
+                    });
+                }
             } else {
                 messageApi.open({
                     type: "error",
@@ -211,14 +217,14 @@ const OrderPage = () => {
 
     const onChange = (e) => {
         if (e.target.value !== searchName && loading === false) {
-            setSearchParams({
-                ...searchParams,
-                pagination: {
-                    ...searchParams.pagination,
-                    current: 1,
-                },
-                searchName: e.target.value,
-            });
+            // setSearchParams({
+            //     ...searchParams,
+            //     pagination: {
+            //         ...searchParams.pagination,
+            //         current: 1,
+            //     },
+            //     searchName: e.target.value,
+            // });
             setSearchName(e.target.value);
         }
     };
@@ -358,6 +364,7 @@ const OrderPage = () => {
             title: "Order Id",
             dataIndex: "orderId",
             width: "20%",
+            sorter: true,
             key: "orderDBId",
             render: (orderId, record) => {
                 const url = `/orderDetails?orderDBId=${record.orderDBId}`;
@@ -371,6 +378,7 @@ const OrderPage = () => {
         {
             title: "Company Name",
             dataIndex: "orderCompanyName",
+            sorter: true,
             width: "20%",
             render: (customerName, record) => {
                 if (record.customerInterPo === null || record.customerInterPo.customerId === null) {

@@ -51,6 +51,11 @@ const OrderDetailsPage = () => {
         setDeleteVisible(true);
     }
 
+    const [printVisible, setPrintVisible] = useState(false);
+    const showPrintModel = () => {
+        setPrintVisible(true);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -180,6 +185,10 @@ const OrderDetailsPage = () => {
         reverseForm.resetFields();
     }
 
+    const handlePrintCancel = () => {
+        setPrintVisible(false);
+    }
+
     const columns = [
         {
             title: 'Product',
@@ -292,19 +301,9 @@ const OrderDetailsPage = () => {
                             {
                                 recordData.orderStatus === "processing" ? (
                                     <>
-                                        <PDFDownloadLink
-                                            document={<MyDocument data={recordData} />}
-                                            fileName={recordData.orderId + ".pdf"}>
-                                            {({ blob, url, loading, error }) => (
-                                                <Button
-                                                    icon={<DownloadOutlined />}
-                                                    size="large"
-                                                    className="edit-customer-details-button"
-                                                    style={{ backgroundColor: "deepskyblue", color: "white" }}>
-                                                    {loading ? 'Loading...' : 'Print'}
-                                                </Button>
-                                            )}
-                                        </PDFDownloadLink>
+                                        <Button icon={<DownloadOutlined />} size="large" className="edit-customer-details-button" onClick={showPrintModel}
+                                            style={{ backgroundColor: "deepskyblue", color: "white" }}> {loading ? 'Loading...' : 'Print'}
+                                        </Button>
                                         <NavLink to={`/editOrder?orderDBId=${recordData.orderDBId}`}>
                                             <Button icon={<EditOutlined />} size="large" className="edit-customer-details-button"
                                                 style={{ backgroundColor: "orange", color: "white" }}>
@@ -318,19 +317,9 @@ const OrderDetailsPage = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <PDFDownloadLink
-                                            document={<MyDocument data={recordData} />}
-                                            fileName={recordData.orderId + ".pdf"}>
-                                            {({ blob, url, loading, error }) => (
-                                                <Button
-                                                    icon={<DownloadOutlined />}
-                                                    size="large"
-                                                    className="edit-customer-details-button"
-                                                    style={{ backgroundColor: "deepskyblue", color: "white" }}>
-                                                    {loading ? 'Loading...' : 'Print'}
-                                                </Button>
-                                            )}
-                                        </PDFDownloadLink>
+                                        <Button icon={<DownloadOutlined />} size="large" className="edit-customer-details-button" onClick={showPrintModel}
+                                            style={{ backgroundColor: "deepskyblue", color: "white" }}> {loading ? 'Loading...' : 'Print'}
+                                        </Button>
                                         <Button icon={<DeleteOutlined />} size="large" className="edit-customer-details-button" disabled={recordData.orderStatus === "reversed"} onClick={showReverseModel}
                                             style={{ backgroundColor: "red", color: "white", }}> Reverse</Button>
                                     </>
@@ -507,6 +496,45 @@ const OrderDetailsPage = () => {
                                 <Input.TextArea placeholder="Reason" style={{ height: '150px' }} />
                             </Form.Item>
                         </Form>
+                    </Modal>
+
+                    <Modal
+                        title="Do you want to print the price?"
+                        open={printVisible}
+                        maskClosable={false}
+                        onCancel={handlePrintCancel}
+                        width={600}
+                        centered
+                        footer={[
+                            <PDFDownloadLink
+                                key="printYes"
+                                document={<MyDocument data={recordData} showPrice={true} />}
+                                fileName={recordData.orderId + ".pdf"}>
+                                {({ blob, url, loading, error }) => (
+                                    <Button
+                                        size="large"
+                                        className="edit-customer-details-button"
+                                        style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                                        onClick={handlePrintCancel}>
+                                        {loading ? 'Loading...' : 'Yes'}
+                                    </Button>
+                                )}
+                            </PDFDownloadLink>,
+                            <PDFDownloadLink
+                                key="printNo"
+                                document={<MyDocument data={recordData} showPrice={false} />}
+                                fileName={recordData.orderId + ".pdf"}>
+                                {({ blob, url, loading, error }) => (
+                                    <Button
+                                        size="large"
+                                        className="edit-customer-details-button"
+                                        style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                                        onClick={handlePrintCancel}>
+                                        {loading ? 'Loading...' : 'No'}
+                                    </Button>
+                                )}
+                            </PDFDownloadLink>,
+                        ]}>
                     </Modal>
 
                     <Card headStyle={{ height: '5%' }} bodyStyle={{ height: '85%', width: '100%' }}>

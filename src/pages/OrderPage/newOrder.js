@@ -141,6 +141,7 @@ const NewOrderPage = () => {
 
     const [productList, setProductList] = useState([]);
     const [cashSaleOrderId, setCashSaleOrderId] = useState("");
+    const [accountSaleOrderId, setAccountSaleOrderId] = useState("");
 
     const [form] = Form.useForm();
     const [newCustomerForm] = Form.useForm();
@@ -539,8 +540,9 @@ const NewOrderPage = () => {
         const fetchCashSaleOrderId = async () => {
             try {
                 const gets = await queryCashSaleOrderId();
-                //Todo: get response data set to cashSaleOrderId
-                setCashSaleOrderId(gets.data);
+                setCashSaleOrderId(gets.data.cashSale);
+                setAccountSaleOrderId(gets.data.accountSale);
+                setOrderId(gets.data.accountSale);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -679,9 +681,7 @@ const NewOrderPage = () => {
                                         <Col span={6}><span className="item-span">Cash Sale</span></Col>
                                         <Col span={18}>
                                             <Switch value={isCashSale} onChange={(value) => {
-                                                if (value === true) {
-                                                    setOrderId(cashSaleOrderId);
-                                                }
+                                                setOrderId(value ? cashSaleOrderId : accountSaleOrderId)
                                                 setIsCashSale(value);
                                             }} />
                                         </Col>

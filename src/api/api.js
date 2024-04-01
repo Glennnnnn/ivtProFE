@@ -107,12 +107,14 @@ export const searchProductList = async (searchName) => {
 }
 
 export const orderList = async (searchingParams) => {
+    console.log(searchingParams);
     var queryBody = {
         "searchParams": searchingParams.searchName ?? "",
         "pageIndex": searchingParams.pagination.current ?? 1,
         "pageSize": searchingParams.pagination.pageSize ?? 10,
         "orderStatus": searchingParams.filters?.orderStatus ?? [],
-        "order": searchingParams.order ?? "descend"
+        "field": searchingParams.field === undefined ? "orderDate" : searchingParams.order === undefined ? "orderDate" : searchingParams.field,
+        "order": searchingParams.order === undefined ? "desc" : searchingParams.order === "ascend" ? "asc" : "desc"
     }
     const response = await http.post(`/queryOrderData`, queryBody);
     return response.data;
@@ -209,6 +211,6 @@ export const restockList = async (searchingParams) => {
 }
 
 export const queryCashSaleOrderId = async () => {
-    const response = await http.get(`/queryCashSaleOrderId`);
+    const response = await http.get(`/queryAutoGenerateOrderId`);
     return response.data;
 }
