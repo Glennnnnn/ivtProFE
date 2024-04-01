@@ -57,7 +57,7 @@ const OrderPage = () => {
             setLoading(true);
             const posts = await orderList(searchParams);
             if (posts.code === 200) {
-                if(posts.data.responsePoList.length === 1){
+                if(posts.data.count === 1){
                     const orderDBId = posts.data.responsePoList[0].orderDBId.toString();
                     window.location.href = `/orderDetails?orderDBId=${orderDBId}`;
                 }
