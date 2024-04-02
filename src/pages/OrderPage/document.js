@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     subscriptName: {
-        flex: 0.3,
+        flex: 0.7,
         color: '#5F9EA0',
         fontFamily: 'Helvetica-Bold',
         fontSize: 11,
         lineHeight: 1.5,
     },
     subscriptNumber: {
-        flex: 0.15,
+        flex: 0.3,
         color: 'black',
         fontSize: 11,
         lineHeight: 1.5,
@@ -125,69 +125,13 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     tableHeaderCell: {
-        flex: 1,
-        fontSize: 11,
-        textAlign: 'center',
-    },
-    itemCodeCell: {
-        flex: 0.15,
         fontFamily: 'Helvetica-Bold',
         textAlign: 'center',
         fontSize: 11,
         lineHeight: 1.5,
         alignItems: 'center',
     },
-    descriptionCell: {
-        flex: 0.4,
-        fontFamily: 'Helvetica-Bold',
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-    },
-    qtyCell: {
-        flex: 0.15,
-        fontFamily: 'Helvetica-Bold',
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-    },
-    rateCell: {
-        flex: 0.15,
-        fontFamily: 'Helvetica-Bold',
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-    },
-    amountCell: {
-        flex: 0.15,
-        fontFamily: 'Helvetica-Bold',
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-    },
-    descriptionItemCell: {
-        flex: 0.4,
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-        alignItems: 'center',
-    },
-    qtyItemCell: {
-        flex: 0.15,
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-        alignItems: 'center',
-    },
-    rateItemCell: {
-        flex: 0.15,
-        textAlign: 'center',
-        fontSize: 11,
-        lineHeight: 1.5,
-        alignItems: 'center',
-    },
-    amountItemCell: {
-        flex: 0.15,
+    tableItemCell: {
         textAlign: 'center',
         fontSize: 11,
         lineHeight: 1.5,
@@ -206,7 +150,7 @@ const styles = StyleSheet.create({
         borderColor: '#A9A9A9',
     },
     totalDue: {
-        flex: 0.3,
+        flex: 0.7,
         color: '#5F9EA0',
         fontFamily: 'Helvetica-Bold',
         fontSize: 13,
@@ -219,7 +163,7 @@ const styles = StyleSheet.create({
         borderBottom: '2px solid #5F9EA0',
     },
     totalDueNumber: {
-        flex: 0.15,
+        flex: 0.3,
         color: '#5F9EA0',
         fontFamily: 'Helvetica-Bold',
         fontSize: 13,
@@ -233,7 +177,7 @@ const styles = StyleSheet.create({
         borderBottom: '2px solid #5F9EA0',
     },
     thankYou: {
-        flex: 0.15,
+        flex: 0.3,
         color: '#5F9EA0',
         fontFamily: 'Helvetica-Bold',
         fontSize: 13,
@@ -251,6 +195,22 @@ const styles = StyleSheet.create({
         right: 0,
         textAlign: 'center', // Center-align the text
         fontSize: 12, // Set font size to 12
+    },
+    topFooter: {
+        flexDirection: 'row',
+        padding: 40,
+    },
+    leftTopFooter: {
+        flex: 1,
+        textAlign: 'left',
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 14,
+    },
+    rightTopFooter: {
+        flex: 1,
+        textAlign: 'left',
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 14,
     },
 });
 
@@ -373,8 +333,12 @@ const MyDocument = ({ data, showPrice = true }) => (
                         <Text> {renderDate(data.orderDate)} </Text>
                     </View>
                     <View style={styles.middleRow}>
-                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>TRACKING NO.</Text>
+                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>TRACKING NO</Text>
                         <Text> {data.orderId} </Text>
+                    </View>
+                    <View style={styles.middleRow}>
+                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>CUSTOMER ORDER NO</Text>
+                        <Text> {data.customerOrderNo} </Text>
                     </View>
                 </View>
 
@@ -382,16 +346,16 @@ const MyDocument = ({ data, showPrice = true }) => (
                 <View style={styles.bottomSection}>
                     {showPrice ?
                         <View style={styles.tableHeader}>
-                            <Text style={styles.itemCodeCell}>ITEM CODE</Text>
-                            <Text style={styles.descriptionCell}>DESCRIPTION</Text>
-                            <Text style={styles.qtyCell}>QTY</Text>
-                            <Text style={styles.rateCell}>RATE</Text>
-                            <Text style={styles.amountCell}>AMOUNT</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>ITEM CODE</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.4 }}>DESCRIPTION</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>QTY</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>RATE</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>AMOUNT</Text>
                         </View> :
                         <View style={styles.tableHeader}>
-                            <Text style={{ ...styles.itemCodeCell, flex: 0.25 }}>ITEM CODE</Text>
-                            <Text style={{ ...styles.descriptionCell, flex: 0.5 }}>DESCRIPTION</Text>
-                            <Text style={{ ...styles.qtyCell, flex: 0.25 }}>QTY</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.25 }}>ITEM CODE</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.5 }}>DESCRIPTION</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.25 }}>QTY</Text>
                         </View>
                     }
 
@@ -400,78 +364,104 @@ const MyDocument = ({ data, showPrice = true }) => (
                     {data.orderIvtPoList && data.orderIvtPoList.map((item, index) => (
                         showPrice ?
                             <View key={index} style={styles.tableRowCell}>
-                                <Text style={styles.itemCodeCell}>{item.ivtSubClassCode ?? ""}</Text>
-                                <View style={styles.descriptionItemCell}>
+                                <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>{item.ivtSubClassCode ?? ""}</Text>
+                                <View style={{ ...styles.tableItemCell, flex: 0.4 }}>
                                     <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
                                 </View>
-                                <Text style={styles.qtyItemCell}>{item.orderIvtQty}</Text>
-                                <Text style={styles.rateItemCell}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
-                                <Text style={styles.amountItemCell}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{item.orderIvtQty}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
                             </View> :
                             <View key={index} style={styles.tableRowCell}>
-                                <Text style={{ ...styles.itemCodeCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <View style={{ ...styles.descriptionItemCell, flex: 0.5 }}>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
+                                <View style={{ ...styles.tableItemCell, flex: 0.5 }}>
                                     <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
                                 </View>
-                                <Text style={{ ...styles.qtyItemCell, flex: 0.25 }}>{item.orderIvtQty}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.orderIvtQty}</Text>
                             </View>
                     ))}
 
                     {
                         showPrice ?
-                            <>
-                                {/* Subscript */}
-                                <View style={styles.tableRow}>
-                                    <View style={styles.itemCodeCell}></View>
-                                    <View style={styles.descriptionItemCell}></View>
-                                    <Text style={styles.subscriptName}>SUBTOTAL</Text>
-                                    <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <View style={{ flex: 0.5 }}>
+                                    <View style={{ ...styles.middleRow, padding: 5 }}>
+                                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>Note</Text>
+                                        <Text> {data.orderNote} </Text>
+                                    </View>
                                 </View>
 
-                                <View style={styles.tableRow}>
-                                    <View style={styles.itemCodeCell}></View>
-                                    <View style={styles.descriptionItemCell}></View>
-                                    <Text style={styles.subscriptName}>SHIPPING</Text>
-                                    <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
+                                <View style={{ flex: 0.5 }}>
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>SUBTOTAL</Text>
+                                        <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>SHIPPING</Text>
+                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
+                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>TOTAL</Text>
+                                        <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.totalDue}>TOTAL DUE</Text>
+                                        <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}></Text>
+                                        <Text style={styles.thankYou}>Thank you.</Text>
+                                    </View>
+                                </View>
+                            </View> :
+                            <View style={{ flexDirection: 'row' }}>
+                                <View style={{ flex: 0.5 }}>
+                                    <View style={{ ...styles.middleRow, padding: 5 }}>
+                                        <Text style={{ fontFamily: 'Helvetica-Bold' }}>Note</Text>
+                                        <Text> {data.orderNote} </Text>
+                                    </View>
                                 </View>
 
-                                <View style={styles.tableRow}>
-                                    <View style={styles.itemCodeCell}></View>
-                                    <View style={styles.descriptionItemCell}></View>
-                                    <Text style={styles.subscriptName}>PREV BALANCE</Text>
-                                    <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                                <View style={{ flex: 0.5 }}>
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}></Text>
+                                        <Text style={styles.thankYou}>Thank you.</Text>
+                                    </View>
                                 </View>
-
-                                <View style={styles.tableRow}>
-                                    <View style={styles.itemCodeCell}></View>
-                                    <View style={styles.descriptionItemCell}></View>
-                                    <Text style={styles.subscriptName}>TOTAL</Text>
-                                    <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
-                                </View>
-
-                                {/* Total Due */}
-                                <View style={styles.tableRow}>
-                                    <View style={styles.itemCodeCell}></View>
-                                    <View style={styles.descriptionItemCell}></View>
-                                    <Text style={styles.totalDue}>TOTAL DUE</Text>
-                                    <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
-                                </View>
-                            </> : <></>
+                            </View>
                     }
-
-
-                    <View style={styles.tableRow}>
-                        <View style={styles.itemCodeCell}></View>
-                        <View style={styles.descriptionItemCell}></View>
-                        <Text style={styles.subscriptName}></Text>
-                        <Text style={styles.thankYou}>Thank you.</Text>
-                    </View>
                 </View>
             </View>
             {/* Footer Section */}
             {data.isCashSale ?
-                <View style={styles.footer}></View> :
                 <View style={styles.footer}>
+                    <View style={styles.topFooter}>
+                        <View style={styles.leftTopFooter}>
+                            <Text>Sign:</Text>
+                        </View>
+                        <View style={styles.rightTopFooter}>
+                            <Text>Prepare by:</Text>
+                        </View>
+                    </View>
+                </View> :
+                <View style={styles.footer}>
+                    <View style={styles.topFooter}>
+                        <View style={styles.leftTopFooter}>
+                            <Text>Sign:</Text>
+                        </View>
+                        <View style={styles.rightTopFooter}>
+                            <Text>Prepare by:</Text>
+                        </View>
+                    </View>
                     <Text>Thanks for your payment via EFT to: </Text>
                     <Text>Pioneer Aluminium Pty Ltd </Text>
                     <Text>BSB: 063 779   Account No: 1032 0767 </Text>

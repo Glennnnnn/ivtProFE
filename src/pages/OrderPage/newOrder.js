@@ -491,6 +491,10 @@ const NewOrderPage = () => {
                         if (e.key === "2") {
                             navigate(-1);
                         }
+                        if(e.key === "3"){
+                            const orderDBId = posts.data.toString();
+                            window.location.href = `/orderDetails?orderDBId=${orderDBId}`;
+                        }
                         else {
                             window.location.reload();
                         }
@@ -589,6 +593,10 @@ const NewOrderPage = () => {
         {
             key: '1',
             label: 'Save and New',
+        },
+        {
+            key: '3',
+            label: 'Save and Open',
         },
         {
             key: '2',
