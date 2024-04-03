@@ -137,7 +137,8 @@ export const ordersDataByCustomerId = async (searchingParams, customerId) => {
         "pageIndex": searchingParams.pagination.current ?? 1,
         "pageSize": searchingParams.pagination.pageSize ?? 10,
         "orderStatus": searchingParams.filters?.orderStatus ?? [],
-        "order": searchingParams.order ?? "",
+        "field": "orderDate",
+        "order": "desc",
         "customerId": customerId
     }
     const response = await http.post(`/queryOrderData`, queryBody);
