@@ -34,6 +34,7 @@ const OrderDetailsPage = () => {
     const [shippingFee, setShippingFee] = useState(0.00);
     const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
+    const [tax, setTax] = useState("");
 
     const [recordData, setRecordData] = useState({});
     const [completeVisible, setCompleteVisible] = useState(false);
@@ -72,6 +73,7 @@ const OrderDetailsPage = () => {
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
                     setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
                     setAllTotal(parseFloat(posts.data.totalPrice));
+                    setTax(posts.data.orderTaxType === "" || posts.data.orderTaxType === null ? "No Tax" : posts.data.orderTaxType);
                 }
                 else {
                     messageApi.open({
@@ -270,6 +272,30 @@ const OrderDetailsPage = () => {
             </span>
         );
     };
+
+    const renderTax = () => {
+        if(tax === "Include"){
+            return (allTotal / 11).toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 0.1).toFixed(2);
+        }
+        else{
+            return 0.00.toFixed(2);
+        }
+    }
+
+    const renderTotal = () => {
+        if(tax === "Include"){
+            return allTotal.toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 1.1).toFixed(2);
+        }
+        else{
+            return allTotal.toFixed(2);
+        }
+    }
 
     return (
         <div className="ivt-layout">
@@ -555,8 +581,12 @@ const OrderDetailsPage = () => {
                             <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{prevBalance.toFixed(2)}</span></Col>
 
+                            <Col span={6} offset={12}><span className="item-span">GST</span></Col>
+                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{tax}</span></Col>
+                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+
                             <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
-                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTotal()}</span></Col>
                         </Row>
                     </Card>
                 </Content>

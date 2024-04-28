@@ -133,6 +133,11 @@ const EditOrderPage = () => {
     const [shippingFee, setShippingFee] = useState(0.00);
     const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
+    const [tax, setTax] = useState("");
+
+    const taxList = [
+        "Include", "Exclude", "No Tax"
+    ]
 
     const [form] = Form.useForm();
     const [customerForm] = Form.useForm();
@@ -262,6 +267,7 @@ const EditOrderPage = () => {
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
                     setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
                     setAllTotal(parseFloat(posts.data.totalPrice));
+                    setTax(posts.data.orderTaxType === "" || posts.data.orderTaxType === null ? "No Tax" : posts.data.orderTaxType);
 
                     let dataList = [];
                     posts.data.orderIvtPoList.forEach((item, index) => {
@@ -443,6 +449,34 @@ const EditOrderPage = () => {
         setAllTotal(parseFloat(subTotal) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
     }
 
+    const handleTaxChange = (value) => {
+        setTax(value);
+    }
+
+    const renderTax = () => {
+        if(tax === "Include"){
+            return (allTotal / 11).toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 0.1).toFixed(2);
+        }
+        else{
+            return 0.00.toFixed(2);
+        }
+    }
+
+    const renderTotal = () => {
+        if(tax === "Include"){
+            return allTotal.toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 1.1).toFixed(2);
+        }
+        else{
+            return allTotal.toFixed(2);
+        }
+    }
+
     const validateSave = () => {
         let isValid = true;
         let reason = "";
@@ -491,6 +525,7 @@ const EditOrderPage = () => {
                     "orderShippingFee": shippingFee,
                     "orderPreBalance": prevBalance,
                     "isCashSale": isCashSale,
+                    "orderTaxType": tax,
                     //Customer
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
                     "orderCustomerName": newCustomerDetails.customerName ?? "",
@@ -729,8 +764,26 @@ const EditOrderPage = () => {
                                 />
                             </Col>
 
+                            <Col span={6} offset={12}><span className="item-span">GST</span></Col>
+                            <Col span={3}>
+                                <Select
+                                    onChange={handleTaxChange}
+                                    placeholder="tax"
+                                    optionLabelProp="label"
+                                    defaultActiveFirstOption={false}
+                                    filterOption={false}
+                                    defaultValue={tax}
+                                    value={tax}
+                                    style={{ width: '100%' }}>
+                                    {taxList.map((tax) => (
+                                        <Option key={tax} value={tax} label={tax} />
+                                    ))}
+                                </Select>
+                            </Col>
+                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+
                             <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
-                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTotal()}</span></Col>
                         </Row>
                     </Card>
                 </Content>

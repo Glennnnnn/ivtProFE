@@ -258,6 +258,36 @@ const renderCompanyandCustomerName = (data) => {
     );
 };
 
+const renderTaxTitle = (data) => {
+    if(data.orderTaxType === "" || data.orderTaxType === null){
+        return "GST (No Tax)";
+    }else{
+        return "GST (" + data.orderTaxType + ")";
+    }
+}
+
+const renderTaxNumber = (data) => {
+    if (data.orderTaxType === "Include"){
+        return (parseFloat(data.totalPrice) / 11).toFixed(2);
+    }
+    else if(data.orderTaxType === "Exclude"){
+        return (parseFloat(data.totalPrice) * 0.1).toFixed(2);
+    }
+    else{
+        return 0.00.toFixed(2);
+    }
+}
+
+const renderTotalNumber = (data) => {
+    if(data.orderTaxType === "Exclude"){
+        return (parseFloat(data.totalPrice) * 1.1).toFixed(2);
+    }
+    else{
+        return parseFloat(data.totalPrice).toFixed(2);
+    }
+}
+
+
 // Create Document Component
 const MyDocument = ({ data, showPrice = true }) => (
     <Document>
@@ -306,7 +336,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                                 </View>
                                 <View style={styles.darkBackground}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>PLEASE PAY</Text>
-                                    <Text>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                    <Text>AUD {renderTotalNumber(data)}</Text>
                                 </View>
                                 <View style={styles.lightBackground}>
                                     <Text>DUE DATE</Text>
@@ -408,13 +438,18 @@ const MyDocument = ({ data, showPrice = true }) => (
                                     </View>
 
                                     <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>{renderTaxTitle(data)}</Text>
+                                        <Text style={styles.subscriptNumber}>{renderTaxNumber(data)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
                                         <Text style={styles.subscriptName}>TOTAL</Text>
-                                        <Text style={styles.subscriptNumber}>{parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                        <Text style={styles.subscriptNumber}>{renderTotalNumber(data)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>
                                         <Text style={styles.totalDue}>TOTAL DUE</Text>
-                                        <Text style={styles.totalDueNumber}>AUD {parseFloat(data.totalPrice).toFixed(2)}</Text>
+                                        <Text style={styles.totalDueNumber}>AUD {renderTotalNumber(data)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>

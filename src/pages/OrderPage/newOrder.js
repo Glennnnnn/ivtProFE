@@ -142,6 +142,11 @@ const NewOrderPage = () => {
     const [productList, setProductList] = useState([]);
     const [cashSaleOrderId, setCashSaleOrderId] = useState("");
     const [accountSaleOrderId, setAccountSaleOrderId] = useState("");
+    const [tax, setTax] = useState("Include");
+
+    const taxList = [
+        "Include", "Exclude", "No Tax"
+    ]
 
     const [form] = Form.useForm();
     const [newCustomerForm] = Form.useForm();
@@ -375,6 +380,34 @@ const NewOrderPage = () => {
     const handleRefreshCustomer = () => {
         fetchCustomerDetail(selectedCustomer);
     }
+    
+    const handleTaxChange = (value) => {
+        setTax(value);
+    }
+
+    const renderTax = () => {
+        if(tax === "Include"){
+            return (allTotal / 11).toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 0.1).toFixed(2);
+        }
+        else{
+            return 0.00.toFixed(2);
+        }
+    }
+
+    const renderTotal = () => {
+        if(tax === "Include"){
+            return allTotal.toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return (allTotal * 1.1).toFixed(2);
+        }
+        else{
+            return allTotal.toFixed(2);
+        }
+    }
 
     const onCancelClick = () => {
         navigate(-1);
@@ -479,6 +512,7 @@ const NewOrderPage = () => {
                         "isSaveCustomer": newCustomerDetails.isSaveCustomer ?? false,
                     },
                     "productList": data,
+                    "orderTaxType": tax,
                 };
 
                 const posts = await addOrder(queryBody);
@@ -491,7 +525,7 @@ const NewOrderPage = () => {
                         if (e.key === "2") {
                             navigate(-1);
                         }
-                        if(e.key === "3"){
+                        if (e.key === "3") {
                             const orderDBId = posts.data.toString();
                             window.location.href = `/orderDetails?orderDBId=${orderDBId}`;
                         }
@@ -866,8 +900,25 @@ const NewOrderPage = () => {
                                 />
                             </Col>
 
+                            <Col span={6} offset={12}><span className="item-span">GST</span></Col>
+                            <Col span={3}>
+                                <Select
+                                    onChange={handleTaxChange}
+                                    placeholder="tax"
+                                    optionLabelProp="label"
+                                    defaultActiveFirstOption={false}
+                                    filterOption={false}
+                                    defaultValue={tax}
+                                    style={{ width: '100%' }}>
+                                    {taxList.map((tax) => (
+                                        <Option key={tax} value={tax} label={tax} />
+                                    ))}
+                                </Select>
+                            </Col>
+                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+
                             <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
-                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{allTotal.toFixed(2)}</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTotal()}</span></Col>
                         </Row>
                     </Card>
                 </Content>
