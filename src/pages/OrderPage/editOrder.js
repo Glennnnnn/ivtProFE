@@ -455,13 +455,25 @@ const EditOrderPage = () => {
 
     const renderTax = () => {
         if(tax === "Include"){
-            return (allTotal / 11).toFixed(2);
+            return ((allTotal - prevBalance) / 11).toFixed(2);
         }
         else if(tax === "Exclude"){
-            return (allTotal * 0.1).toFixed(2);
+            return ((allTotal - prevBalance) * 0.1).toFixed(2);
         }
         else{
             return 0.00.toFixed(2);
+        }
+    }
+
+    const renderOrderTotal = () => {
+        if(tax === "Include"){
+            return ((allTotal - prevBalance)).toFixed(2);
+        }
+        else if(tax === "Exclude"){
+            return ((allTotal - prevBalance) * 1.1).toFixed(2);
+        }
+        else{
+            return (allTotal - prevBalance).toFixed(2);
         }
     }
 
@@ -470,7 +482,7 @@ const EditOrderPage = () => {
             return allTotal.toFixed(2);
         }
         else if(tax === "Exclude"){
-            return (allTotal * 1.1).toFixed(2);
+            return (parseFloat((allTotal - prevBalance) * 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
         else{
             return allTotal.toFixed(2);
@@ -754,16 +766,6 @@ const EditOrderPage = () => {
                                 />
                             </Col>
 
-                            <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
-                            <Col span={6}>
-                                <Input
-                                    placeholder="0"
-                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
-                                    value={prevBalance}
-                                    onChange={(e) => { setPrevBalance(e.target.value); }}
-                                />
-                            </Col>
-
                             <Col span={6} offset={12}><span className="item-span">GST</span></Col>
                             <Col span={3}>
                                 <Select
@@ -782,7 +784,20 @@ const EditOrderPage = () => {
                             </Col>
                             <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
 
-                            <Col span={6} offset={12}><span className="item-span">TOTAL</span></Col>
+                            <Col span={6} offset={12}><span className="item-span">ORDER TOTAL</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderOrderTotal()}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">PREVIOUS BALANCE</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
+                                    value={prevBalance}
+                                    onChange={(e) => { setPrevBalance(e.target.value); }}
+                                />
+                            </Col>
+
+                            <Col span={6} offset={12}><span className="item-span">ALL TOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTotal()}</span></Col>
                         </Row>
                     </Card>

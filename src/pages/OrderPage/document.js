@@ -259,28 +259,41 @@ const renderCompanyandCustomerName = (data) => {
 };
 
 const renderTaxTitle = (data) => {
-    if(data.orderTaxType === "" || data.orderTaxType === null){
+    if(data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax"){
         return "GST (No Tax)";
-    }else{
-        return "GST (" + data.orderTaxType + ")";
+    }
+    else{
+        return "GST (" + data.orderTaxType + " 10%)";
     }
 }
 
 const renderTaxNumber = (data) => {
     if (data.orderTaxType === "Include"){
-        return (parseFloat(data.totalPrice) / 11).toFixed(2);
+        return (parseFloat(data.totalPrice - data.orderPreBalance) / 11).toFixed(2);
     }
     else if(data.orderTaxType === "Exclude"){
-        return (parseFloat(data.totalPrice) * 0.1).toFixed(2);
+        return (parseFloat(data.totalPrice - data.orderPreBalance) * 0.1).toFixed(2);
     }
     else{
         return 0.00.toFixed(2);
     }
 }
 
+const renderOrderTotalNumber = (data) => {
+    if(data.orderTaxType === "Include"){
+        return ((data.totalPrice - data.orderPreBalance)).toFixed(2);
+    }
+    else if(data.orderTaxType === "Exclude"){
+        return ((data.totalPrice - data.orderPreBalance) * 1.1).toFixed(2);
+    }
+    else{
+        return (data.totalPrice - data.orderPreBalance).toFixed(2);
+    }
+}
+
 const renderTotalNumber = (data) => {
     if(data.orderTaxType === "Exclude"){
-        return (parseFloat(data.totalPrice) * 1.1).toFixed(2);
+        return (parseFloat((data.totalPrice - data.orderPreBalance) * 1.1) + parseFloat(data.orderPreBalance)).toFixed(2);
     }
     else{
         return parseFloat(data.totalPrice).toFixed(2);
@@ -433,22 +446,27 @@ const MyDocument = ({ data, showPrice = true }) => (
                                     </View>
 
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
-                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
-                                    </View>
-
-                                    <View style={styles.tableRow}>
                                         <Text style={styles.subscriptName}>{renderTaxTitle(data)}</Text>
                                         <Text style={styles.subscriptNumber}>{renderTaxNumber(data)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>TOTAL</Text>
+                                        <Text style={styles.subscriptName}>ORDER TOTAL</Text>
+                                        <Text style={styles.subscriptNumber}>{renderOrderTotalNumber(data)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
+                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.subscriptName}>ALL TOTAL</Text>
                                         <Text style={styles.subscriptNumber}>{renderTotalNumber(data)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.totalDue}>TOTAL DUE</Text>
+                                        <Text style={styles.totalDue}>ALL TOTAL DUE</Text>
                                         <Text style={styles.totalDueNumber}>AUD {renderTotalNumber(data)}</Text>
                                     </View>
 
