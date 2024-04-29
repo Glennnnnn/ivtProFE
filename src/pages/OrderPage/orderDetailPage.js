@@ -274,37 +274,37 @@ const OrderDetailsPage = () => {
     };
 
     const renderTax = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return ((allTotal - prevBalance) / 11).toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return ((allTotal - prevBalance) * 0.1).toFixed(2);
         }
-        else{
+        else {
             return 0.00.toFixed(2);
         }
     }
 
     const renderOrderTotal = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return ((allTotal - prevBalance)).toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return ((allTotal - prevBalance) * 1.1).toFixed(2);
         }
-        else{
+        else {
             return (allTotal - prevBalance).toFixed(2);
         }
     }
 
     const renderTotal = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return allTotal.toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return (parseFloat((allTotal - prevBalance) * 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
-        else{
+        else {
             return allTotal.toFixed(2);
         }
     }
@@ -590,9 +590,15 @@ const OrderDetailsPage = () => {
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{shippingFee.toFixed(2)}</span></Col>
 
-                            <Col span={6} offset={12}><span className="item-span">GST</span></Col>
-                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{tax}</span></Col>
-                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+                            {
+                                recordData.isCashSale === true ?
+                                    <></> :
+                                    <>
+                                        <Col span={6} offset={12}><span className="item-span">GST</span></Col>
+                                        <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{tax}</span></Col>
+                                        <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+                                    </>
+                            }
 
                             <Col span={6} offset={12}><span className="item-span">ORDER TOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderOrderTotal()}</span></Col>

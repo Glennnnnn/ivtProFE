@@ -259,43 +259,43 @@ const renderCompanyandCustomerName = (data) => {
 };
 
 const renderTaxTitle = (data) => {
-    if(data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax"){
+    if (data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax") {
         return "GST (No Tax)";
     }
-    else{
+    else {
         return "GST (" + data.orderTaxType + " 10%)";
     }
 }
 
 const renderTaxNumber = (data) => {
-    if (data.orderTaxType === "Include"){
+    if (data.orderTaxType === "Include") {
         return (parseFloat(data.totalPrice - data.orderPreBalance) / 11).toFixed(2);
     }
-    else if(data.orderTaxType === "Exclude"){
+    else if (data.orderTaxType === "Exclude") {
         return (parseFloat(data.totalPrice - data.orderPreBalance) * 0.1).toFixed(2);
     }
-    else{
+    else {
         return 0.00.toFixed(2);
     }
 }
 
 const renderOrderTotalNumber = (data) => {
-    if(data.orderTaxType === "Include"){
+    if (data.orderTaxType === "Include") {
         return ((data.totalPrice - data.orderPreBalance)).toFixed(2);
     }
-    else if(data.orderTaxType === "Exclude"){
+    else if (data.orderTaxType === "Exclude") {
         return ((data.totalPrice - data.orderPreBalance) * 1.1).toFixed(2);
     }
-    else{
+    else {
         return (data.totalPrice - data.orderPreBalance).toFixed(2);
     }
 }
 
 const renderTotalNumber = (data) => {
-    if(data.orderTaxType === "Exclude"){
+    if (data.orderTaxType === "Exclude") {
         return (parseFloat((data.totalPrice - data.orderPreBalance) * 1.1) + parseFloat(data.orderPreBalance)).toFixed(2);
     }
-    else{
+    else {
         return parseFloat(data.totalPrice).toFixed(2);
     }
 }
@@ -445,10 +445,13 @@ const MyDocument = ({ data, showPrice = true }) => (
                                         <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
                                     </View>
 
-                                    <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>{renderTaxTitle(data)}</Text>
-                                        <Text style={styles.subscriptNumber}>{renderTaxNumber(data)}</Text>
-                                    </View>
+                                    {data.isCashSale || data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax" ?
+                                        <></> :
+                                        <View style={styles.tableRow}>
+                                            <Text style={styles.subscriptName}>{renderTaxTitle(data)}</Text>
+                                            <Text style={styles.subscriptNumber}>{renderTaxNumber(data)}</Text>
+                                        </View>
+                                    }
 
                                     <View style={styles.tableRow}>
                                         <Text style={styles.subscriptName}>ORDER TOTAL</Text>

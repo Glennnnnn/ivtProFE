@@ -454,37 +454,37 @@ const EditOrderPage = () => {
     }
 
     const renderTax = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return ((allTotal - prevBalance) / 11).toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return ((allTotal - prevBalance) * 0.1).toFixed(2);
         }
-        else{
+        else {
             return 0.00.toFixed(2);
         }
     }
 
     const renderOrderTotal = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return ((allTotal - prevBalance)).toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return ((allTotal - prevBalance) * 1.1).toFixed(2);
         }
-        else{
+        else {
             return (allTotal - prevBalance).toFixed(2);
         }
     }
 
     const renderTotal = () => {
-        if(tax === "Include"){
+        if (tax === "Include") {
             return allTotal.toFixed(2);
         }
-        else if(tax === "Exclude"){
+        else if (tax === "Exclude") {
             return (parseFloat((allTotal - prevBalance) * 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
-        else{
+        else {
             return allTotal.toFixed(2);
         }
     }
@@ -676,7 +676,12 @@ const EditOrderPage = () => {
 
                                         <Col span={6}><span className="item-span">Cash Sale</span></Col>
                                         <Col span={18}>
-                                            <Switch value={isCashSale} onChange={(value) => { setIsCashSale(value) }} />
+                                            <Switch value={isCashSale} onChange={(value) => {
+                                                setIsCashSale(value);
+                                                if (value) {
+                                                    setTax("No Tax");
+                                                }
+                                            }} />
                                         </Col>
 
                                         <Col span={6}><span className="item-span">Order Note</span></Col>
@@ -766,23 +771,28 @@ const EditOrderPage = () => {
                                 />
                             </Col>
 
-                            <Col span={6} offset={12}><span className="item-span">GST</span></Col>
-                            <Col span={3}>
-                                <Select
-                                    onChange={handleTaxChange}
-                                    placeholder="tax"
-                                    optionLabelProp="label"
-                                    defaultActiveFirstOption={false}
-                                    filterOption={false}
-                                    defaultValue={tax}
-                                    value={tax}
-                                    style={{ width: '100%' }}>
-                                    {taxList.map((tax) => (
-                                        <Option key={tax} value={tax} label={tax} />
-                                    ))}
-                                </Select>
-                            </Col>
-                            <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+                            {isCashSale ?
+                                <></> :
+                                <>
+                                    <Col span={6} offset={12}><span className="item-span">GST</span></Col>
+                                    <Col span={3}>
+                                        <Select
+                                            onChange={handleTaxChange}
+                                            placeholder="tax"
+                                            optionLabelProp="label"
+                                            defaultActiveFirstOption={false}
+                                            filterOption={false}
+                                            defaultValue={tax}
+                                            value={tax}
+                                            style={{ width: '100%' }}>
+                                            {taxList.map((tax) => (
+                                                <Option key={tax} value={tax} label={tax} />
+                                            ))}
+                                        </Select>
+                                    </Col>
+                                    <Col span={3}><span className="item-span" style={{ paddingRight: "8px" }}>{renderTax()}</span></Col>
+                                </>
+                            }
 
                             <Col span={6} offset={12}><span className="item-span">ORDER TOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{renderOrderTotal()}</span></Col>
