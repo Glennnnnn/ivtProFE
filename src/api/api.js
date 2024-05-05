@@ -215,3 +215,11 @@ export const queryCashSaleOrderId = async () => {
     const response = await http.get(`/queryAutoGenerateOrderId`);
     return response.data;
 }
+
+export const queryOrderDataByIdList = async (orderDBIdList) => {
+    var queryBody = {
+        "orderDBIdList": orderDBIdList,
+    }
+    const response = await http.post(`/queryOrderDataByIdList`, queryBody);
+    return response.data;
+}

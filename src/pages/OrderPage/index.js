@@ -15,12 +15,13 @@ import {
     Input,
     Popconfirm
 } from 'antd'
-import { PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, CheckOutlined, DownloadOutlined } from '@ant-design/icons'
 import StatisticCard from "@/components/StatisticCard/StatisticCard";
 import { Link, NavLink } from 'react-router-dom';
-import { orderList, getOrderSummary, editOrderStatusByIds, deleteOrderByIds } from "../../api/api.js";
+import { orderList, getOrderSummary, editOrderStatusByIds, deleteOrderByIds, queryOrderDataByIdList } from "../../api/api.js";
 import moment from "moment";
 import dayjs from 'dayjs';
+import { saveAs } from 'file-saver';
 
 
 const OrderPage = () => {
@@ -57,11 +58,11 @@ const OrderPage = () => {
             setLoading(true);
             const posts = await orderList(searchParams);
             if (posts.code === 200) {
-                if(posts.data.count === 1){
+                if (posts.data.count === 1) {
                     const orderDBId = posts.data.responsePoList[0].orderDBId.toString();
                     window.location.href = `/orderDetails?orderDBId=${orderDBId}`;
                 }
-                else{
+                else {
                     setDataSource(posts.data.responsePoList);
                     setSearchParams({
                         ...searchParams,
@@ -184,6 +185,77 @@ const OrderPage = () => {
         }
     }
 
+    const handleExportCSV = async () => {
+        try {
+            setBulkLoading(true);
+            const filteredList = [];
+            for (const item of dataSource) {
+                const checkId = selectedRowKeys.some(bigNumber => bigNumber.toString() === item.orderDBId.toString());
+                if (checkId) {
+                    filteredList.push(item.orderDBId.toString());
+                }
+            }
+
+            const posts = await queryOrderDataByIdList(filteredList);
+            if (posts.code === 200) {
+                const csvData = generateCSV(posts.data);
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+                saveAs(blob, 'data.csv');
+            }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Export CSV Error!",
+            });
+        } finally {
+            setBulkLoading(false);
+        }
+    }
+
+    function generateCSV(data) {
+        let csv = `*InvoiceNo,*Customer,*InvoiceDate,*DueDate,Terms,Location,Memo,*Item(Product/Service),ItemDescription, ItemQuantity,ItemRate,*ItemAmount,Item Tax Amount,*Item Tax Code,Currency\n`;
+        data.forEach(item => {
+            item.orderIvtPoList.forEach((eachItem, index) => {
+                if (index === 0) {
+                    csv += `${item.orderId},${item.orderCompanyName},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${eachItem.ivtCatName}:${eachItem.ivtSubClassCode},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                }
+                else {
+                    csv += `${item.orderId},,,,,,,${eachItem.ivtCatName}:${eachItem.ivtSubClassCode},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                }
+            })
+        })
+        return csv;
+    }
+
+    function renderDueDate(data) {
+        const originalDate = moment(data.orderDate);
+
+        if (data.customerInterPo === null || "immediately" === data.customerInterPo?.creditTerm || data.customerInterPo === undefined) {
+            return originalDate.format('DD/MM/YYYY');
+        } else if (data.customerInterPo.creditTerm.includes("30")) {
+            return originalDate.add(30, 'day').format('DD/MM/YYYY');
+        } else if (data.customerInterPo.creditTerm.includes("60")) {
+            return originalDate.add(30, 'day').format('DD/MM/YYYY');
+        } else {
+            return originalDate.format('DD/MM/YYYY');
+        }
+    }
+
+    function renderTags(tags) {
+        if (!tags || tags.length === 0) {
+            return "";
+        }
+
+        return tags.map(tag => {
+            if (tag !== null) {
+                return `${tag.tagName}: ${tag.tagValue}`;
+            } else {
+                return "";
+            }
+        }).join(" ");
+    }
 
     useEffect(() => {
         fetchDataAndUpdateState();
@@ -481,7 +553,7 @@ const OrderPage = () => {
                             bodyStyle={{ height: "85%", width: "100%" }}
                         >
                             <Row justify={"end"}>
-                                <Col span={8}>
+                                <Col span={12}>
                                     <Popconfirm title="Are you sure you want to complete selected order?"
                                         onConfirm={handleComplete}
                                         okText="Yes"
@@ -500,8 +572,17 @@ const OrderPage = () => {
                                             Delete Selected
                                         </Button>
                                     </Popconfirm>
+                                    <Popconfirm title="Are you sure you want to export selected order?"
+                                        onConfirm={handleExportCSV}
+                                        okText="Yes"
+                                        cancelText="No">
+                                        <Button type="primary" className="new-customer-button" icon={<DownloadOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                                            style={{ backgroundColor: hasSelected ? "deepskyblue" : "", color: hasSelected ? "white" : "" }}>
+                                            Export CSV
+                                        </Button>
+                                    </Popconfirm>
                                 </Col>
-                                <Col span={11}>
+                                <Col span={7}>
 
                                 </Col>
                                 <Col span={5}>
