@@ -192,7 +192,15 @@ const OrderPage = () => {
             for (const item of dataSource) {
                 const checkId = selectedRowKeys.some(bigNumber => bigNumber.toString() === item.orderDBId.toString());
                 if (checkId) {
-                    filteredList.push(item.orderDBId.toString());
+                    if (item.isCashSale) {
+                        messageApi.open({
+                            type: "error",
+                            content: "Cash Sale cannot be exported!",
+                        });
+                        return; // Stop the execution of the function
+                    } else {
+                        filteredList.push(item.orderDBId.toString());
+                    }
                 }
             }
 
