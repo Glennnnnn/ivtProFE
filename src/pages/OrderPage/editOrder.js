@@ -278,7 +278,7 @@ const EditOrderPage = () => {
                             qty: item.orderIvtQty,
                             price: item.orderIvtPrice,
                             total: item.orderIvtTotal,
-                            key: item.ivtId.toString(),
+                            key: item.ivtId.toString() + index.toString(),
                             label: item.ivtClassName.toString() + " " + item.tags.map((tag) => {
                                 if (tag === null) {
                                     return ''
