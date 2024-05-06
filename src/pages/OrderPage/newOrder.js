@@ -142,7 +142,7 @@ const NewOrderPage = () => {
     const [productList, setProductList] = useState([]);
     const [cashSaleOrderId, setCashSaleOrderId] = useState("");
     const [accountSaleOrderId, setAccountSaleOrderId] = useState("");
-    const [tax, setTax] = useState("Include");
+    const [tax, setTax] = useState("Exclude");
 
     const taxList = [
         "Include", "Exclude", "No Tax"

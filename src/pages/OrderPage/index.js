@@ -227,14 +227,23 @@ const OrderPage = () => {
         data.forEach(item => {
             item.orderIvtPoList.forEach((eachItem, index) => {
                 if (index === 0) {
-                    csv += `${item.orderId},${item.orderCompanyName},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${eachItem.ivtCatName}:${eachItem.ivtSubClassCode},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${renderItem(eachItem)},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
                 else {
-                    csv += `${item.orderId},,,,,,,${eachItem.ivtCatName}:${eachItem.ivtSubClassCode},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem)},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
             })
         })
         return csv;
+    }
+
+    function renderItem(eachItem){
+        if(eachItem.ivtCatName === null || eachItem.ivtCatName === '' || eachItem.ivtCatName === undefined){
+            return eachItem.ivtSubClassCode;
+        }
+        else{
+            return eachItem.ivtCatName + ":" + eachItem.ivtSubClassCode;
+        }
     }
 
     function renderDueDate(data) {
