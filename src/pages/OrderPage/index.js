@@ -227,10 +227,10 @@ const OrderPage = () => {
         data.forEach(item => {
             item.orderIvtPoList.forEach((eachItem, index) => {
                 if (index === 0) {
-                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${renderItem(eachItem)},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${renderItem(eachItem)},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
                 else {
-                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem)},${eachItem.ivtClassName} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem)},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
             })
         })
@@ -267,7 +267,7 @@ const OrderPage = () => {
 
         return tags.map(tag => {
             if (tag !== null) {
-                return `${tag.tagName}: ${tag.tagValue}`;
+                return `${tag.tagName}: ${tag.tagValue.replace(',', ' ')}`;
             } else {
                 return "";
             }
