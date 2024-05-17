@@ -232,7 +232,10 @@ const OrderPage = () => {
                 else {
                     csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
-            })
+            });
+            if(item.orderShippingFee !== 0){
+                csv += `${item.orderId.replace('PT', '')},,,,,,,FC,Freight Charge,1,${item.orderShippingFee},${item.orderShippingFee},${(parseFloat(item.orderShippingFee)*0.1).toFixed(2)},GST,\n`;
+            }
         })
         return csv;
     }
