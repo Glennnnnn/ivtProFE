@@ -242,7 +242,7 @@ const OrderPage = () => {
 
     function renderItem(eachItem){
         if(eachItem.ivtCatName === null || eachItem.ivtCatName === '' || eachItem.ivtCatName === undefined){
-            return eachItem.ivtSubClassCode;
+            return eachItem.ivtSubClassCode ?? eachItem.ivtClassName;
         }
         else{
             return eachItem.ivtCatName + ":" + eachItem.ivtSubClassCode;
