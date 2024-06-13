@@ -392,9 +392,6 @@ const CustomerDetailsPage = () => {
                             <Form.Item
                                 label="Customer Email"
                                 name="customerEmail"
-                                rules={[
-                                    { type: "email", message: "Invalid email format" },
-                                ]}
                                 initialValue={recordData.customerEmail}>
                                 <Input placeholder="Email" className="form-item" />
                             </Form.Item>
