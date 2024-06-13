@@ -240,10 +240,10 @@ const CustomerDetailsPage = () => {
                 if (record.customerInterPo === null || "immediately" === record.customerInterPo?.creditTerm) {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
-                else if (record.customerInterPo.creditTerm.include("30")) {
+                else if (record.customerInterPo.creditTerm.includes("30")) {
                     isOverDue = currentDate.isAfter(originalDate.add(1, 'month').endOf('month'));
                 }
-                else if (record.customerInterPo.creditTerm.include("14")) {
+                else if (record.customerInterPo.creditTerm.includes("14")) {
                     isOverDue = currentDate.isAfter(originalDate.add(14, 'day'));
                 }
 
