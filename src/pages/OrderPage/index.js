@@ -255,9 +255,9 @@ const OrderPage = () => {
         if (data.customerInterPo === null || "immediately" === data.customerInterPo?.creditTerm || data.customerInterPo === undefined) {
             return originalDate.format('DD/MM/YYYY');
         } else if (data.customerInterPo.creditTerm.includes("30")) {
-            return originalDate.add(30, 'day').format('DD/MM/YYYY');
-        } else if (data.customerInterPo.creditTerm.includes("60")) {
-            return originalDate.add(30, 'day').format('DD/MM/YYYY');
+            return originalDate.add(1, 'month').endOf('month').format('DD/MM/YYYY');
+        } else if (data.customerInterPo.creditTerm.includes("14")) {
+            return originalDate.add(14, 'day').format('DD/MM/YYYY');
         } else {
             return originalDate.format('DD/MM/YYYY');
         }
@@ -409,10 +409,10 @@ const OrderPage = () => {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
                 else if (record.customerInterPo.creditTerm.includes("30")) {
-                    isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
+                    isOverDue = currentDate.isAfter(originalDate.add(1, 'month').endOf('month'));
                 }
-                else if (record.customerInterPo.creditTerm.includes("60")) {
-                    isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+                else if (record.customerInterPo.creditTerm.includes("14")) {
+                    isOverDue = currentDate.isAfter(originalDate.add(14, 'day'));
                 }
 
                 if (isOverDue) {

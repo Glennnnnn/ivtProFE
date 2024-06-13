@@ -260,9 +260,9 @@ const OrderDetailsPage = () => {
         if (recordData.customerInterPo === null || "immediately" === recordData.customerInterPo?.creditTerm || recordData.customerInterPo === undefined) {
             isOverDue = currentDate.isAfter(originalDate);
         } else if (recordData.customerInterPo.creditTerm.includes("30")) {
-            isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
-        } else if (recordData.customerInterPo.creditTerm.includes("60")) {
-            isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+            isOverDue = currentDate.isAfter(originalDate.add(1, 'month').endOf('month'));
+        } else if (recordData.customerInterPo.creditTerm.includes("14")) {
+            isOverDue = currentDate.isAfter(originalDate.add(14, 'day'));
         }
 
         return (

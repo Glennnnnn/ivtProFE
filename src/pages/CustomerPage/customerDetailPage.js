@@ -241,10 +241,10 @@ const CustomerDetailsPage = () => {
                     isOverDue = currentDate.isAfter(originalDate)
                 }
                 else if (record.customerInterPo.creditTerm.include("30")) {
-                    isOverDue = currentDate.isAfter(originalDate.add(30, 'day'));
+                    isOverDue = currentDate.isAfter(originalDate.add(1, 'month').endOf('month'));
                 }
-                else if (record.customerInterPo.creditTerm.include("60")) {
-                    isOverDue = currentDate.isAfter(originalDate.add(60, 'day'));
+                else if (record.customerInterPo.creditTerm.include("14")) {
+                    isOverDue = currentDate.isAfter(originalDate.add(14, 'day'));
                 }
 
                 if (isOverDue) {
@@ -414,9 +414,9 @@ const CustomerDetailsPage = () => {
                                 ]}
                                 initialValue={recordData.creditTerm}>
                                 <Select placeholder="* Credit Term" className="form-item">
-                                    <Option value="immediately">Immediately</Option>
-                                    <Option value="30 days">30 days</Option>
-                                    <Option value="60 days">60 days</Option>
+                                    <Option value="immediately">COD</Option>
+                                    <Option value="NET 30">NET 30</Option>
+                                    <Option value="14 days">14 days</Option>
                                 </Select>
                             </Form.Item>
 

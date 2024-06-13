@@ -278,10 +278,10 @@ const CustomerPage = () => {
 										className="form-item"
 									>
 										<Option value="immediately">
-											Immediately
+											COD
 										</Option>
-										<Option value="30 days">30 days</Option>
-										<Option value="60 days">60 days</Option>
+										<Option value="NET 30">NET 30</Option>
+										<Option value="14 days">14 days</Option>
 									</Select>
 								</Form.Item>
 

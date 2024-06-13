@@ -224,9 +224,9 @@ const renderDueDate = (data) => {
     if (data.customerInterPo === null || "immediately" === data.customerInterPo?.creditTerm || data.customerInterPo === undefined) {
         return originalDate.format('DD/MM/YYYY');
     } else if (data.customerInterPo.creditTerm.includes("30")) {
-        return originalDate.add(30, 'day').format('DD/MM/YYYY');
-    } else if (data.customerInterPo.creditTerm.includes("60")) {
-        return originalDate.add(30, 'day').format('DD/MM/YYYY');
+        return originalDate.add(1, 'month').endOf('month').format('DD/MM/YYYY');
+    } else if (data.customerInterPo.creditTerm.includes("14")) {
+        return originalDate.add(14, 'day').format('DD/MM/YYYY');
     } else {
         return originalDate.format('DD/MM/YYYY');
     }
