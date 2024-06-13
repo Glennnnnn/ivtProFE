@@ -243,12 +243,6 @@ const CustomerPage = () => {
 
 								<Form.Item
 									name="customerEmail"
-									rules={[
-										{
-											type: "email",
-											message: "Invalid email format",
-										},
-									]}
 								>
 									<Input
 										placeholder="Email"
