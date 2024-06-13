@@ -227,7 +227,7 @@ const OrderPage = () => {
         data.forEach(item => {
             item.orderIvtPoList.forEach((eachItem, index) => {
                 if (index === 0) {
-                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(data)},,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(item)},,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
                 }
                 else {
                     csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
@@ -253,13 +253,13 @@ const OrderPage = () => {
         const originalDate = moment(data.orderDate);
 
         if (data.customerInterPo === null || "immediately" === data.customerInterPo?.creditTerm || data.customerInterPo === undefined) {
-            return originalDate.format('DD/MM/YYYY');
+            return originalDate.clone().format('DD/MM/YYYY');
         } else if (data.customerInterPo.creditTerm.includes("30")) {
-            return originalDate.add(1, 'month').endOf('month').format('DD/MM/YYYY');
+            return originalDate.clone().add(1, 'month').endOf('month').format('DD/MM/YYYY');
         } else if (data.customerInterPo.creditTerm.includes("14")) {
-            return originalDate.add(14, 'day').format('DD/MM/YYYY');
+            return originalDate.clone().add(14, 'day').format('DD/MM/YYYY');
         } else {
-            return originalDate.format('DD/MM/YYYY');
+            return originalDate.clone().format('DD/MM/YYYY');
         }
     }
 
