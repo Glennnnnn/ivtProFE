@@ -8,7 +8,8 @@ const styles = StyleSheet.create({
     page: {
         flexDirection: 'column',
         backgroundColor: '#FDFDFD',
-        padding: 20
+        padding: 20,
+        position: 'absolute'
     },
     header: {
         paddingTop: 20,
@@ -116,7 +117,8 @@ const styles = StyleSheet.create({
         lineHeight: 1.5,
     },
     bottomSection: {
-        marginTop: 20,
+        top: 20,
+        position: 'relative',
     },
     tableHeader: {
         flexDirection: 'row',
@@ -130,12 +132,14 @@ const styles = StyleSheet.create({
         fontSize: 11,
         lineHeight: 1.5,
         alignItems: 'center',
+        flexWrap: 'wrap',
     },
     tableItemCell: {
         textAlign: 'center',
         fontSize: 11,
         lineHeight: 1.5,
         alignItems: 'center',
+        flexWrap: 'wrap',
     },
     tableRow: {
         flexDirection: 'row',
@@ -148,6 +152,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         borderBottomWidth: 1,
         borderColor: '#A9A9A9',
+        flexWrap: 'wrap',
     },
     totalDue: {
         flex: 0.7,
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
     },
     footer: {
-        position: 'absolute',
+        position: 'relative',
         bottom: 30,
         left: 0,
         right: 0,
@@ -386,7 +391,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                 </View>
 
                 {/* Bottom Section */}
-                <View style={styles.bottomSection}>
+                <View style={styles.bottomSection} wrap>
                     {showPrice ?
                         <View style={styles.tableHeader}>
                             <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>ITEM CODE</Text>
@@ -406,7 +411,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                     {/* Table Body */}
                     {data.orderIvtPoList && data.orderIvtPoList.map((item, index) => (
                         showPrice ?
-                            <View key={index} style={styles.tableRowCell}>
+                            <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>{item.ivtSubClassCode ?? ""}</Text>
                                 <View style={{ ...styles.tableItemCell, flex: 0.4 }}>
                                     <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
@@ -415,7 +420,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                                 <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
                             </View> :
-                            <View key={index} style={styles.tableRowCell}>
+                            <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
                                 <View style={{ ...styles.tableItemCell, flex: 0.5 }}>
                                     <Text>{item.ivtClassName} {renderTags(item.tags)}</Text>
