@@ -413,14 +413,14 @@ const MyDocument = ({ data, showPrice = true }) => (
                         showPrice ?
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.4 }} >{item.orderIvtDesc} {renderTags(item.tags)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.4 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{item.orderIvtQty}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
                             </View> :
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.5 }} >{item.orderIvtDesc} {renderTags(item.tags)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.5 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.orderIvtQty}</Text>
                             </View>
                     ))}
