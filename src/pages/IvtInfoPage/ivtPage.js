@@ -19,7 +19,7 @@ const IvtPage = () => {
   const [ivtResults, setIvtResults] = useState([])
   const [searchParas, setSearchParas] = useState({
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 20
   })
   const [ivtCount, setIvtCount] = useState()
 
