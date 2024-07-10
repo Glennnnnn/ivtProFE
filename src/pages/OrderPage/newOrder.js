@@ -79,6 +79,16 @@ const EditableCell = ({
                         })}>
                         <div>{`${product.ivtClassName} - ${product.ivtSubclassCode}`}</div>
                         <span style={{ whiteSpace: 'pre-wrap' }}>
+                            {product.delFlag === 1 &&
+                                <Tag color={'black'}>
+                                    Unavailable
+                                </Tag>
+                            }
+                            {product.ivtQty <= product.lowStockAlertAmount &&
+                                <Tag color={'red'} key={product.ivtId}>
+                                    Low Stock
+                                </Tag>
+                            }
                             {product.tags.map((tag) => {
                                 let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
                                 if (tag.tagName === 'color') {
@@ -737,7 +747,7 @@ const NewOrderPage = () => {
                                             <Switch value={isCashSale} onChange={(value) => {
                                                 setOrderId(value ? cashSaleOrderId : accountSaleOrderId)
                                                 setIsCashSale(value);
-                                                if(value){
+                                                if (value) {
                                                     setTax("No Tax");
                                                 }
                                             }} />
@@ -904,7 +914,7 @@ const NewOrderPage = () => {
                                     onChange={(e) => { setShippingFee(e.target.value); }}
                                 />
                             </Col>
-                            
+
                             {
                                 isCashSale ? <></> :
                                     <>

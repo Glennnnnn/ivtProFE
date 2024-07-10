@@ -200,7 +200,11 @@ const OrderDetailsPage = () => {
                 return (
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
-                            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtId === null ? "" : ivtId.toString()}</NavLink>
+                            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >
+                                {ivtId === null ? " " : ivtId.toString() + " "}
+                            </NavLink>
+                            {record.delFlag === 1 && <Tag color={'black'} > Unavailable </Tag>}
+                            {record.ivtQty <= record.lowStockAlertAmount && <Tag color={'red'} key={record.ivtId}> Low Stock </Tag>}
                         </Col>
                         <Col span={12}>
                             <span style={{ whiteSpace: 'pre-wrap' }}>

@@ -70,7 +70,15 @@ const IvtPage = () => {
       key: 'ivtClassName',
       render: (ivtClassName, record) => {
         // console.log(JSON.stringify(ivtClassName) + JSON.stringify(record))
-        return <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >{ivtClassName}</NavLink>
+        return (
+          <>
+            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >
+              {ivtClassName + " "}
+            </NavLink>
+            {record.delFlag === 1 && <Tag color={'black'} > Unavailable </Tag>}
+            {record.ivtQty <= record.lowStockAlertAmount && <Tag color={'red'} key={record.ivtId}> Low Stock </Tag>}
+          </>
+        )
       }
     },
     {

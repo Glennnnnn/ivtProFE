@@ -302,6 +302,8 @@ function IvtDetailPage() {
                 <Row gutter={[16, 16]}>
                   <Col span={14}>
                     <span>
+                      {baseData?.delFlag === 1 && <Tag color={'black'} > Unavailable </Tag>}
+                      {baseData?.ivtQty <= baseData?.lowStockAlertAmount && <Tag color={'red'}> Low Stock </Tag>}
                       {baseData?.tags?.map((tag) => {
                         let color = tag.tagName.length > 5 ? 'geekblue' : 'green';
                         if (tag.tagName === 'color') {
