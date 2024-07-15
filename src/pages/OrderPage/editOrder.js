@@ -351,7 +351,7 @@ const EditOrderPage = () => {
 
     const handleSearchChange = async (value) => {
         try {
-            const posts = await searchProductList(value);
+            const posts = await searchProductList(value, false);
             setProductList(posts.ivtResultPos);
         }
         catch (error) {
@@ -596,7 +596,7 @@ const EditOrderPage = () => {
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-                const posts = await searchProductList("");
+                const posts = await searchProductList("", false);
                 setProductList(posts.ivtResultPos);
             }
             catch (error) {

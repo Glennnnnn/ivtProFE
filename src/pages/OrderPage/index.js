@@ -209,6 +209,15 @@ const OrderPage = () => {
                 const csvData = generateCSV(posts.data);
                 const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
                 saveAs(blob, 'data.csv');
+
+                messageApi.open({
+                    type: 'success',
+                    content: 'Export CSV Success!',
+                })
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         }
         catch (error) {
@@ -227,24 +236,24 @@ const OrderPage = () => {
         data.forEach(item => {
             item.orderIvtPoList.forEach((eachItem, index) => {
                 if (index === 0) {
-                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(item)},,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(item)},,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
                 }
                 else {
-                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal)*0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
                 }
             });
-            if(item.orderShippingFee !== 0){
-                csv += `${item.orderId.replace('PT', '')},,,,,,,FC,Freight Charge,1,${item.orderShippingFee},${item.orderShippingFee},${(parseFloat(item.orderShippingFee)*0.1).toFixed(2)},GST,\n`;
+            if (item.orderShippingFee !== 0) {
+                csv += `${item.orderId.replace('PT', '')},,,,,,,FC,Freight Charge,1,${item.orderShippingFee},${item.orderShippingFee},${(parseFloat(item.orderShippingFee) * 0.1).toFixed(2)},GST,\n`;
             }
         })
         return csv;
     }
 
-    function renderItem(eachItem){
-        if(eachItem.ivtCatName === null || eachItem.ivtCatName === '' || eachItem.ivtCatName === undefined){
+    function renderItem(eachItem) {
+        if (eachItem.ivtCatName === null || eachItem.ivtCatName === '' || eachItem.ivtCatName === undefined) {
             return eachItem.ivtSubClassCode ?? eachItem.ivtClassName;
         }
-        else{
+        else {
             return eachItem.ivtCatName + ":" + eachItem.ivtSubClassCode;
         }
     }
@@ -461,9 +470,21 @@ const OrderPage = () => {
             render: (orderId, record) => {
                 const url = `/orderDetails?orderDBId=${record.orderDBId}`;
                 return (
-                    <NavLink to={url}>
-                        {orderId}
-                    </NavLink>
+                    <>
+                        {!record.isCashSale && (
+                            <>
+                                {(record.isReportGenerated === null || record.isReportGenerated === false) && (
+                                    <Tag color="orange">Ready for export</Tag>
+                                )}
+                                {record.isReportGenerated === true && (
+                                    <Tag color="green">Exported</Tag>
+                                )}
+                            </>
+                        )}
+                        <NavLink to={url}>
+                            {orderId}
+                        </NavLink>
+                    </>
                 );
             },
         },
