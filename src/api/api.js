@@ -109,7 +109,7 @@ export const searchProductList = async (searchName, filterDel = null) => {
 }
 
 export const orderList = async (searchingParams) => {
-    console.log(searchingParams);
+    //console.log(searchingParams);
     var queryBody = {
         "searchParams": searchingParams.searchName ?? "",
         "pageIndex": searchingParams.pagination.current ?? 1,
@@ -119,6 +119,21 @@ export const orderList = async (searchingParams) => {
         "order": searchingParams.order === undefined ? "desc" : searchingParams.order === "ascend" ? "asc" : "desc"
     }
     const response = await http.post(`/queryOrderData`, queryBody);
+    return response.data;
+}
+
+export const orderListWithPx = async (searchingParams, orderType = 1) => {
+    var queryBody = {
+        "searchParams": searchingParams.searchName ?? "",
+        "pageIndex": searchingParams.pagination.current ?? 1,
+        "pageSize": searchingParams.pagination.pageSize ?? 20,
+        "orderStatus": searchingParams.filters?.orderStatus ?? [],
+        "field": searchingParams.field === undefined ? "orderId" : searchingParams.order === undefined ? "orderId" : searchingParams.field,
+        "order": searchingParams.order === undefined ? "desc" : searchingParams.order === "ascend" ? "asc" : "desc",
+        "orderType" : orderType
+    }
+    //console.log(queryBody);
+    const response = await http.post(`/queryOrderDataWithPx`, queryBody);
     return response.data;
 }
 
