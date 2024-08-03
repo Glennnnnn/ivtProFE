@@ -59,6 +59,7 @@ const SearchTab = () => {
                     setDataSource(posts.data.responsePoList);
                     setSearchParams({
                         ...searchParams,
+                        searchName: searchName,
                         pagination: {
                             ...searchParams.pagination,
                             total: posts.data.count,
