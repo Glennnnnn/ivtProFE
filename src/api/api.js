@@ -261,3 +261,14 @@ export const queryCompanyList = async (searchParams) => {
     const response = await http.post(`/company/queryCompanyList`, queryBody);
     return response.data;
 }
+
+export const searchCompanyList = async (searchName) => {
+    var queryBody = {
+        "searchParam": searchName,
+        "pageOffset": 1,
+        "pageSize": 30,
+        "delFlag": ["active"],
+    }
+    const response = await http.post(`/company/queryCompanyList`, queryBody);
+    return response.data;
+}

@@ -22,7 +22,7 @@ import {
 import moment from "moment";
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
-import { addRestock, searchProductList, } from "@/api/api.js";
+import { addRestock, searchProductList, searchCompanyList } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -127,6 +127,9 @@ const NewRestockPage = () => {
     const [loading, setLoading] = useState(false);
 
     const [productList, setProductList] = useState([]);
+    const [selectedCompany, setSelectedCompany] = useState('');
+    const [companyList, setCompanyList] = useState([]);
+    const [searchValue, setSearchValue] = useState('');
 
     const [form] = Form.useForm();
 
@@ -294,12 +297,13 @@ const NewRestockPage = () => {
         setRestockDate(date);
     };
 
-    const handleRestockCompanyChange = (e) => {
-        setRestockCompany(e.target.value);
-    };
-
     const handleRestockNoteChange = (e) => {
         setRestockNote(e.target.value);
+    }
+
+    const handleSelectedCompany = (e) => {
+        setSearchValue('');
+        setSelectedCompany(e);
     }
 
     const onCancelClick = () => {
@@ -319,6 +323,12 @@ const NewRestockPage = () => {
         if (restockDate === null) {
             isValid = false;
             reason = "Restock Date cannot be empty!";
+            return { isValid, reason };
+        }
+
+        if (selectedCompany.trim() === '' || selectedCompany === null) {
+            isValid = false;
+            reason = "Restock Company cannot be empty!";
             return { isValid, reason };
         }
 
@@ -348,7 +358,7 @@ const NewRestockPage = () => {
                     "stockBatchId": restockId,
                     "stockBatchDate": moment(restockDate.toString()).format("YYYY/MM/DD"),
                     "stockBatchNote": restockNote,
-                    "stockBatchCompany": restockCompany,
+                    "stockBatchCompanyId": selectedCompany,
                     "stockPoList": data,
                 };
 
@@ -356,7 +366,7 @@ const NewRestockPage = () => {
                 if (posts.code === 200) {
                     messageApi.open({
                         type: "success",
-                        content: "Save Order Success!",
+                        content: "Save Restock Success!",
                     });
                     setTimeout(() => {
                         navigate(-1);
@@ -366,7 +376,7 @@ const NewRestockPage = () => {
                 else {
                     messageApi.open({
                         type: "error",
-                        content: "Save Order Error!",
+                        content: "Save Restock Error!",
                     });
                 }
             }
@@ -390,6 +400,30 @@ const NewRestockPage = () => {
         }
 
     };
+
+    useEffect(() => {
+        const fetchCompanyData = async () => {
+            try {
+                setLoading(true);
+                const posts = await searchCompanyList(searchValue);
+                if (posts.code === 200) {
+                    setCompanyList(posts.data.companyPoList);
+                } else {
+                    messageApi.open({
+                        type: "error",
+                        content: "Loading Customers Error!",
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompanyData();
+    }, [searchValue]);
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -465,14 +499,27 @@ const NewRestockPage = () => {
                                             />
                                         </Col>
 
-                                        <Col span={6}><span className="item-span"> Restock Company</span></Col>
+                                        <Col span={6}><span className="item-span">* Restock Company</span></Col>
                                         <Col span={18}>
-                                            <Input
+                                            <Select
+                                                showSearch
+                                                value={selectedCompany}
                                                 placeholder="Restock Company"
-                                                style={{ border: 'none', borderBottom: '1px solid #d9d9d9' }}
-                                                value={restockCompany}
-                                                onChange={handleRestockCompanyChange}
-                                            />
+                                                onSearch={(value) => setSearchValue(value)}
+                                                onChange={handleSelectedCompany}
+                                                optionLabelProp="label"
+                                                loading={loading}
+                                                defaultActiveFirstOption={false}
+                                                filterOption={false}
+                                                style={{ width: '100%' }}>
+                                                {companyList.map((company) => (
+                                                    <Option key={company.companyId.toString()} value={company.companyId.toString()} label={company.companyName.toString()}>
+                                                        <div>{`${company.companyName}`}</div>
+                                                        {company.companyPhone && <div>{`Phone: ${company.companyPhone}`}</div>}
+                                                        {company.companyEmail && <div>{`Email: ${company.companyEmail}`}</div>}
+                                                    </Option>
+                                                ))}
+                                            </Select>
                                         </Col>
 
                                     </Row>
