@@ -56,6 +56,7 @@ const CompanyPage = () => {
                         total: posts.data.count,
                     },
                 });
+                console.log(searchParams.pagination);
             } else {
                 messageApi.open({
                     type: "error",
@@ -122,14 +123,14 @@ const CompanyPage = () => {
             dataIndex: "companyName",
             key: "companyName",
             width: "20%",
-            render: (companyDBId, record) => {
-                const url = `/companyDetail?companyDBId=${record.companyId}`;
-                return (
-                    <NavLink to={url}>
-                        {companyDBId}
-                    </NavLink>
-                );
-            },
+            // render: (companyDBId, record) => {
+            //     const url = `/companyDetail?companyDBId=${record.companyId}`;
+            //     return (
+            //         <NavLink to={url}>
+            //             {companyDBId}
+            //         </NavLink>
+            //     );
+            // },
         },
         {
             title: "Company Email",

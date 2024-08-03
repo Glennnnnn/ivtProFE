@@ -257,7 +257,6 @@ export const queryCompanyList = async (searchParams) => {
         "pageOffset": searchParams.pagination.current ?? 1,
         "pageSize": searchParams.pagination.pageSize ?? 20
     }
-    console.log(queryBody);
     const response = await http.post(`/company/queryCompanyList`, queryBody);
     return response.data;
 }
