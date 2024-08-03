@@ -122,7 +122,7 @@ const CompanyPage = () => {
             title: "Company Name",
             dataIndex: "companyName",
             key: "companyName",
-            width: "20%",
+            width: "30%",
             // render: (companyDBId, record) => {
             //     const url = `/companyDetail?companyDBId=${record.companyId}`;
             //     return (
@@ -135,17 +135,17 @@ const CompanyPage = () => {
         {
             title: "Company Email",
             dataIndex: "companyEmail",
-            width: "20%",
+            width: "30%",
         },
         {
             title: "Company Phone",
             dataIndex: "companyPhone",
-            width: "20%",
+            width: "30%",
         },
         {
             title: "Status",
             dataIndex: "delFlag",
-            width: "20%",
+            width: "10%",
             render: (status) => (
                 <span>
                     <Tag color={status === false ? "green" : "volcano"}>

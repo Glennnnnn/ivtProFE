@@ -498,7 +498,7 @@ const SearchTab = () => {
                         onConfirm={handleComplete}
                         okText="Yes"
                         cancelText="No">
-                        <Button type="primary" className="new-customer-button-search" icon={<CheckOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                        <Button type="primary" className="new-customer-button-search" icon={<CheckOutlined />} disabled={!hasSelected} loading={bulkLoading} size="large"
                             style={{ backgroundColor: hasSelected ? "green" : "", color: hasSelected ? "white" : "" }}>
                             Complete Selected
                         </Button>
@@ -509,7 +509,7 @@ const SearchTab = () => {
                         onConfirm={handleDelete}
                         okText="Yes"
                         cancelText="No">
-                        <Button type="primary" className="new-customer-button-search" icon={<DeleteOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                        <Button type="primary" className="new-customer-button-search" icon={<DeleteOutlined />} disabled={!hasSelected} loading={bulkLoading} size="large"
                             style={{ backgroundColor: hasSelected ? "red" : "", color: hasSelected ? "white" : "" }}>
                             Delete Selected
                         </Button>
@@ -520,7 +520,7 @@ const SearchTab = () => {
                         onConfirm={handleExportCSV}
                         okText="Yes"
                         cancelText="No">
-                        <Button type="primary" className="new-customer-button-search" icon={<DownloadOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                        <Button type="primary" className="new-customer-button-search" icon={<DownloadOutlined />} disabled={!hasSelected} loading={bulkLoading} size="large"
                             style={{ backgroundColor: hasSelected ? "deepskyblue" : "", color: hasSelected ? "white" : "" }}>
                             Export CSV
                         </Button>

@@ -121,7 +121,6 @@ const NewRestockPage = () => {
 
     const [restockId, setRestockId] = useState('');
     const [restockDate, setRestockDate] = useState(dayjs());
-    const [restockCompany, setRestockCompany] = useState('');
     const [restockNote, setRestockNote] = useState('');
 
     const [loading, setLoading] = useState(false);
