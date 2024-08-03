@@ -10,7 +10,8 @@ import {
   LogoutOutlined,
   TeamOutlined,
   CopyOutlined,
-  AppstoreTwoTone
+  AppstoreTwoTone,
+  BankOutlined
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 
@@ -21,11 +22,12 @@ import OrderPage from './pages/OrderPage/index.js';
 import NewOrderPage from './pages/OrderPage/newOrder.js';
 import OrderDetailsPage from './pages/OrderPage/orderDetailPage.js';
 import EditOrderPage from './pages/OrderPage/editOrder.js';
+import CustomerPage from './pages/CustomerPage/index.js';
+import CustomerDetailsPage from './pages/CustomerPage/customerDetailPage.js';
 import RestockPage from './pages/RestockPage/index.js';
 import NewRestockPage from './pages/RestockPage/newRestock.js';
 import RestockDetailsPage from './pages/RestockPage/restockDetailPage.js';
-import CustomerPage from './pages/CustomerPage/index.js';
-import CustomerDetailsPage from './pages/CustomerPage/customerDetailPage.js';
+import CompanyPage from './pages/CompanyPage/index.js';
 import HomePage from './pages/HomePage/index.js';
 import IvtCreatePage from './pages/IvtInfoPage/ivtCreatePage.js';
 import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
@@ -84,11 +86,14 @@ const App = () => {
           <Menu.Item key="orders" icon={<ShoppingOutlined />} onClick={() => setMenu('orders')}>
             <Link to="/orders">Orders</Link>
           </Menu.Item>
+          <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setMenu('customers')}>
+            <Link to="/customers">Customers</Link>
+          </Menu.Item>
           <Menu.Item key="restock" icon={<CopyOutlined />} onClick={() => setMenu('restock')}>
             <Link to="/restock">Restock</Link>
           </Menu.Item>
-          <Menu.Item key="customers" icon={<TeamOutlined />} onClick={() => setMenu('customers')}>
-            <Link to="/customers">Customers</Link>
+          <Menu.Item key="company" icon={<BankOutlined />} onClick={() => setMenu('company')}>
+            <Link to="/company">Restock Company</Link>
           </Menu.Item>
           <Menu.Item key="inventory" icon={<FolderOpenOutlined />} onClick={() => setMenu('inventory')}>
             <Link to="/inventory">Inventory</Link>
@@ -143,6 +148,7 @@ const App = () => {
             <Route path="/restockDetails" element={isAuthenticated ? <RestockDetailsPage /> : <Navigate to="/login" />} />
             <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
+            <Route path='/company' element={isAuthenticated ? <CompanyPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
             <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/login" />} />

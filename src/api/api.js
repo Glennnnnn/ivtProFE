@@ -240,3 +240,24 @@ export const queryOrderDataByIdList = async (orderDBIdList) => {
     const response = await http.post(`/queryOrderDataByIdList`, queryBody);
     return response.data;
 }
+
+export const addCompany = async (formData) => {
+    var queryBody = {
+        "companyName": formData.companyName,
+        "companyPhone": formData.companyPhone,
+        "companyEmail": formData.companyEmail,
+    }
+    const response = await http.post(`/company/insertNewCompany`, queryBody);
+    return response.data;
+}
+
+export const queryCompanyList = async (searchParams) => {
+    var queryBody = {
+        "searchParam": searchParams.searchName ?? "",
+        "pageOffset": searchParams.pagination.current ?? 1,
+        "pageSize": searchParams.pagination.pageSize ?? 20
+    }
+    console.log(queryBody);
+    const response = await http.post(`/company/queryCompanyList`, queryBody);
+    return response.data;
+}
