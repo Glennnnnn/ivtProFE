@@ -344,9 +344,9 @@ const MyDocument = ({ data, showPrice = true }) => (
                 }
 
                 {
-                    showPrice ?
+                    !data.isCashSale ?
                         <View style={styles.middleHeader}>
-                            <Text style={{ fontFamily: 'Helvetica-Bold' }}>Tax Invoice</Text>
+                            <Text style={{ fontFamily: 'Helvetica-Bold' }}> {showPrice ? "Tax Invoice" : "Delivery Docket"}</Text>
                         </View> : <View style={styles.middleHeader}></View>
                 }
 

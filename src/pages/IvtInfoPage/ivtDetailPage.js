@@ -21,15 +21,17 @@ function IvtDetailPage() {
   let location = useLocation()
   let navigate = useNavigate()
   const { Content } = Layout;
-  const ivtId = JSON.parse(location.state.ivtId)
+  const urlParams = new URLSearchParams(window.location.search);
+  const ivtId = urlParams.get('ivtId');
+  //const ivtId = JSON.parse(location.state.ivtId)
   // const ivtId = Object.assign(({}, JSON.parse(location.state.ivtId)))
   //const baseData = Object.assign({}, recordData)
-  const prePage = location.state.prePage
+  const prePage = "inventory";
 
-  const [baseData, setBaseData] = useState({})
+  const [baseData, setBaseData] = useState({});
 
   const [stockSource, setStockSource] = useState([]);
-  const [stockCount, setStockCount] = useState()
+  const [stockCount, setStockCount] = useState();
   const [stockSearchParams, setStockSearchParams] = useState({
     ivtId: ivtId,
     pageIndex: 1,

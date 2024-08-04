@@ -484,6 +484,12 @@ const NewOrderPage = () => {
             return { isValid, reason };
         }
 
+        if (productDiscount < 0 || productDiscount > 100){
+            isValid = false;
+            reason = "Discount should between 0 and 100!";
+            return { isValid, reason };
+        }
+
         if (showCustomer) {
             const customerFormData = newCustomerForm.getFieldValue();
             if (!customerFormData.hasOwnProperty('companyName') || (customerFormData.companyName?.trim() === '')) {
@@ -516,6 +522,12 @@ const NewOrderPage = () => {
             if (item.qty === 0) {
                 isValid = false;
                 reason = "QTY cannot be 0!";
+                return { isValid, reason };
+            }
+
+            if (item.discount < 0 || item.discount > 100){
+                isValid = false;
+                reason = "Item Discount should between 0 and 100!";
                 return { isValid, reason };
             }
         })

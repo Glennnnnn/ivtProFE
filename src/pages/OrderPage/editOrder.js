@@ -523,6 +523,12 @@ const EditOrderPage = () => {
             return { isValid, reason };
         }
 
+        if (productDiscount < 0 || productDiscount > 100){
+            isValid = false;
+            reason = "Discount should between 0 and 100!";
+            return { isValid, reason };
+        }
+
         data.forEach(item => {
             if (item.product === '') {
                 isValid = false;
@@ -533,6 +539,12 @@ const EditOrderPage = () => {
             if (item.qty === 0) {
                 isValid = false;
                 reason = "QTY cannot be 0!";
+                return { isValid, reason };
+            }
+
+            if (item.discount < 0 || item.discount > 100){
+                isValid = false;
+                reason = "Item Discount should between 0 and 100!";
                 return { isValid, reason };
             }
         })

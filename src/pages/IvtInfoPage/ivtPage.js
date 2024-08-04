@@ -70,9 +70,10 @@ const IvtPage = () => {
       key: 'ivtClassName',
       render: (ivtClassName, record) => {
         // console.log(JSON.stringify(ivtClassName) + JSON.stringify(record))
+        const url = `/ivtDetailPage?ivtId=${record.ivtId}`;
         return (
           <>
-            <NavLink to='/ivtDetailPage' state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >
+            <NavLink to={url} state={{ "prePage": "inventory", "ivtId": JSON.stringify(record.ivtId) }} >
               {ivtClassName + " "}
             </NavLink>
             {record.delFlag === 1 && <Tag color={'black'} > Unavailable </Tag>}
