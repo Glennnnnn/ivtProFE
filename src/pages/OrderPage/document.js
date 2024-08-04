@@ -12,18 +12,24 @@ const styles = StyleSheet.create({
         position: 'absolute'
     },
     header: {
-        paddingTop: 20,
+        paddingTop: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 5,
+    },
+    middleHeader: {
+        fontSize: 24,
+        color: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     leftHeader: {
-        fontSize: 11,
+        fontSize: 9,
         color: 'black',
         lineHeight: 1.5,
     },
     rightHeader: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#5F9EA0',
         justifyContent: 'center',
         alignItems: 'center',
@@ -45,14 +51,8 @@ const styles = StyleSheet.create({
         color: 'black',
         lineHeight: 1.5,
     },
-    topCenter: {
-        flex: 1,
-        fontSize: 11,
-        color: 'black',
-        lineHeight: 1.5,
-    },
     topRight: {
-        flex: 2,
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
@@ -103,6 +103,20 @@ const styles = StyleSheet.create({
         flex: 0.3,
         color: 'black',
         fontSize: 11,
+        lineHeight: 1.5,
+        textAlign: 'center',
+    },
+    smallSubscriptName: {
+        flex: 0.7,
+        color: '#5F9EA0',
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 9,
+        lineHeight: 1.5,
+    },
+    smallSubscriptNumber: {
+        flex: 0.3,
+        color: 'black',
+        fontSize: 9,
         lineHeight: 1.5,
         textAlign: 'center',
     },
@@ -195,15 +209,16 @@ const styles = StyleSheet.create({
     },
     footer: {
         position: 'relative',
-        bottom: 30,
+        bottom: 0,
         left: 0,
         right: 0,
-        textAlign: 'center', // Center-align the text
-        fontSize: 12, // Set font size to 12
+        textAlign: 'center',
+        fontSize: 12,
+        padding: 10,
     },
     topFooter: {
         flexDirection: 'row',
-        padding: 40,
+        padding: 10,
     },
     leftTopFooter: {
         flex: 1,
@@ -217,6 +232,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica-Bold',
         fontSize: 14,
     },
+    claims: {
+        textAlign: 'center',
+        fontSize: 10,
+        marginTop: 10,
+    }
 });
 
 const renderDate = (text) => {
@@ -274,10 +294,10 @@ const renderTaxTitle = (data) => {
 
 const renderTaxNumber = (data) => {
     if (data.orderTaxType === "Include") {
-        return (parseFloat(data.totalPrice - data.orderPreBalance) / 11).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) / 11).toFixed(2);
     }
     else if (data.orderTaxType === "Exclude") {
-        return (parseFloat(data.totalPrice - data.orderPreBalance) * 0.1).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 0.1).toFixed(2);
     }
     else {
         return 0.00.toFixed(2);
@@ -286,22 +306,22 @@ const renderTaxNumber = (data) => {
 
 const renderOrderTotalNumber = (data) => {
     if (data.orderTaxType === "Include") {
-        return ((data.totalPrice - data.orderPreBalance)).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)).toFixed(2);
     }
     else if (data.orderTaxType === "Exclude") {
-        return ((data.totalPrice - data.orderPreBalance) * 1.1).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 1.1).toFixed(2);
     }
     else {
-        return (data.totalPrice - data.orderPreBalance).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)).toFixed(2);
     }
 }
 
 const renderTotalNumber = (data) => {
     if (data.orderTaxType === "Exclude") {
-        return (parseFloat((data.totalPrice - data.orderPreBalance) * 1.1) + parseFloat(data.orderPreBalance)).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 1.1 + parseFloat(data.orderPreBalance)).toFixed(2);
     }
     else {
-        return parseFloat(data.totalPrice).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee) + parseFloat(data.orderPreBalance)).toFixed(2);
     }
 }
 
@@ -319,8 +339,15 @@ const MyDocument = ({ data, showPrice = true }) => (
                         <Text>70 North View Drive</Text>
                         <Text>Sunshine West VIC  3020</Text>
                         <Text>info@pioneertrading.com.au</Text>
-                        <Text>ABN 69870739006</Text>
+                        <Text>Tel: 03 9312 6218</Text>
                     </View>
+                }
+
+                {
+                    showPrice ?
+                        <View style={styles.middleHeader}>
+                            <Text style={{ fontFamily: 'Helvetica-Bold' }}>Tax Invoice</Text>
+                        </View> : <View style={styles.middleHeader}></View>
                 }
 
                 <View style={styles.rightHeader}>
@@ -339,8 +366,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                         <Text style={{ fontFamily: 'Helvetica-Bold' }}>Invoice to</Text>
                         {renderCompanyandCustomerName(data)}
                         <Text>{data.orderBillingAddress}</Text>
-                    </View>
-                    <View style={styles.topCenter}>
+
                         <Text style={{ fontFamily: 'Helvetica-Bold' }}>Ship to</Text>
                         {renderCompanyandCustomerName(data)}
                         <Text>{data.orderDeliveryAddress}</Text>
@@ -395,10 +421,11 @@ const MyDocument = ({ data, showPrice = true }) => (
                     {showPrice ?
                         <View style={styles.tableHeader}>
                             <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>ITEM CODE</Text>
-                            <Text style={{ ...styles.tableHeaderCell, flex: 0.4 }}>DESCRIPTION</Text>
-                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>QTY</Text>
-                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>RATE</Text>
-                            <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>AMOUNT</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.45 }}>DESCRIPTION</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.10 }}>QTY</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.10 }}>RATE</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.10 }}>DISCOUNT(%)</Text>
+                            <Text style={{ ...styles.tableHeaderCell, flex: 0.10 }}>AMOUNT</Text>
                         </View> :
                         <View style={styles.tableHeader}>
                             <Text style={{ ...styles.tableHeaderCell, flex: 0.25 }}>ITEM CODE</Text>
@@ -413,10 +440,11 @@ const MyDocument = ({ data, showPrice = true }) => (
                         showPrice ?
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.4 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{item.orderIvtQty}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.15 }}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.45 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{item.orderIvtQty}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{item.orderIvtDiscount}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{parseFloat(item.orderIvtTotal).toFixed(2)}</Text>
                             </View> :
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
@@ -437,20 +465,25 @@ const MyDocument = ({ data, showPrice = true }) => (
 
                                 <View style={{ flex: 0.5 }}>
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>SUBTOTAL</Text>
-                                        <Text style={styles.subscriptNumber}>{(parseFloat(data.totalPrice) - parseFloat(data.orderShippingFee) - parseFloat(data.orderPreBalance)).toFixed(2)}</Text>
+                                        <Text style={styles.smallSubscriptName}>SUBTOTAL</Text>
+                                        <Text style={styles.smallSubscriptNumber}>{(parseFloat(data.orderSubTotal)).toFixed(2)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>SHIPPING</Text>
-                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
+                                        <Text style={styles.smallSubscriptName}>DISCOUNT(%)</Text>
+                                        <Text style={styles.smallSubscriptNumber}>{data.orderDiscount}</Text>
+                                    </View>
+
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.smallSubscriptName}>SHIPPING</Text>
+                                        <Text style={styles.smallSubscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
                                     </View>
 
                                     {data.isCashSale || data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax" ?
                                         <></> :
                                         <View style={styles.tableRow}>
-                                            <Text style={styles.subscriptName}>{renderTaxTitle(data)}</Text>
-                                            <Text style={styles.subscriptNumber}>{renderTaxNumber(data)}</Text>
+                                            <Text style={styles.smallSubscriptName}>{renderTaxTitle(data)}</Text>
+                                            <Text style={styles.smallSubscriptNumber}>{renderTaxNumber(data)}</Text>
                                         </View>
                                     }
 
@@ -460,8 +493,8 @@ const MyDocument = ({ data, showPrice = true }) => (
                                     </View>
 
                                     <View style={styles.tableRow}>
-                                        <Text style={styles.subscriptName}>PREV BALANCE</Text>
-                                        <Text style={styles.subscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
+                                        <Text style={styles.smallSubscriptName}>PREV BALANCE</Text>
+                                        <Text style={styles.smallSubscriptNumber}>{parseFloat(data.orderPreBalance).toFixed(2)}</Text>
                                     </View>
 
                                     <View style={styles.tableRow}>
@@ -499,31 +532,33 @@ const MyDocument = ({ data, showPrice = true }) => (
                 </View>
             </View>
             {/* Footer Section */}
-            {data.isCashSale ?
-                <View style={styles.footer}>
-                    <View style={styles.topFooter}>
-                        <View style={styles.leftTopFooter}>
-                            <Text>Sign:</Text>
-                        </View>
-                        <View style={styles.rightTopFooter}>
-                            <Text>Prepare by:</Text>
-                        </View>
+            <View style={styles.footer}>
+                <View style={styles.topFooter}>
+                    <View style={styles.leftTopFooter}>
+                        <Text>Sign:</Text>
                     </View>
-                </View> :
-                <View style={styles.footer}>
-                    <View style={styles.topFooter}>
-                        <View style={styles.leftTopFooter}>
-                            <Text>Sign:</Text>
-                        </View>
-                        <View style={styles.rightTopFooter}>
-                            <Text>Prepare by:</Text>
-                        </View>
+                    <View style={styles.rightTopFooter}>
+                        <Text>Prepare by:</Text>
                     </View>
-                    <Text>Thanks for your payment via EFT to: </Text>
-                    <Text>Pioneer Aluminium Pty Ltd </Text>
-                    <Text>BSB: 063 779   Account No: 1032 0767 </Text>
                 </View>
-            }
+
+                {!data.isCashSale && showPrice && (
+                    <View>
+                        <Text>Thanks for your payment via EFT to:</Text>
+                        <Text>Pioneer Aluminium Pty Ltd</Text>
+                        <Text>BSB: 063 779   Account No: 1032 0767</Text>
+                    </View>
+                )}
+
+                <View style={styles.claims}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                        NO CLAIMS RECOGNISED UNLESS MADE WITHIN 7 DAYS
+                    </Text>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                        OF RECEIPT OF GOODS
+                    </Text>
+                </View>
+            </View>
 
         </Page>
     </Document>
