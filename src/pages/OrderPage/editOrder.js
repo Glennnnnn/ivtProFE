@@ -140,6 +140,7 @@ const EditOrderPage = () => {
     const [productList, setProductList] = useState([]);
 
     const [productTotal, setProductTotal] = useState(0.00);
+    const [productDiscount, setProductDiscount] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
     const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
@@ -170,7 +171,7 @@ const EditOrderPage = () => {
         {
             title: 'Description',
             dataIndex: 'description',
-            width: '15%',
+            width: '10%',
             editable: true,
         },
         {
@@ -182,6 +183,12 @@ const EditOrderPage = () => {
         {
             title: 'Price(AUD)',
             dataIndex: 'price',
+            width: '10%',
+            editable: true,
+        },
+        {
+            title: 'Discount(%)',
+            dataIndex: 'discount',
             width: '10%',
             editable: true,
         },
@@ -216,6 +223,7 @@ const EditOrderPage = () => {
             description: '',
             qty: 0,
             price: 0,
+            discount: 0,
             total: 0,
             key: new Date().getTime(),
         };
@@ -252,6 +260,7 @@ const EditOrderPage = () => {
                 description: '',
                 qty: 0,
                 price: 0,
+                discount: 0,
                 total: 0,
                 key: 1,
             }])
@@ -273,10 +282,10 @@ const EditOrderPage = () => {
                     setOrderNote(posts.data.orderNote);
                     setIsCashSale(posts.data.isCashSale);
 
-                    setProductTotal(parseFloat(posts.data.totalPrice) - parseFloat(posts.data.orderShippingFee ?? 0) - parseFloat(posts.data.orderPreBalance ?? 0));
+                    setProductTotal(parseFloat(posts.data.orderSubTotal));
+                    setProductDiscount(parseFloat(posts.data.orderDiscount ?? 0));
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
                     setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
-                    setAllTotal(parseFloat(posts.data.totalPrice));
                     setTax(posts.data.orderTaxType === "" || posts.data.orderTaxType === null ? "No Tax" : posts.data.orderTaxType);
 
                     let dataList = [];
@@ -287,6 +296,7 @@ const EditOrderPage = () => {
                             description: item.orderIvtDesc,
                             qty: item.orderIvtQty,
                             price: item.orderIvtPrice,
+                            discount: item.orderIvtDiscount,
                             total: item.orderIvtTotal,
                             key: item.ivtId.toString() + index.toString(),
                             label: item.ivtClassName.toString() + " " + item.tags.map((tag) => {
@@ -335,10 +345,13 @@ const EditOrderPage = () => {
         const newData = data.map((item) => {
             if (item.rowNo === rowNo) {
                 if (dataIndex === 'qty') {
-                    return { ...item, [dataIndex]: value, total: value * item.price }
+                    return { ...item, [dataIndex]: value, total: value * item.price * (1 - item.discount / 100) }
                 }
                 if (dataIndex === 'price') {
-                    return { ...item, [dataIndex]: value, total: value * item.qty }
+                    return { ...item, [dataIndex]: value, total: value * item.qty * (1 - item.discount / 100)}
+                }
+                if (dataIndex === 'discount') {
+                    return { ...item, [dataIndex]: value, total: item.price * item.qty * (1 - value / 100)}
                 }
                 return { ...item, [dataIndex]: value, };
             }
@@ -368,6 +381,7 @@ const EditOrderPage = () => {
             form.setFieldsValue({ [`product_${item.key}`]: item.label ?? "" });
             form.setFieldsValue({ [`description_${item.key}`]: item.description ?? "" });
             form.setFieldsValue({ [`price_${item.key}`]: item.price ?? "" });
+            form.setFieldsValue({ [`discount_${item.key}`]: item.discount ?? "" });
             form.setFieldsValue({ [`qty_${item.key}`]: item.qty ?? "" });
         })
     }
@@ -388,10 +402,12 @@ const EditOrderPage = () => {
             if (item.rowNo === rowNo) {
                 form.setFieldsValue({ [`description_${item.key}`]: selectedProduct.ivtNote ?? "" });
                 form.setFieldsValue({ [`price_${item.key}`]: selectedProduct.ivtPrice ?? "" });
+                form.setFieldsValue({ [`discount_${item.key}`]: 0 });
                 return {
                     ...item, product: selectedProduct.ivtId,
                     description: selectedProduct.ivtNote,
                     price: selectedProduct.ivtPrice,
+                    discount: 0,
                     total: item.qty * selectedProduct.ivtPrice
                 };
             }
@@ -409,7 +425,7 @@ const EditOrderPage = () => {
             ...col,
             onCell: (record) => ({
                 record,
-                inputType: col.dataIndex === 'qty' || col.dataIndex === "price" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "price" || col.dataIndex === "discount" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: true,
@@ -449,14 +465,6 @@ const EditOrderPage = () => {
         })
 
         setProductTotal(subTotal);
-        updateTotal(subTotal);
-    }
-
-    const updateTotal = (subTotal) => {
-        let thisShipping = shippingFee === "" ? 0 : shippingFee;
-        let thisPrevBalance = prevBalance === "" ? 0 : prevBalance;
-
-        setAllTotal(parseFloat(subTotal) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
     }
 
     const handleTaxChange = (value) => {
@@ -465,10 +473,10 @@ const EditOrderPage = () => {
 
     const renderTax = () => {
         if (tax === "Include") {
-            return ((allTotal - prevBalance) / 11).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) / 11).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((allTotal - prevBalance) * 0.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 0.1).toFixed(2);
         }
         else {
             return 0.00.toFixed(2);
@@ -477,25 +485,25 @@ const EditOrderPage = () => {
 
     const renderOrderTotal = () => {
         if (tax === "Include") {
-            return ((allTotal - prevBalance)).toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((allTotal - prevBalance) * 1.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1).toFixed(2);
         }
         else {
-            return (allTotal - prevBalance).toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
     }
 
     const renderTotal = () => {
         if (tax === "Include") {
-            return allTotal.toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return (parseFloat((allTotal - prevBalance) * 1.1) + parseFloat(prevBalance)).toFixed(2);
+            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
         else {
-            return allTotal.toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
     }
 
@@ -544,6 +552,8 @@ const EditOrderPage = () => {
                     "orderDate": moment(orderDate.toString()).format("YYYY/MM/DD"),
                     "orderNote": orderNote,
                     "customerOrderNo": customerOrderNo,
+                    "orderSubTotal": productTotal,
+                    "orderDiscount": productDiscount,
                     "orderShippingFee": shippingFee,
                     "orderPreBalance": prevBalance,
                     "isCashSale": isCashSale,
@@ -610,14 +620,6 @@ const EditOrderPage = () => {
 
         fetchProductData();
     }, []);
-
-    useEffect(() => {
-        updateTotal(productTotal);
-    }, [shippingFee])
-
-    useEffect(() => {
-        updateTotal(productTotal);
-    }, [prevBalance])
 
     return (
         <div className="ivt-layout">
@@ -770,6 +772,16 @@ const EditOrderPage = () => {
                         <Row gutter={[16, 16]} style={{ margin: '20px' }}>
                             <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">DISCOUNT(%)</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
+                                    value={productDiscount}
+                                    onChange={(e) => { setProductDiscount(e.target.value); }}
+                                />
+                            </Col>
 
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}>

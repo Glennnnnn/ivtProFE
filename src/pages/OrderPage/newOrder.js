@@ -137,6 +137,7 @@ const NewOrderPage = () => {
     const [orderNote, setOrderNote] = useState('');
 
     const [productTotal, setProductTotal] = useState(0.00);
+    const [productDiscount, setProductDiscount] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
     const [prevBalance, setPrevBalance] = useState(0.00);
     const [allTotal, setAllTotal] = useState(0.00);
@@ -169,6 +170,7 @@ const NewOrderPage = () => {
                 description: '',
                 qty: 0,
                 price: 0,
+                discount: 0,
                 total: 0,
                 key: 1,
             }
@@ -191,7 +193,7 @@ const NewOrderPage = () => {
         {
             title: 'Description',
             dataIndex: 'description',
-            width: '15%',
+            width: '10%',
             editable: true,
         },
         {
@@ -203,6 +205,12 @@ const NewOrderPage = () => {
         {
             title: 'Price(AUD)',
             dataIndex: 'price',
+            width: '10%',
+            editable: true,
+        },
+        {
+            title: 'Discount(%)',
+            dataIndex: 'discount',
             width: '10%',
             editable: true,
         },
@@ -237,6 +245,7 @@ const NewOrderPage = () => {
             description: '',
             qty: 0,
             price: 0,
+            discount: 0,
             total: 0,
             key: new Date().getTime(),
         };
@@ -273,6 +282,7 @@ const NewOrderPage = () => {
                 description: '',
                 qty: 0,
                 price: 0,
+                discount: 0,
                 total: 0,
                 key: 1,
             }])
@@ -283,10 +293,13 @@ const NewOrderPage = () => {
         const newData = data.map((item) => {
             if (item.rowNo === rowNo) {
                 if (dataIndex === 'qty') {
-                    return { ...item, [dataIndex]: value, total: value * item.price }
+                    return { ...item, [dataIndex]: value, total: value * item.price * (1 - item.discount / 100) }
                 }
                 if (dataIndex === 'price') {
-                    return { ...item, [dataIndex]: value, total: value * item.qty }
+                    return { ...item, [dataIndex]: value, total: value * item.qty * (1 - item.discount / 100)}
+                }
+                if (dataIndex === 'discount') {
+                    return { ...item, [dataIndex]: value, total: item.price * item.qty * (1 - value / 100)}
                 }
                 return { ...item, [dataIndex]: value, };
             }
@@ -316,10 +329,12 @@ const NewOrderPage = () => {
             if (item.rowNo === rowNo) {
                 form.setFieldsValue({ [`description_${item.key}`]: selectedProduct.ivtNote ?? "" });
                 form.setFieldsValue({ [`price_${item.key}`]: selectedProduct.ivtPrice ?? "" });
+                form.setFieldsValue({ [`discount_${item.key}`]: 0 });
                 return {
                     ...item, product: selectedProduct.ivtId,
                     description: selectedProduct.ivtNote,
                     price: selectedProduct.ivtPrice,
+                    discount: 0,
                     total: item.qty * selectedProduct.ivtPrice
                 };
             }
@@ -337,7 +352,7 @@ const NewOrderPage = () => {
             ...col,
             onCell: (record) => ({
                 record,
-                inputType: col.dataIndex === 'qty' || col.dataIndex === "price" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
+                inputType: col.dataIndex === 'qty' || col.dataIndex === "price" || col.dataIndex === "discount" ? 'number' : col.dataIndex === 'product' ? 'select' : 'text',
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: true,
@@ -446,10 +461,11 @@ const NewOrderPage = () => {
     }
 
     const updateTotal = (subTotal) => {
+        let thisDiscount = productDiscount === "" ? 0 : productDiscount;
         let thisShipping = shippingFee === "" ? 0 : shippingFee;
         let thisPrevBalance = prevBalance === "" ? 0 : prevBalance;
 
-        setAllTotal(parseFloat(subTotal) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
+        setAllTotal(parseFloat(subTotal) * (1 - thisDiscount / 100) + parseFloat(thisShipping) + parseFloat(thisPrevBalance));
     }
 
     const validateSave = () => {
@@ -520,6 +536,8 @@ const NewOrderPage = () => {
                     "isNewCustomer": showCustomer,
                     "isCashSale": isCashSale,
                     "customerId": selectedCustomer,
+                    "orderSubTotal": productTotal,
+                    "orderDiscount": productDiscount,
                     "orderShippingFee": shippingFee,
                     "orderPreBalance": prevBalance,
                     "newCustomerDetails": {
@@ -639,11 +657,7 @@ const NewOrderPage = () => {
 
     useEffect(() => {
         updateTotal(productTotal);
-    }, [shippingFee])
-
-    useEffect(() => {
-        updateTotal(productTotal);
-    }, [prevBalance])
+    }, [shippingFee, productDiscount ,prevBalance])
 
     const buttonItems = [
         {
@@ -904,6 +918,16 @@ const NewOrderPage = () => {
                         <Row gutter={[16, 16]} style={{ margin: '20px' }}>
                             <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">DISCOUNT(%)</span></Col>
+                            <Col span={6}>
+                                <Input
+                                    placeholder="0"
+                                    style={{ border: 'none', borderBottom: '1px solid #d9d9d9', textAlign: 'right', height: '20px' }}
+                                    value={productDiscount}
+                                    onChange={(e) => { setProductDiscount(e.target.value); }}
+                                />
+                            </Col>
 
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}>

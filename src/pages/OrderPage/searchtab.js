@@ -450,10 +450,10 @@ const SearchTab = () => {
         },
         {
             title: "Total(AUD)",
-            dataIndex: "totalPrice",
+            dataIndex: "orderSubTotal",
             width: "10%",
             render: (_, record) => {
-                const total = parseFloat(record.totalPrice)
+                const total = parseFloat(record.orderSubTotal) * (1 - (record.orderDiscount ?? 0) / 100) + parseFloat(record.orderShippingFee) + parseFloat(record.orderPreBalance);
                 const formattedTotal = total.toFixed(2);
                 return ` ${formattedTotal}`;
             },

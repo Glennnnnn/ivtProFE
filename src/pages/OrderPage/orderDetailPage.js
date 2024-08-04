@@ -31,9 +31,9 @@ const OrderDetailsPage = () => {
     const [loading, setLoading] = useState(false);
 
     const [productTotal, setProductTotal] = useState(0.00);
+    const [productDiscount, setProductDiscount] = useState(0.00);
     const [shippingFee, setShippingFee] = useState(0.00);
     const [prevBalance, setPrevBalance] = useState(0.00);
-    const [allTotal, setAllTotal] = useState(0.00);
     const [tax, setTax] = useState("");
 
     const [recordData, setRecordData] = useState({});
@@ -69,10 +69,10 @@ const OrderDetailsPage = () => {
                     //console.log(posts.data);
                     setRecordData(posts.data);
                     setDataSource(posts.data.orderIvtPoList);
-                    setProductTotal(parseFloat(posts.data.totalPrice) - parseFloat(posts.data.orderShippingFee ?? 0) - parseFloat(posts.data.orderPreBalance ?? 0));
+                    setProductTotal(parseFloat(posts.data.orderSubTotal));
+                    setProductDiscount(parseFloat(posts.data.orderDiscount ?? 0));
                     setShippingFee(parseFloat(posts.data.orderShippingFee ?? 0));
                     setPrevBalance(parseFloat(posts.data.orderPreBalance ?? 0));
-                    setAllTotal(parseFloat(posts.data.totalPrice));
                     setTax(posts.data.orderTaxType === "" || posts.data.orderTaxType === null ? "No Tax" : posts.data.orderTaxType);
                 }
                 else {
@@ -226,7 +226,7 @@ const OrderDetailsPage = () => {
         {
             title: 'Description',
             dataIndex: 'orderIvtDesc',
-            width: "25%",
+            width: "20%",
         },
         {
             title: 'QTY',
@@ -244,6 +244,14 @@ const OrderDetailsPage = () => {
                 const formattedTotal = _.toFixed(2);
                 return ` ${formattedTotal}`;
             },
+        },
+        {
+            title: 'Discount(%)',
+            dataIndex: 'orderIvtDiscount',
+            width: "10%",
+            render: (_) => {
+                return _ ?? 0;
+            }
         },
         {
             title: 'Total(AUD)',
@@ -279,10 +287,10 @@ const OrderDetailsPage = () => {
 
     const renderTax = () => {
         if (tax === "Include") {
-            return ((allTotal - prevBalance) / 11).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) / 11).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((allTotal - prevBalance) * 0.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 0.1).toFixed(2);
         }
         else {
             return 0.00.toFixed(2);
@@ -291,25 +299,25 @@ const OrderDetailsPage = () => {
 
     const renderOrderTotal = () => {
         if (tax === "Include") {
-            return ((allTotal - prevBalance)).toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((allTotal - prevBalance) * 1.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1).toFixed(2);
         }
         else {
-            return (allTotal - prevBalance).toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
     }
 
     const renderTotal = () => {
         if (tax === "Include") {
-            return allTotal.toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return (parseFloat((allTotal - prevBalance) * 1.1) + parseFloat(prevBalance)).toFixed(2);
+            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
         else {
-            return allTotal.toFixed(2);
+            return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
     }
 
@@ -590,6 +598,9 @@ const OrderDetailsPage = () => {
                         <Row gutter={[16, 16]} style={{ margin: '20px' }}>
                             <Col span={6} offset={12}><span className="item-span">SUBTOTAL</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productTotal.toFixed(2)}</span></Col>
+
+                            <Col span={6} offset={12}><span className="item-span">DISCOUNT(%)</span></Col>
+                            <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{productDiscount}</span></Col>
 
                             <Col span={6} offset={12}><span className="item-span">SHIPPING</span></Col>
                             <Col span={6}><span className="item-span" style={{ paddingRight: "8px" }}>{shippingFee.toFixed(2)}</span></Col>
