@@ -440,7 +440,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                         showPrice ?
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableHeaderCell, flex: 0.15 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.45 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.45 }} >{item.ivtClassName} {renderTags(item.tags)}   {item.orderIvtDesc ?? ""}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{item.orderIvtQty}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{parseFloat(item.orderIvtPrice).toFixed(2)}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.10 }}>{item.orderIvtDiscount}</Text>
@@ -448,7 +448,7 @@ const MyDocument = ({ data, showPrice = true }) => (
                             </View> :
                             <View key={index} style={styles.tableRowCell} wrap>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.ivtSubClassCode ?? ""}</Text>
-                                <Text style={{ ...styles.tableItemCell, flex: 0.5 }} >{item.ivtClassName} {item.orderIvtDesc} {renderTags(item.tags)}</Text>
+                                <Text style={{ ...styles.tableItemCell, flex: 0.5 }} >{item.ivtClassName} {renderTags(item.tags)}   {item.orderIvtDesc ?? ""}</Text>
                                 <Text style={{ ...styles.tableItemCell, flex: 0.25 }}>{item.orderIvtQty}</Text>
                             </View>
                     ))}
