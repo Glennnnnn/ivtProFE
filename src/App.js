@@ -28,7 +28,7 @@ import RestockPage from './pages/RestockPage/index.js';
 import NewRestockPage from './pages/RestockPage/newRestock.js';
 import RestockDetailsPage from './pages/RestockPage/restockDetailPage.js';
 import CompanyPage from './pages/CompanyPage/index.js';
-import HomePage from './pages/HomePage/index.js';
+import UploadPage from './pages/HomePage/index.js';
 import IvtCreatePage from './pages/IvtInfoPage/ivtCreatePage.js';
 import IvtDetailPage from './pages/IvtInfoPage/ivtDetailPage.js';
 import IvtEditPage from './pages/IvtInfoPage/ivtEditPage.js';
@@ -150,7 +150,7 @@ const App = () => {
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path='/company' element={isAuthenticated ? <CompanyPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
-            <Route path="/settings" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
+            <Route path="/settings" element={isAuthenticated ? <UploadPage /> : <Navigate to="/login" />} />
             <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/login" />} />
             <Route path='/ivtEditPage' element={isAuthenticated ? <IvtEditPage /> : <Navigate to="/login" />} />
             <Route path="/ivtDetailPage" element={isAuthenticated ? <IvtDetailPage /> : <Navigate to="/login" />} />

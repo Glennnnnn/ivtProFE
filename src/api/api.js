@@ -271,3 +271,16 @@ export const searchCompanyList = async (searchName) => {
     const response = await http.post(`/company/queryCompanyList`, queryBody);
     return response.data;
 }
+
+export const uploadCompanyFile = async (file) => {
+    const formData = new FormData();
+    formData.append("newIvtCsv", file);
+
+    const response = await http.post(`/file/newIvtCsv`, formData, {
+        headers: {
+            'Content-Type': "multipart/form-data"
+        }
+    });
+
+    return response.data;
+}
