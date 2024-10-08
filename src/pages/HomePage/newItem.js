@@ -28,7 +28,7 @@ const NewItemUpload = () => {
     };
 
     const beforeUpload = async (file) => {
-        const isCSV = file.type === "text/csv";
+        const isCSV = file.name.toLowerCase().endsWith(".csv");
         if (!isCSV) {
             message.error("You can only upload CSV file!");
             return false;
