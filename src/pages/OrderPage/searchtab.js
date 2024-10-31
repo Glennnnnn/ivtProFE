@@ -230,10 +230,10 @@ const SearchTab = () => {
         data.forEach(item => {
             item.orderIvtPoList.forEach((eachItem, index) => {
                 if (index === 0) {
-                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(item)},,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},${item.orderCompanyName.replace(',', ' ')},${moment(item.orderDate).format('DD/MM/YYYY')},${renderDueDate(item)},,,,${renderItem(eachItem).replace(',', ' ')},${renderItemDescription(eachItem)} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
                 }
                 else {
-                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${eachItem.ivtClassName.replace(',', ' ')} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
+                    csv += `${item.orderId.replace('PT', '')},,,,,,,${renderItem(eachItem).replace(',', ' ')},${renderItemDescription(eachItem)} ${renderTags(eachItem.tags)},${eachItem.orderIvtQty},${eachItem.orderIvtPrice},${eachItem.orderIvtTotal},${(parseFloat(eachItem.orderIvtTotal) * 0.1).toFixed(2)},GST,\n`;
                 }
             });
             if (item.orderShippingFee !== 0) {
@@ -249,6 +249,15 @@ const SearchTab = () => {
         }
         else {
             return eachItem.ivtCatName + ":" + eachItem.ivtSubClassCode;
+        }
+    }
+
+    function renderItemDescription(eachItem){
+        if(eachItem.ivtSubClassCode === "MSG"){
+            return eachItem.ivtClassName.replace(',', ' ') + ": " + eachItem.orderIvtDesc
+        }
+        else{
+            return eachItem.ivtClassName.replace(',', ' ')
         }
     }
 
