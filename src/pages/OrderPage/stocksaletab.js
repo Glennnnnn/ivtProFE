@@ -252,12 +252,10 @@ const StockSaleTab = () => {
     }
 
     function renderItemDescription(eachItem){
-        if(eachItem.ivtSubClassCode === "MSG"){
-            return eachItem.ivtClassName.replace(',', ' ') + ": " + eachItem.orderIvtDesc
+        if (eachItem.orderIvtDesc !== null && eachItem.orderIvtDesc !== "") {
+            return eachItem.ivtClassName.replace(',', ' ') + ": " + eachItem.orderIvtDesc.replace(',', ' ').replace('\n', ' ')
         }
-        else{
-            return eachItem.ivtClassName.replace(',', ' ')
-        }
+        return eachItem.ivtClassName.replace(',', ' ')
     }
 
     function renderDueDate(data) {

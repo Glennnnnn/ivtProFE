@@ -253,12 +253,10 @@ const SearchTab = () => {
     }
 
     function renderItemDescription(eachItem){
-        if(eachItem.ivtSubClassCode === "MSG"){
-            return eachItem.ivtClassName.replace(',', ' ') + ": " + eachItem.orderIvtDesc
+        if (eachItem.orderIvtDesc !== null && eachItem.orderIvtDesc !== "") {
+            return eachItem.ivtClassName.replace(',', ' ') + ": " + eachItem.orderIvtDesc.replace(',', ' ').replace('\n', ' ')
         }
-        else{
-            return eachItem.ivtClassName.replace(',', ' ')
-        }
+        return eachItem.ivtClassName.replace(',', ' ')
     }
 
     function renderDueDate(data) {
@@ -489,7 +487,7 @@ const SearchTab = () => {
     return (
         <Card style={{ marginTop: "0px", marginLeft: "10px", marginRight: "10px", marginBottom: "10px" }}>
             {contextHolder}
-            <Row gutter={[16, 16]} justify={"center"} style={{marginBottom: 20}}>
+            <Row gutter={[16, 16]} justify={"center"} style={{ marginBottom: 20 }}>
                 <Col span={24}>
                     <Input.Search
                         placeholder="Search Order Id"
