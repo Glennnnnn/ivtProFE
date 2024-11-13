@@ -37,6 +37,7 @@ import { useIvt } from '@/store'
 
 //components
 import './App.css';
+import CompanyDetailsPage from './pages/CompanyPage/companyDetailPage.js';
 
 
 const { Header, Sider, Content } = Layout;
@@ -149,6 +150,7 @@ const App = () => {
             <Route path='/customers' element={isAuthenticated ? <CustomerPage /> : <Navigate to="/login" />} />
             <Route path='/customerDetails' element={isAuthenticated ? <CustomerDetailsPage /> : <Navigate to="/login" />} />
             <Route path='/company' element={isAuthenticated ? <CompanyPage /> : <Navigate to="/login" />} />
+            <Route path='/companyDetails' element={isAuthenticated ? <CompanyDetailsPage /> : <Navigate to="/login" />} />
             <Route path="/inventory" element={isAuthenticated ? <IvtPage /> : <Navigate to="/login" />} />
             <Route path="/settings" element={isAuthenticated ? <UploadPage /> : <Navigate to="/login" />} />
             <Route path="/ivtCreatePage" element={isAuthenticated ? <IvtCreatePage /> : <Navigate to="/login" />} />

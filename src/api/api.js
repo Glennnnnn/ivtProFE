@@ -284,3 +284,13 @@ export const uploadCompanyFile = async (file) => {
 
     return response.data;
 }
+
+export const getRestockCompanyById = async(companyId) => {
+    const response = await http.get(`/company/companyStockBatchWithId?companyId=${companyId}`);
+    return response.data;
+}
+
+export const updateRestockOrderDetails = async(queryBody) => {
+    const response = await http.post(`/updateStockBatch`, queryBody);
+    return response.data;
+}

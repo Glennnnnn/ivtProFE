@@ -123,14 +123,14 @@ const CompanyPage = () => {
             dataIndex: "companyName",
             key: "companyName",
             width: "30%",
-            // render: (companyDBId, record) => {
-            //     const url = `/companyDetail?companyDBId=${record.companyId}`;
-            //     return (
-            //         <NavLink to={url}>
-            //             {companyDBId}
-            //         </NavLink>
-            //     );
-            // },
+            render: (companyDBId, record) => {
+                const url = `/companyDetails?companyId=${record.companyId}`;
+                return (
+                    <NavLink to={url}>
+                        {companyDBId}
+                    </NavLink>
+                );
+            },
         },
         {
             title: "Company Email",

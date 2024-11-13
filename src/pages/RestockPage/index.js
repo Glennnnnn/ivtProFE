@@ -139,6 +139,14 @@ const RestockPage = () => {
             title: "Restock Company",
             dataIndex: "stockBatchCompany",
             width: "20%",
+            render: (stockBatchCompany, record) => {
+                const url = `/companyDetails?companyId=${record.stockBatchCompanyId}`;
+                return (
+                    <NavLink to={url}>
+                        {stockBatchCompany}
+                    </NavLink>
+                );
+            },
         }
     ];
 
