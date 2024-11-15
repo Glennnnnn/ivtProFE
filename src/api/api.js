@@ -272,11 +272,24 @@ export const searchCompanyList = async (searchName) => {
     return response.data;
 }
 
-export const uploadCompanyFile = async (file) => {
+export const uploadNewItemFile = async (file) => {
     const formData = new FormData();
     formData.append("newIvtCsv", file);
 
     const response = await http.post(`/file/newIvtCsv`, formData, {
+        headers: {
+            'Content-Type': "multipart/form-data"
+        }
+    });
+
+    return response.data;
+}
+
+export const updateItemFile = async (file) => {
+    const formData = new FormData();
+    formData.append("updateIvtCsv", file);
+
+    const response = await http.post(`/file/updateIvtCsv`, formData, {
         headers: {
             'Content-Type': "multipart/form-data"
         }
@@ -293,4 +306,9 @@ export const getRestockCompanyById = async(companyId) => {
 export const updateRestockOrderDetails = async(queryBody) => {
     const response = await http.post(`/updateStockBatch`, queryBody);
     return response.data;
+}
+
+export const getInventoryDetailByIdsList = async(queryBody) => {
+    const response = await http.post(`/ivt/ivtDataByIdsOrderByColor`, queryBody);
+    return response.data
 }

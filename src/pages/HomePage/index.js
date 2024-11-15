@@ -2,6 +2,7 @@ import React from "react";
 import { Tabs } from "antd";
 import { PlusSquareOutlined, EditOutlined } from '@ant-design/icons';
 import NewItemUpload from "./newItem";
+import UpdateItemUpload from "./updateItem";
 
 const UploadPage = () => {
     const items = [
@@ -15,7 +16,7 @@ const UploadPage = () => {
         {
             key: "2",
             label: "Update Items",
-            disabled: true,
+            children: <UpdateItemUpload />,
             icon: <EditOutlined />,
             destroyInactiveTabPane: true,
         }
