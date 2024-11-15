@@ -46,7 +46,7 @@ const UpdateItemUpload = () => {
     return (
         <Flex vertical gap="large">
 
-            <img src="/sample.png" alt="sample" style={{ width: "100%", marginTop: '16px', marginBottom: '16px' }} />
+            <img src="/sample2.jpg" alt="sample" style={{ width: "100%", marginTop: '16px', marginBottom: '16px' }} />
 
             <Dragger
                 name="file"
