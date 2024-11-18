@@ -253,7 +253,7 @@ const StockSaleTab = () => {
 
     function renderItemDescription(eachItem){
         if (eachItem.orderIvtDesc !== null && eachItem.orderIvtDesc !== "") {
-            return "DESC: " + eachItem.orderIvtDesc.replace(',', ' ').replace('\n', ' ')
+            return "DESC: " + eachItem.orderIvtDesc.replace(/,/g, ' ').replace(/\n/g, ' ')
         }
         return ""
     }
