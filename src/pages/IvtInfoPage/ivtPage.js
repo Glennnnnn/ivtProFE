@@ -113,7 +113,7 @@ const IvtPage = () => {
     function generateCSV(data) {
         let csv = `Id,Name,Code,Quantity,Price,Note,Alert Amount\n`;
         data.forEach(item => {
-            csv += `ID${item.ivtId},${item.ivtClassName},Code:${item.ivtSubclassCode},${item.ivtQty},${item.ivtPrice},${item.ivtNote === null ? "" : item.ivtNote.replace(',', ' ').replace('\n', ' ')},${item.lowStockAlertAmount}\n`;
+            csv += `ID${item.ivtId},${item.ivtClassName.replace(/,/g, ';')},Code:${item.ivtSubclassCode},${item.ivtQty},${item.ivtPrice},${item.ivtNote === null ? "" : item.ivtNote.replace(/,/g, ' ').replace(/\n/g, ' ')},${item.lowStockAlertAmount}\n`;
         });
         return csv;
     }
