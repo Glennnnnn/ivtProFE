@@ -82,7 +82,7 @@ const IvtPage = () => {
     const handleExport = async () => {
         try {
             setBulkLoading(true);
-            
+
             var queryBody = {
                 "ivtIdList": selectedRowKeys.map(i => i.toString())
             };
@@ -110,10 +110,49 @@ const IvtPage = () => {
         }
     }
 
+    const handleExportQuantity = async () => {
+        try {
+            setBulkLoading(true);
+
+            var queryBody = {
+                "ivtIdList": selectedRowKeys.map(i => i.toString())
+            };
+            const posts = await getInventoryDetailByIdsList(queryBody);
+
+            if (posts.code === 200) {
+                const csvData = generateQuantityCSV(posts.data);
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+                saveAs(blob, 'inventoryQuantity.csv');
+
+                messageApi.open({
+                    type: 'success',
+                    content: 'Export Inventory Quantity Success!',
+                })
+            }
+        }
+        catch (error) {
+            console.log(error);
+            messageApi.open({
+                type: "error",
+                content: "Export Inventory Quantity Error!",
+            });
+        } finally {
+            setBulkLoading(false);
+        }
+    }
+
     function generateCSV(data) {
         let csv = `Id,Name,Code,Quantity,Price,Note,Alert Amount\n`;
         data.forEach(item => {
             csv += `ID${item.ivtId},${item.ivtClassName.replace(/,/g, ';')},Code:${item.ivtSubclassCode},${item.ivtQty},${item.ivtPrice},${item.ivtNote === null ? "" : item.ivtNote.replace(/,/g, ' ').replace(/\n/g, ' ')},${item.lowStockAlertAmount}\n`;
+        });
+        return csv;
+    }
+
+    function generateQuantityCSV(data) {
+        let csv = `Id,Name,Quantity\n`;
+        data.forEach(item => {
+            csv += `ID${item.ivtId},${item.ivtClassName.replace(/,/g, ';')},${item.ivtQty}\n`;
         });
         return csv;
     }
@@ -270,6 +309,15 @@ const IvtPage = () => {
                                         Export Inventory
                                     </Button>
                                 </Popconfirm>
+                                {/* <Popconfirm title="Are you sure you want to export selected inventory?"
+                                    onConfirm={handleExportQuantity}
+                                    okText="Yes"
+                                    cancelText="No">
+                                    <Button type="primary" className="new-customer-button" icon={<DownloadOutlined />} disabled={!hasSelected} loading={bulkLoading}
+                                        style={{ backgroundColor: hasSelected ? "green" : "", color: hasSelected ? "white" : "" }}>
+                                        Quantity Only
+                                    </Button>
+                                </Popconfirm> */}
                             </Col>
                             <Col>
                                 <Input.Search

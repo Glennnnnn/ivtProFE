@@ -3,6 +3,8 @@ import { Tabs } from "antd";
 import { PlusSquareOutlined, EditOutlined } from '@ant-design/icons';
 import NewItemUpload from "./newItem";
 import UpdateItemUpload from "./updateItem";
+import UpdateQuantityUpload from "./updateQuantity";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 const UploadPage = () => {
     const items = [
@@ -17,6 +19,14 @@ const UploadPage = () => {
             key: "2",
             label: "Update Items",
             children: <UpdateItemUpload />,
+            icon: <EditOutlined />,
+            destroyInactiveTabPane: true,
+        },
+        {
+            key: "3",
+            label: "Update Quantity",
+            disabled: true,
+            children: <UpdateQuantityUpload />,
             icon: <EditOutlined />,
             destroyInactiveTabPane: true,
         }

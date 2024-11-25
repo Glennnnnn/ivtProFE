@@ -18,7 +18,7 @@ import {
     EditOutlined, UserOutlined, BarsOutlined
 } from '@ant-design/icons'
 import { NavLink } from "react-router-dom";
-import { getRestockCompanyById } from '../../api/api.js'
+import { getRestockCompanyById, updateCompanyById } from '../../api/api.js'
 import moment from "moment";
 import dayjs from "dayjs";
 
@@ -29,7 +29,7 @@ const CompanyDetailsPage = () => {
 
     const { Content } = Layout;
     const [messageApi, contextHolder] = message.useMessage();
-    // const [form] = Form.useForm();
+    const [form] = Form.useForm();
 
     const [recordData, setRecordData] = useState({});
     const [dataSource, setDataSource] = useState([]);
@@ -61,44 +61,67 @@ const CompanyDetailsPage = () => {
     }, []);
 
 
-    // const [editVisible, setEditVisible] = useState(false);
-    // const [editLoading, setEditLoading] = useState(false);
-    // const showEditModel = () => {
-    //     setEditVisible(true);
-    // }
+    const [editVisible, setEditVisible] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
+    const showEditModel = () => {
+        setEditVisible(true);
+    }
 
 
-    // const handleEditOk = async () => {
-    //     form.validateFields().then(async (values) => {
-    //         setEditLoading(true);
+    const handleEditOk = async () => {
+        form.validateFields().then(async (values) => {
+            setEditLoading(true);
+            try {
+                const queryBody = {
+                    "companyId": companyId,
+                    "companyName": values.companyName,
+                    "companyEmail": values.companyEmail,
+                    "companyPhone": values.companyPhone
+                }
+                
+                const posts = await updateCompanyById(queryBody);
+                if (posts.code === 200) {
+                    setEditVisible(false);
+                    form.resetFields();
+                    messageApi.open({
+                        type: 'success',
+                        content: 'Edit Company Success!',
+                    })
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000)
+                }
+                else {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Edit Company Error!'
+                    })
+                }
+            }
+            catch (error) {
+                console.log(error);
+                messageApi.open({
+                    type: 'error',
+                    content: 'Edit Company Error!'
+                })
+            }
+        }).catch((errorInfo) => {
+            messageApi.open({
+                type: 'error',
+                content: 'Please fill in the required fields!'
+            })
 
-    //         try {
+        }).finally(() => {
+            setEditLoading(false);
 
-    //         }
-    //         catch (error) {
-    //             console.log(error);
-    //             messageApi.open({
-    //                 type: 'error',
-    //                 content: 'Edit Company Error!'
-    //             })
-    //         }
-    //     }).catch((errorInfo) => {
-    //         messageApi.open({
-    //             type: 'error',
-    //             content: 'Please fill in the required fields!'
-    //         })
+        });
+    }
 
-    //     }).finally(() => {
-    //         setEditLoading(false);
-
-    //     });
-    // }
-
-    // const handleEditCancel = () => {
-    //     setEditVisible(false);
-    //     setEditLoading(false);
-    //     form.resetFields();
-    // }
+    const handleEditCancel = () => {
+        setEditVisible(false);
+        setEditLoading(false);
+        form.resetFields();
+    }
 
     const columns = [
         {
@@ -160,7 +183,7 @@ const CompanyDetailsPage = () => {
                             { marginBottom: '20px' }
                         } />
 
-                    {/* <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
+                    <div style={{ display: 'flex', marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
                         <div style={{ marginLeft: 'auto' }}>
                             <Button type="default" icon={<EditOutlined />} size="large" onClick={showEditModel} className="edit-customer-details-button" style={{ backgroundColor: "orange", color: "white" }}> Edit</Button>
                         </div>
@@ -206,7 +229,7 @@ const CompanyDetailsPage = () => {
                                 <Input placeholder="Phone Number" className="form-item" />
                             </Form.Item>
                         </Form>
-                    </Modal> */}
+                    </Modal>
 
                     <div style={{ marginBottom: '20px' }}>
                         <Row gutter={[16, 64]}>
