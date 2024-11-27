@@ -309,7 +309,7 @@ const IvtPage = () => {
                                         Export Inventory
                                     </Button>
                                 </Popconfirm>
-                                {/* <Popconfirm title="Are you sure you want to export selected inventory?"
+                                <Popconfirm title="Are you sure you want to export selected inventory?"
                                     onConfirm={handleExportQuantity}
                                     okText="Yes"
                                     cancelText="No">
@@ -317,7 +317,7 @@ const IvtPage = () => {
                                         style={{ backgroundColor: hasSelected ? "green" : "", color: hasSelected ? "white" : "" }}>
                                         Quantity Only
                                     </Button>
-                                </Popconfirm> */}
+                                </Popconfirm>
                             </Col>
                             <Col>
                                 <Input.Search
