@@ -43,7 +43,9 @@ function IvtDetailPage() {
   const [orderSearchParams, setOrderSearchParams] = useState({
     ivtId: ivtId,
     pageIndex: 1,
-    pageSize: 5
+    pageSize: 5,
+    field: "orderDate",
+    order: "descend"
   })
   useEffect(() => {
     const queryBasicDataAsync = async () => {
