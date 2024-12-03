@@ -23,7 +23,7 @@ import {
 import moment from "moment";
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom';
-import { searchProductList, getOrderDetailByDBId, editOrderById } from "@/api/api.js";
+import { searchProductList, getOrderDetailByDBId, editOrderById, searchCustomerList, getCustomerDetailById } from "@/api/api.js";
 
 const { Option } = Select;
 
@@ -138,6 +138,10 @@ const EditOrderPage = () => {
     const [isCashSale, setIsCashSale] = useState();
     const [loading, setLoading] = useState(false);
     const [productList, setProductList] = useState([]);
+
+    const [customerList, setCustomerList] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState('');
+    const [searchValue, setSearchValue] = useState('');
 
     const [productTotal, setProductTotal] = useState(0.00);
     const [productDiscount, setProductDiscount] = useState(0.00);
@@ -341,6 +345,30 @@ const EditOrderPage = () => {
         updateCustomerFormData();
     }, [orderDetail])
 
+    useEffect(() => {
+        const fetchCustomerData = async () => {
+            try {
+                setLoading(true);
+                const posts = await searchCustomerList(searchValue);
+                if (posts.code === 200) {
+                    setCustomerList(posts.data.customerInterPos);
+                } else {
+                    messageApi.open({
+                        type: "error",
+                        content: "Loading Customers Error!",
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCustomerData();
+    }, [searchValue]);
+
     const handleInputChange = (rowNo, dataIndex, value) => {
         const newData = data.map((item) => {
             if (item.rowNo === rowNo) {
@@ -348,10 +376,10 @@ const EditOrderPage = () => {
                     return { ...item, [dataIndex]: value, total: value * item.price * (1 - item.discount / 100) }
                 }
                 if (dataIndex === 'price') {
-                    return { ...item, [dataIndex]: value, total: value * item.qty * (1 - item.discount / 100)}
+                    return { ...item, [dataIndex]: value, total: value * item.qty * (1 - item.discount / 100) }
                 }
                 if (dataIndex === 'discount') {
-                    return { ...item, [dataIndex]: value, total: item.price * item.qty * (1 - value / 100)}
+                    return { ...item, [dataIndex]: value, total: item.price * item.qty * (1 - value / 100) }
                 }
                 return { ...item, [dataIndex]: value, };
             }
@@ -387,6 +415,7 @@ const EditOrderPage = () => {
     }
 
     const updateCustomerFormData = () => {
+        setSelectedCustomer(orderDetail.customerInterPo?.customerId.toString() ?? "");
         customerForm.setFieldsValue({
             companyName: orderDetail.orderCompanyName,
             customerName: orderDetail.orderCustomerName,
@@ -395,6 +424,30 @@ const EditOrderPage = () => {
             deliveryAddress: orderDetail.orderDeliveryAddress,
             billingAddress: orderDetail.orderBillingAddress,
         })
+    }
+
+    const handleSelectedCustomer = (e) => {
+        setSearchValue('');
+        setSelectedCustomer(e);
+        fetchCustomerDetail(e);
+    }
+
+    const fetchCustomerDetail = async (customerId) => {
+        try {
+            const posts = await getCustomerDetailById(customerId);
+            if (posts.code === 200) {
+                customerForm.setFieldsValue({
+                    companyName: posts.data.companyName,
+                    customerName: posts.data.customerName,
+                    customerPhone: posts.data.customerPhone,
+                    customerEmail: posts.data.customerEmail,
+                    deliveryAddress: posts.data.deliveryAddress,
+                    billingAddress: posts.data.billingAddress,
+                })
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     }
 
     const handleSelectChange = (rowNo, selectedProduct) => {
@@ -488,7 +541,7 @@ const EditOrderPage = () => {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 1.1).toFixed(2);
         }
         else {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
@@ -500,7 +553,7 @@ const EditOrderPage = () => {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1) + parseFloat(prevBalance)).toFixed(2);
+            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
         else {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
@@ -523,7 +576,7 @@ const EditOrderPage = () => {
             return { isValid, reason };
         }
 
-        if (productDiscount < 0 || productDiscount > 100){
+        if (productDiscount < 0 || productDiscount > 100) {
             isValid = false;
             reason = "Discount should between 0 and 100!";
             return { isValid, reason };
@@ -542,7 +595,7 @@ const EditOrderPage = () => {
                 return { isValid, reason };
             }
 
-            if (item.discount < 0 || item.discount > 100){
+            if (item.discount < 0 || item.discount > 100) {
                 isValid = false;
                 reason = "Item Discount should between 0 and 100!";
                 return { isValid, reason };
@@ -571,6 +624,7 @@ const EditOrderPage = () => {
                     "isCashSale": isCashSale,
                     "orderTaxType": tax,
                     //Customer
+                    "customerId": selectedCustomer,
                     "orderCompanyName": newCustomerDetails.companyName ?? "",
                     "orderCustomerName": newCustomerDetails.customerName ?? "",
                     "orderDeliveryAddress": newCustomerDetails.deliveryAddress ?? "",
@@ -580,7 +634,7 @@ const EditOrderPage = () => {
                     //Product
                     "productList": data,
                 };
-
+                //console.log(queryBody);
                 const posts = await editOrderById(queryBody);
                 if (posts.code === 200) {
                     messageApi.open({
@@ -729,7 +783,28 @@ const EditOrderPage = () => {
                                                 <Form.Item
                                                     label="* Company Name"
                                                     name="companyName">
-                                                    <Input placeholder="* Company Name" className="form-item" disabled />
+                                                    {/* <Input placeholder="* Company Name" className="form-item"/> */}
+                                                    <Select
+                                                        showSearch
+                                                        className="form-item"
+                                                        value={selectedCustomer}
+                                                        placeholder="Search for customer"
+                                                        onSearch={(value) => setSearchValue(value)}
+                                                        onChange={handleSelectedCustomer}
+                                                        optionLabelProp="label"
+                                                        loading={loading}
+                                                        defaultActiveFirstOption={false}
+                                                        filterOption={false}
+                                                        style={{ width: '100%' }}>
+                                                        {customerList.map((customer) => (
+                                                            <Option key={customer.customerId.toString()} value={customer.customerId.toString()} label={customer.companyName.toString()}>
+                                                                <div>{`${customer.companyName}`}</div>
+                                                                {customer.customerName && <div>{`Name: ${customer.customerName}`}</div>}
+                                                                {customer.customerPhone && <div>{`Phone: ${customer.customerPhone}`}</div>}
+                                                                {customer.customerEmail && <div>{`Email: ${customer.customerEmail}`}</div>}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
                                                 </Form.Item>
 
                                                 <Form.Item name="customerName" label="Customer Name">
