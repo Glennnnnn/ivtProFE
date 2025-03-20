@@ -294,10 +294,10 @@ const renderTaxTitle = (data) => {
 
 const renderTaxNumber = (data) => {
     if (data.orderTaxType === "Include") {
-        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) / 11).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)) / 11).toFixed(2);
     }
     else if (data.orderTaxType === "Exclude") {
-        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 0.1).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)) * 0.1).toFixed(2);
     }
     else {
         return 0.00.toFixed(2);
@@ -306,22 +306,22 @@ const renderTaxNumber = (data) => {
 
 const renderOrderTotalNumber = (data) => {
     if (data.orderTaxType === "Include") {
-        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)).toFixed(2);
     }
     else if (data.orderTaxType === "Exclude") {
-        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 1.1).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)) * 1.1).toFixed(2);
     }
     else {
-        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)).toFixed(2);
     }
 }
 
 const renderTotalNumber = (data) => {
     if (data.orderTaxType === "Exclude") {
-        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee)) * 1.1 + parseFloat(data.orderPreBalance)).toFixed(2);
+        return ((parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0)) * 1.1 + parseFloat(data.orderPreBalance)).toFixed(2);
     }
     else {
-        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee) + parseFloat(data.orderPreBalance)).toFixed(2);
+        return (parseFloat(data.orderSubTotal) * (1 - parseFloat(data.orderDiscount) / 100) + parseFloat(data.orderShippingFee ?? 0) + parseFloat(data.orderPreBalance)).toFixed(2);
     }
 }
 
@@ -476,7 +476,7 @@ const MyDocument = ({ data, showPrice = true }) => (
 
                                     <View style={styles.tableRow}>
                                         <Text style={styles.smallSubscriptName}>SHIPPING</Text>
-                                        <Text style={styles.smallSubscriptNumber}>{parseFloat(data.orderShippingFee).toFixed(2)}</Text>
+                                        <Text style={styles.smallSubscriptNumber}>{parseFloat(data.orderShippingFee ?? 0).toFixed(2)}</Text>
                                     </View>
 
                                     {data.isCashSale || data.orderTaxType === "" || data.orderTaxType === null || data.orderTaxType === "No Tax" ?
