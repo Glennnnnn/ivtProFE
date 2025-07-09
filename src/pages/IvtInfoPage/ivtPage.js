@@ -338,7 +338,8 @@ const IvtPage = () => {
                                 current: searchParas.pageIndex,
                                 pageSize: searchParas.pageSize,
                                 total: ivtCount,
-                                onChange: handlePageChange
+                                onChange: handlePageChange,
+                                pageSizeOptions:['10', '20', '50', '100', '2000'],
                             }}
                         />
                     </Card>

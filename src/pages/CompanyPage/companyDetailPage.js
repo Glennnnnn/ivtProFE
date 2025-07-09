@@ -13,6 +13,7 @@ import {
     message,
     Modal,
     Input,
+    Switch,
 } from 'antd';
 import {
     EditOutlined, UserOutlined, BarsOutlined
@@ -76,7 +77,8 @@ const CompanyDetailsPage = () => {
                     "companyId": companyId,
                     "companyName": values.companyName,
                     "companyEmail": values.companyEmail,
-                    "companyPhone": values.companyPhone
+                    "companyPhone": values.companyPhone,
+                    "delFlag": !values.companyStatus,
                 }
                 
                 const posts = await updateCompanyById(queryBody);
@@ -228,6 +230,10 @@ const CompanyDetailsPage = () => {
                             <Form.Item label="Phone Number" name="companyPhone" initialValue={recordData.companyPhone}>
                                 <Input placeholder="Phone Number" className="form-item" />
                             </Form.Item>
+
+                            <Form.Item label="Is Active" name="companyStatus" initialValue={!recordData.delFlag} valuePropName="checked">
+                                <Switch />
+                            </Form.Item>
                         </Form>
                     </Modal>
 
@@ -242,6 +248,11 @@ const CompanyDetailsPage = () => {
                                             </Col>
                                             <Col span={18}>
                                                 {recordData.companyName}
+                                            </Col>
+                                            <Col span={4} style={{ textAlign: 'right' }}>
+                                                <Tag color={recordData.delFlag ? "volcano" : "green"}>
+                                                    {recordData.delFlag ? "inactive" : "active"}
+                                                </Tag>
                                             </Col>
                                         </Row>}
                                     bordered={false}
