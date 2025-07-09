@@ -9,7 +9,7 @@ import {
   Layout,
   Breadcrumb,
   Space,
-  Select, Button, Divider, Tag, message
+  Select, Button, Divider, Tag, message, Switch
 } from 'antd';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 // import { createBrowserHistory } from 'history'
@@ -91,7 +91,8 @@ const IvtEditPage = () => {
 
   const navigateDetail = () => {
     let data = { "prePage": "inventory", "ivtId": JSON.stringify(baseData.ivtId) }
-    navigate("/ivtDetailPage", { state: data });
+    let url = `/ivtDetailPage?ivtId=${baseData.ivtId}`;
+    navigate(url, { state: data });
   }
 
 
@@ -109,6 +110,7 @@ const IvtEditPage = () => {
     } else {
       values.isQtyModified = false
     }
+    values.delFlag = values.delFlag === true ? 0 : 1;
     console.log('Received values of form: ', values);
     setSubmitLoading(true)
     let res = await http.post("/ivt/updateIvt", { values })
@@ -142,6 +144,7 @@ const IvtEditPage = () => {
       'ivtValue': baseData.ivtValue,
       'ivtPrice': baseData.ivtPrice,
       'ivtNote': baseData.ivtNote,
+      'delFlag': !baseData.delFlag,
       'tags': (function () {
         let _tags = {}
         for (let i = 0; i < baseData.tags.length; i++) {
@@ -294,6 +297,9 @@ const IvtEditPage = () => {
 
           <Form.Item name="ivtNote" label="Note">
             <TextArea rows={4} />
+          </Form.Item>
+          <Form.Item name="delFlag" label="Is Active">
+            <Switch />
           </Form.Item>
           {/* <Form.Item label="Select">
             <Select>
