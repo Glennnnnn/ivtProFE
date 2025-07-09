@@ -406,7 +406,7 @@ const NewRestockPage = () => {
                 setLoading(true);
                 const posts = await searchCompanyList(searchValue);
                 if (posts.code === 200) {
-                    setCompanyList(posts.data.companyPoList);
+                    setCompanyList(posts.data.companyPoList.filter(company => !company.delFlag));
                 } else {
                     messageApi.open({
                         type: "error",
