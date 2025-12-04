@@ -20,7 +20,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { getOrderDetailByDBId, updateOrderStatus, deleteOrderById } from '../../api/api.js'
 import moment from "moment";
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 import MyDocument from './document'
 
 
@@ -56,6 +56,15 @@ const OrderDetailsPage = () => {
     const showPrintModel = () => {
         setPrintVisible(true);
     }
+
+    const downloadPDF = async (data, showPrice) => {
+        const blob = await pdf(<MyDocument data={data} showPrice={showPrice} />).toBlob();
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = data.orderId + '.pdf';
+        link.click();
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -302,7 +311,7 @@ const OrderDetailsPage = () => {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1).toFixed(2);
+            return ((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 1.1).toFixed(2);
         }
         else {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)).toFixed(2);
@@ -314,7 +323,7 @@ const OrderDetailsPage = () => {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
         }
         else if (tax === "Exclude") {
-            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee))* 1.1) + parseFloat(prevBalance)).toFixed(2);
+            return (((productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee)) * 1.1) + parseFloat(prevBalance)).toFixed(2);
         }
         else {
             return (productTotal * (1 - productDiscount / 100) + parseFloat(shippingFee) + parseFloat(prevBalance)).toFixed(2);
@@ -556,34 +565,29 @@ const OrderDetailsPage = () => {
                         width={600}
                         centered
                         footer={[
-                            <PDFDownloadLink
+                            <Button
                                 key="printYes"
-                                document={<MyDocument data={recordData} showPrice={true} />}
-                                fileName={recordData.orderId + ".pdf"}>
-                                {({ blob, url, loading, error }) => (
-                                    <Button
-                                        size="large"
-                                        className="edit-customer-details-button"
-                                        style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                                        onClick={handlePrintCancel}>
-                                        {loading ? 'Loading...' : 'Yes'}
-                                    </Button>
-                                )}
-                            </PDFDownloadLink>,
-                            <PDFDownloadLink
+                                size="large"
+                                className="edit-customer-details-button"
+                                style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                                onClick={async () => {
+                                    await downloadPDF(recordData, true);
+                                    handlePrintCancel();
+                                }}>
+                                Yes
+                            </Button>,
+
+                            <Button
                                 key="printNo"
-                                document={<MyDocument data={recordData} showPrice={false} />}
-                                fileName={recordData.orderId + ".pdf"}>
-                                {({ blob, url, loading, error }) => (
-                                    <Button
-                                        size="large"
-                                        className="edit-customer-details-button"
-                                        style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                                        onClick={handlePrintCancel}>
-                                        {loading ? 'Loading...' : 'No'}
-                                    </Button>
-                                )}
-                            </PDFDownloadLink>,
+                                size="large"
+                                className="edit-customer-details-button"
+                                style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                                onClick={async () => {
+                                    await downloadPDF(recordData, false);
+                                    handlePrintCancel();
+                                }}>
+                                No
+                            </Button>,
                         ]}>
                     </Modal>
 
